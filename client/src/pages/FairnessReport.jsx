@@ -21,6 +21,7 @@ import {
 import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 //import { getCategoryColor } from "../utils/fairness.js";
 // getCategoryColor not currently used in this component
 
@@ -61,6 +62,7 @@ function getDateRange(filter) {
 }
 
 export default function FairnessReport() {
+  useDocumentTitle("Fairness Report");
   const { currentGroup } = useGroup();
   const [period, setPeriod] = useState("all");
   const [report, setReport] = useState(null);

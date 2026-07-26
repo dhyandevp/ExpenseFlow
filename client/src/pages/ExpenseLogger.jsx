@@ -17,6 +17,7 @@ import { formatINR } from "../utils/formatCurrency";
 import ExpenseForm from "../components/ExpenseForm";
 import BalanceChip from "../components/BalanceChip";
 import { getBalances } from "../api/client";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const categoryIcons = {
   Rent: Home,
@@ -37,6 +38,7 @@ const categoryColors = {
 };
 
 export default function ExpenseLogger() {
+  useDocumentTitle("Log Expenses");
   const { currentGroup, setCurrentGroup } = useGroup();
   const location = useLocation();
   const navigate = useNavigate();

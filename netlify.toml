@@ -8,7 +8,7 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = { Path = ["!/api/*", "!/assets/*", "!/*.json", "!/*.ico", "!/*.png", "!/*.svg"] }
+  conditions = { Path = ["!/api/*", "!/assets/*", "!/*.json", "!/*.ico", "!/*.png", "!/*.svg", "!/robots.txt", "!/sitemap.xml"] }
 
 # ── API proxy: forward /api/* to the backend server ───────────
 [[redirects]]
@@ -29,3 +29,13 @@
     X-Content-Type-Options = "nosniff"
     X-Frame-Options = "DENY"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/robots.txt"
+  [headers.values]
+    Content-Type = "text/plain"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml"

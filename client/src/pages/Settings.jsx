@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useGroup } from "../App";
 import { updateGroup, removeMember } from "../api/client";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 function getCategories(group) {
   return group?.categories?.length > 0
@@ -35,6 +36,7 @@ const modelOptions = [
 ];
 
 export default function SettingsPage() {
+  useDocumentTitle("Group Settings");
   const { currentGroup, setCurrentGroup } = useGroup();
   const navigate = useNavigate();
 

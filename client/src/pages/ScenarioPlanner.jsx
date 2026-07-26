@@ -23,6 +23,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 function getGroupCategories(group) {
   return group?.categories?.length > 0
@@ -52,6 +53,7 @@ const prebuiltExamples = [
 ];
 
 export default function ScenarioPlanner() {
+  useDocumentTitle("Scenario Planner");
   const { currentGroup } = useGroup();
   const members = currentGroup?.members || [];
 

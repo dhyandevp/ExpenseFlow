@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -19,6 +20,7 @@ const fadeUp = {
 };
 
 export default function Landing() {
+  useDocumentTitle("Free Expense Sharing App for Roommates & Couples");
   const navigate = useNavigate();
   const [joinCode, setJoinCode] = useState("");
   const [joinError, setJoinError] = useState("");

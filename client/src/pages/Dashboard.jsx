@@ -26,6 +26,7 @@ import {
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { getFairnessColor, getCategoryColor } from "../utils/fairness";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 const timeFilters = [
   { label: "All Time", value: "all" },
@@ -61,6 +62,7 @@ function getDateRange(filter) {
 }
 
 export default function Dashboard() {
+  useDocumentTitle("Dashboard");
   const { currentGroup } = useGroup();
   const [timeFilter, setTimeFilter] = useState("all");
 

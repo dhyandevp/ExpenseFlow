@@ -4,8 +4,10 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useGroup } from "../App";
 import { getGroupByCode } from "../api/client";
+import useDocumentTitle from "../hooks/useDocumentTitle";
 
 export default function JoinGroup() {
+  useDocumentTitle("Join Group");
   const { code } = useParams();
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
