@@ -23,10 +23,13 @@ import {
   getBalances,
   getBreakdown,
   getFairnessScore,
+  applyDueRecurring,
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { getFairnessColor, getCategoryColor } from "../utils/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import FairnessTrend from "../components/FairnessTrend";
+import SettlementHistory from "../components/SettlementHistory";
 
 const timeFilters = [
   { label: "All Time", value: "all" },
@@ -89,6 +92,13 @@ export default function Dashboard() {
       .catch(console.error)
       .finally(() => setLoading(false));
   }, [currentGroup, timeFilter]);
+
+  // Auto-apply overdue recurring expenses on mount
+  useEffect(() => {
+    if (currentGroup) {
+      applyDueRecurring(currentGroup.id).catch(() => {});
+    }
+  }, [currentGroup]);
 
   if (!currentGroup) return null;
 
@@ -251,6 +261,9 @@ export default function Dashboard() {
           </motion.div>
         )}
       </div>
+
+      {/* Settlement History */}
+      <SettlementHistory />
 
       {/* Bar chart */}
       {chartData.length > 0 && (
@@ -432,6 +445,9 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* Fairness Trend */}
+      <FairnessTrend />
     </div>
   );
 }

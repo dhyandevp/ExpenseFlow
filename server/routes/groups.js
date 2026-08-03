@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { z } from "zod";
+import crypto from "node:crypto";
 import { getDB } from "../db.js";
 import { seedDefaultCategories } from "./categories.js";
 
@@ -7,11 +8,12 @@ const router = Router();
 
 function generateCode() {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
-  let code = "";
-  for (let i = 0; i < 6; i++) {
-    code += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return code;
+  const bytes = crypto.randomBytes(6);
+  return Array.from(bytes).map(b => chars[b % chars.length]).join("");
+}
+
+function hashPin(pin) {
+  return crypto.createHash("sha256").update(String(pin)).digest("hex");
 }
 
 const createGroupSchema = z.object({
@@ -135,7 +137,7 @@ router.post("/", (req, res, next) => {
   }
 });
 
-// GET /api/groups/:code — Get group by code
+// GET /api/groups/:code — Get group by code (rate-limited separately in index.js)
 router.get("/:code", (req, res, next) => {
   try {
     const db = getDB();
@@ -150,6 +152,18 @@ router.get("/:code", (req, res, next) => {
       });
     }
 
+    // PIN verification if group has one set
+    if (group.pin_hash) {
+      const pin = req.query.pin;
+      if (!pin || hashPin(pin) !== group.pin_hash) {
+        return res.status(403).json({
+          success: false,
+          message: "This group requires a PIN to join.",
+          requires_pin: true,
+        });
+      }
+    }
+
     const members = db
       .prepare("SELECT * FROM members WHERE group_id = ? ORDER BY id")
       .all(group.id);
@@ -161,9 +175,11 @@ router.get("/:code", (req, res, next) => {
       .prepare("SELECT * FROM categories WHERE group_id = ? ORDER BY sort_order ASC, id ASC")
       .all(group.id);
 
+    // Don't send pin_hash to client
+    const { pin_hash, ...groupData } = group;
     res.json({
       success: true,
-      data: { ...group, members, fairness_models: fairnessModels, categories },
+      data: { ...groupData, has_pin: !!pin_hash, members, fairness_models: fairnessModels, categories },
     });
   } catch (err) {
     next(err);
@@ -240,6 +256,56 @@ router.put("/:id", (req, res, next) => {
     ).run(...values);
 
     res.json({ success: true, message: "Group updated." });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/groups/:id/regenerate-code — Generate a new invite code
+router.post("/:id/regenerate-code", (req, res, next) => {
+  try {
+    const db = getDB();
+    let newCode;
+    let attempts = 0;
+    while (attempts < 10) {
+      newCode = generateCode();
+      const existing = db.prepare("SELECT id FROM groups WHERE code = ?").get(newCode);
+      if (!existing) break;
+      attempts++;
+    }
+
+    db.prepare("UPDATE groups SET code = ? WHERE id = ?").run(newCode, req.params.id);
+
+    res.json({
+      success: true,
+      data: { code: newCode },
+      message: "Invite code regenerated! Share the new code with your group.",
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// POST /api/groups/:id/set-pin — Set or remove a group PIN
+router.post("/:id/set-pin", (req, res, next) => {
+  try {
+    const db = getDB();
+    const { pin } = req.body;
+
+    if (pin === null || pin === "" || pin === undefined) {
+      // Remove PIN
+      db.prepare("UPDATE groups SET pin_hash = NULL WHERE id = ?").run(req.params.id);
+      return res.json({ success: true, message: "Group PIN removed." });
+    }
+
+    if (String(pin).length < 4 || String(pin).length > 8) {
+      return res.status(400).json({ success: false, message: "PIN must be 4-8 characters." });
+    }
+
+    const pinHash = hashPin(pin);
+    db.prepare("UPDATE groups SET pin_hash = ? WHERE id = ?").run(pinHash, req.params.id);
+
+    res.json({ success: true, message: "Group PIN set!" });
   } catch (err) {
     next(err);
   }

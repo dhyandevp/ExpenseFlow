@@ -23,13 +23,27 @@ export const createGroup = (groupData) =>
     body: JSON.stringify(groupData),
   });
 
-export const getGroupByCode = (code) => request(`/groups/${code}`);
+export const getGroupByCode = (code, pin) => {
+  const params = new URLSearchParams();
+  if (pin) params.set("pin", pin);
+  const qs = params.toString();
+  return request(`/groups/${code}${qs ? `?${qs}` : ""}`);
+};
 
 export const getGroupById = (id) => request(`/groups/id/${id}`);
 
 export const updateGroup = (id, data) =>
   request(`/groups/${id}`, {
     method: "PUT",
+    body: JSON.stringify(data),
+  });
+
+export const regenerateCode = (groupId) =>
+  request(`/groups/${groupId}/regenerate-code`, { method: "POST" });
+
+export const setGroupPin = (groupId, data) =>
+  request(`/groups/${groupId}/set-pin`, {
+    method: "POST",
     body: JSON.stringify(data),
   });
 
@@ -169,3 +183,66 @@ export const updateFairnessModel = (groupId, category, data) =>
     method: "PUT",
     body: JSON.stringify(data),
   });
+
+// Recurring expenses
+export const getRecurringTemplates = (groupId) =>
+  request(`/groups/${groupId}/recurring`);
+
+export const createRecurringTemplate = (groupId, data) =>
+  request(`/groups/${groupId}/recurring`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const updateRecurringTemplate = (groupId, rid, data) =>
+  request(`/groups/${groupId}/recurring/${rid}`, {
+    method: "PUT",
+    body: JSON.stringify(data),
+  });
+
+export const deleteRecurringTemplate = (groupId, rid) =>
+  request(`/groups/${groupId}/recurring/${rid}`, { method: "DELETE" });
+
+export const applyRecurringTemplate = (groupId, rid) =>
+  request(`/groups/${groupId}/recurring/${rid}/apply`, { method: "POST" });
+
+export const applyDueRecurring = (groupId) =>
+  request(`/groups/${groupId}/recurring/apply-due`, { method: "POST" });
+
+// Settlements
+export const getSettlements = (groupId) =>
+  request(`/groups/${groupId}/settlements`);
+
+export const recordSettlement = (groupId, data) =>
+  request(`/groups/${groupId}/settlements`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+
+export const deleteSettlement = (groupId, sid) =>
+  request(`/groups/${groupId}/settlements/${sid}`, { method: "DELETE" });
+
+// Fairness trend
+export const getFairnessTrend = (groupId) =>
+  request(`/groups/${groupId}/fairness-trend`);
+
+export const snapshotFairness = (groupId) =>
+  request(`/groups/${groupId}/fairness-trend/snapshot`, { method: "POST" });
+
+// Upload (uses FormData, not JSON)
+export const uploadReceipt = async (file) => {
+  const formData = new FormData();
+  formData.append("receipt", file);
+
+  const response = await fetch(`${BASE_URL}/upload/receipt`, {
+    method: "POST",
+    body: formData,
+    // Don't set Content-Type header — browser sets it with boundary for multipart
+  });
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message || "Upload failed");
+  }
+  return data;
+};

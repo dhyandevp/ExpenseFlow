@@ -2,5 +2,6 @@ User-agent: *
 Allow: /
 Disallow: /api/
 Disallow: /group/
+Disallow: /join/
 
 Sitemap: https://balance-board.netlify.app/sitemap.xml

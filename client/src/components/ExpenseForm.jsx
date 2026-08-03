@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 import { useGroup } from "../App";
+import ReceiptUpload from "./ReceiptUpload";
 
 // Categories from group data - defaults if not loaded yet
 function getGroupCategories(group) {
@@ -27,6 +28,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     expense_date: new Date().toISOString().split("T")[0],
     split_type: "equal",
     split_members: [],
+    receipt_path: null,
   });
 
   // Lock body scroll when modal is open
@@ -59,6 +61,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
         expense_date: new Date().toISOString().split("T")[0],
         split_type: "equal",
         split_members: [],
+        receipt_path: null,
       });
     }
   }, [initialData, isOpen]);
@@ -80,6 +83,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
       description: form.description,
       expense_date: form.expense_date,
       split_type: form.split_type,
+      receipt_path: form.receipt_path,
       split_members:
         form.split_members.length > 0
           ? form.split_members.map(Number)
@@ -213,6 +217,12 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                   placeholder="What was this for?"
                 />
               </div>
+
+              {/* Receipt Upload */}
+              <ReceiptUpload
+                value={form.receipt_path}
+                onChange={(path) => setForm((f) => ({ ...f, receipt_path: path }))}
+              />
 
               {/* Date */}
               <div>

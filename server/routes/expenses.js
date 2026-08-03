@@ -12,6 +12,7 @@ const createExpenseSchema = z.object({
   description: z.string().default(""),
   expense_date: z.string(),
   split_type: z.enum(["equal", "custom_amounts", "custom_percentages"]).default("equal"),
+  receipt_path: z.string().nullable().optional(),
   splits: z
     .array(
       z.object({
@@ -62,8 +63,8 @@ router.post("/", (req, res, next) => {
     const transaction = db.transaction(() => {
       const result = db
         .prepare(
-          `INSERT INTO expenses (group_id, paid_by, amount, category, description, expense_date, split_type)
-           VALUES (?, ?, ?, ?, ?, ?, ?)`
+          `INSERT INTO expenses (group_id, paid_by, amount, category, description, expense_date, split_type, receipt_path)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
         )
         .run(
           data.group_id,
@@ -72,7 +73,8 @@ router.post("/", (req, res, next) => {
           data.category,
           data.description,
           data.expense_date,
-          data.split_type
+          data.split_type,
+          data.receipt_path || null
         );
       const expenseId = result.lastInsertRowid;
 

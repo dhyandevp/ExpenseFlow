@@ -18,6 +18,8 @@ import ExpenseForm from "../components/ExpenseForm";
 import BalanceChip from "../components/BalanceChip";
 import { getBalances } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { ReceiptIndicator, ReceiptLightbox } from "../components/ReceiptUpload";
+import SettlementHistory from "../components/SettlementHistory";
 
 const categoryIcons = {
   Rent: Home,
@@ -50,6 +52,7 @@ export default function ExpenseLogger() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState("");
   const [filterMember, setFilterMember] = useState("");
+  const [receiptView, setReceiptView] = useState(null);
 
   // On mount, if we came from join link, set group from navigation state
   useEffect(() => {
@@ -168,6 +171,9 @@ export default function ExpenseLogger() {
           </p>
         </motion.div>
       )}
+
+      {/* Settlement History */}
+      <SettlementHistory />
 
       {/* Filters */}
       <div className="flex flex-wrap gap-2 mb-4">
@@ -316,6 +322,10 @@ export default function ExpenseLogger() {
 
                   {/* Actions */}
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <ReceiptIndicator
+                      receiptPath={expense.receipt_path}
+                      onClick={() => setReceiptView(expense.receipt_path)}
+                    />
                     <button
                       onClick={() => handleDelete(expense.id)}
                       className="p-1.5 rounded-lg hover:bg-accent/10 text-text-muted hover:text-accent transition-colors"
@@ -340,6 +350,14 @@ export default function ExpenseLogger() {
         onSubmit={handleAddExpense}
         initialData={editingExpense}
       />
+
+      {/* Receipt Lightbox */}
+      {receiptView && (
+        <ReceiptLightbox
+          receiptPath={receiptView}
+          onClose={() => setReceiptView(null)}
+        />
+      )}
     </div>
   );
 }

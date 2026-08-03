@@ -40,7 +40,7 @@ export default function Landing() {
         className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto"
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl">⚖️</span>
+          <span className="text-2xl" role="img" aria-label="BalanceBoard logo">⚖️</span>
           <span className="font-heading font-bold text-xl text-text-dark">
             BalanceBoard
           </span>

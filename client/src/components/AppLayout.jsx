@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   PlusCircle,
   LayoutDashboard,
@@ -9,6 +9,8 @@ import {
   LogOut,
   Menu,
   X,
+  ChevronDown,
+  Users,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGroup } from "../App";
@@ -24,31 +26,94 @@ const navItems = [
 export default function AppLayout({ children }) {
   const { code } = useParams();
   const location = useLocation();
-  const { currentGroup, setCurrentGroup } = useGroup();
+  const navigate = useNavigate();
+  const { currentGroup, setCurrentGroup, recentGroups } = useGroup();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [groupSwitcherOpen, setGroupSwitcherOpen] = useState(false);
 
   const handleLeave = () => {
     setCurrentGroup(null);
   };
 
+  const handleSwitchGroup = (group) => {
+    setGroupSwitcherOpen(false);
+    navigate(`/join/${group.code}`);
+  };
+
   if (!currentGroup) return null;
+
+  // Filter out current group from recent groups
+  const otherGroups = (recentGroups || []).filter(
+    (g) => g.code !== currentGroup.code
+  );
 
   return (
     <div className="min-h-screen bg-background flex">
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-surface border-r border-border min-h-screen p-4 sticky top-0">
-        <div className="flex items-center gap-3 px-3 py-4 mb-6">
-          <span className="text-2xl">⚖️</span>
-          <div>
-            <h2 className="font-heading font-bold text-lg text-text-dark leading-tight">
-              {currentGroup.name}
-            </h2>
-            <p className="text-xs text-text-muted font-mono">#{currentGroup.code}</p>
+        <div className="px-3 py-4 mb-2">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">⚖️</span>
+            <div className="flex-1 min-w-0">
+              <h2 className="font-heading font-bold text-lg text-text-dark leading-tight truncate">
+                {currentGroup.name}
+              </h2>
+              <p className="text-xs text-text-muted font-mono">#{currentGroup.code}</p>
+            </div>
           </div>
         </div>
 
+        {/* Group Switcher */}
+        {otherGroups.length > 0 && (
+          <div className="px-3 mb-4 relative">
+            <button
+              onClick={() => setGroupSwitcherOpen(!groupSwitcherOpen)}
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-text-muted hover:bg-background hover:text-text-dark transition-all"
+            >
+              <Users size={14} />
+              Switch Group
+              <ChevronDown
+                size={14}
+                className={`ml-auto transition-transform ${groupSwitcherOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+            <AnimatePresence>
+              {groupSwitcherOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -4 }}
+                  className="absolute left-3 right-3 top-full mt-1 bg-surface rounded-xl border border-border shadow-lg z-20 overflow-hidden"
+                >
+                  {otherGroups.map((g) => (
+                    <button
+                      key={g.code}
+                      onClick={() => handleSwitchGroup(g)}
+                      className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-dark hover:bg-highlight/30 transition-colors text-left"
+                    >
+                      <span className="text-xs">⚖️</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium truncate text-xs">{g.name}</p>
+                        <p className="text-[10px] text-text-muted font-mono">#{g.code}</p>
+                      </div>
+                    </button>
+                  ))}
+                  <Link
+                    to="/"
+                    onClick={() => setGroupSwitcherOpen(false)}
+                    className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-primary hover:bg-highlight/30 transition-colors border-t border-border"
+                  >
+                    <PlusCircle size={14} />
+                    Join another group
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
         <nav className="flex-1 space-y-1">
-          {navItems.map((item, idx) => {
+          {navItems.map((item) => {
             const basePath = `/group/${code}`;
             const itemPath = `${basePath}${item.path}`;
             const isActive = location.pathname === itemPath;
@@ -107,7 +172,7 @@ export default function AppLayout({ children }) {
             className="md:hidden fixed top-[57px] left-0 right-0 z-30 bg-surface border-b border-border shadow-lg"
           >
             <div className="p-3 space-y-1">
-              {navItems.map((item, idx) => {
+              {navItems.map((item) => {
                 const basePath = `/group/${code}`;
                 const itemPath = `${basePath}${item.path}`;
                 const isActive = location.pathname === itemPath;
@@ -127,6 +192,28 @@ export default function AppLayout({ children }) {
                   </Link>
                 );
               })}
+
+              {/* Mobile group switcher */}
+              {otherGroups.length > 0 && (
+                <div className="border-t border-border pt-2 mt-2">
+                  <p className="px-3 py-1 text-[10px] uppercase tracking-wider text-text-muted font-medium">Recent Groups</p>
+                  {otherGroups.map((g) => (
+                    <button
+                      key={g.code}
+                      onClick={() => {
+                        setMobileMenuOpen(false);
+                        handleSwitchGroup(g);
+                      }}
+                      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-dark hover:bg-highlight/30 transition-colors text-left rounded-xl"
+                    >
+                      <span className="text-xs">⚖️</span>
+                      <span className="truncate text-xs">{g.name}</span>
+                      <span className="text-[10px] text-text-muted font-mono">#{g.code}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
@@ -150,7 +237,7 @@ export default function AppLayout({ children }) {
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface/90 backdrop-blur-md border-t border-border safe-area-bottom">
         <div className="flex items-center justify-around py-2">
-          {navItems.slice(0, 5).map((item, idx) => {
+          {navItems.slice(0, 5).map((item) => {
             const basePath = `/group/${code}`;
             const itemPath = `${basePath}${item.path}`;
             const isActive = location.pathname === itemPath;

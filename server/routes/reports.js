@@ -3,6 +3,18 @@ import { getDB } from "../db.js";
 
 const router = Router();
 
+/**
+ * Sanitize a string for CSV output — prevents formula injection
+ * by prefixing cells that start with =, +, -, @, \t, or \r
+ */
+function csvSafe(value) {
+  if (typeof value !== "string") return value;
+  if (/^[=+\-@\t\r]/.test(value)) {
+    return "'" + value;
+  }
+  return value;
+}
+
 // GET /api/groups/:id/report — Generate report data
 router.get("/:id/report", (req, res, next) => {
   try {
@@ -210,7 +222,11 @@ router.get("/:id/report/csv", (req, res, next) => {
 
     let csv = "Date,Category,Description,Amount,Paid By\n";
     for (const e of expenses) {
-      csv += `${e.expense_date},${e.category},"${e.description.replace(/"/g, '""')}",${e.amount},${e.payer_name}\n`;
+      // Sanitize text fields to prevent CSV formula injection
+      const safeDesc = csvSafe(e.description);
+      const safeCat = csvSafe(e.category);
+      const safeName = csvSafe(e.payer_name);
+      csv += `${e.expense_date},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\n`;
     }
 
     res.setHeader("Content-Type", "text/csv");

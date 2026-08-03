@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import crypto from "node:crypto";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -117,7 +118,50 @@ export function initDB() {
       created_at TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE
     );
+
+    CREATE TABLE IF NOT EXISTS recurring_templates (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id INTEGER NOT NULL,
+      paid_by INTEGER NOT NULL,
+      amount REAL NOT NULL CHECK(amount > 0),
+      category TEXT NOT NULL,
+      description TEXT DEFAULT '',
+      split_type TEXT DEFAULT 'equal',
+      frequency TEXT NOT NULL CHECK(frequency IN ('monthly', 'weekly')),
+      next_due TEXT NOT NULL,
+      is_active INTEGER DEFAULT 1,
+      created_at TEXT DEFAULT (datetime('now')),
+      FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+      FOREIGN KEY (paid_by) REFERENCES members(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS fairness_snapshots (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_id INTEGER NOT NULL,
+      snapshot_month TEXT NOT NULL,
+      member_id INTEGER NOT NULL,
+      score INTEGER NOT NULL,
+      total_paid REAL DEFAULT 0,
+      total_share REAL DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now')),
+      UNIQUE(group_id, snapshot_month, member_id),
+      FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
+      FOREIGN KEY (member_id) REFERENCES members(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_recurring_templates_group ON recurring_templates(group_id);
+    CREATE INDEX IF NOT EXISTS idx_fairness_snapshots_group ON fairness_snapshots(group_id);
+    CREATE INDEX IF NOT EXISTS idx_settlements_group ON settlements(group_id);
   `);
+
+  // Add new columns to existing tables (safe — errors if already exists)
+  const safeAlter = (sql) => {
+    try { db.exec(sql); } catch (e) {
+      if (!e.message.includes('duplicate column')) throw e;
+    }
+  };
+  safeAlter("ALTER TABLE groups ADD COLUMN pin_hash TEXT DEFAULT NULL");
+  safeAlter("ALTER TABLE expenses ADD COLUMN receipt_path TEXT DEFAULT NULL");
 
   console.log("Database initialized");
 }

@@ -9,10 +9,15 @@ import {
   AlertTriangle,
   LogOut,
   RefreshCw,
+  KeyRound,
+  Copy,
+  Check,
+  Shield,
 } from "lucide-react";
 import { useGroup } from "../App";
-import { updateGroup, removeMember } from "../api/client";
+import { updateGroup, removeMember, regenerateCode, setGroupPin } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import RecurringManager from "../components/RecurringManager";
 
 function getCategories(group) {
   return group?.categories?.length > 0
@@ -48,6 +53,13 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
   const [showReset, setShowReset] = useState(false);
+
+  // Security: PIN and code
+  const [pinInput, setPinInput] = useState("");
+  const [pinSaving, setPinSaving] = useState(false);
+  const [pinMessage, setPinMessage] = useState("");
+  const [regenerating, setRegenerating] = useState(false);
+  const [codeCopied, setCodeCopied] = useState(false);
 
   useEffect(() => {
     if (currentGroup) {
@@ -106,9 +118,49 @@ export default function SettingsPage() {
       )
     )
       return;
-    // Reset logic would go here — for now just show confirmation
     setShowReset(false);
     alert("Data reset is handled server-side. Contact your group admin.");
+  };
+
+  const handleRegenerateCode = async () => {
+    if (!confirm("Regenerate invite code? The old code will stop working immediately.")) return;
+    setRegenerating(true);
+    try {
+      const res = await regenerateCode(currentGroup.id);
+      const newCode = res.data.code;
+      setCurrentGroup({ ...currentGroup, code: newCode });
+    } catch (err) {
+      alert("Failed to regenerate: " + err.message);
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  const handleSetPin = async () => {
+    setPinSaving(true);
+    setPinMessage("");
+    try {
+      if (pinInput.trim() === "") {
+        await setGroupPin(currentGroup.id, { pin: null });
+        setPinMessage("PIN removed.");
+        setCurrentGroup({ ...currentGroup, has_pin: false });
+      } else {
+        await setGroupPin(currentGroup.id, { pin: pinInput });
+        setPinMessage("PIN set!");
+        setCurrentGroup({ ...currentGroup, has_pin: true });
+      }
+      setPinInput("");
+    } catch (err) {
+      setPinMessage(err.message);
+    } finally {
+      setPinSaving(false);
+    }
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(currentGroup.code);
+    setCodeCopied(true);
+    setTimeout(() => setCodeCopied(false), 2000);
   };
 
   return (
@@ -190,6 +242,96 @@ export default function SettingsPage() {
           )}
         </div>
       </div>
+
+      {/* Security: Code & PIN */}
+      <div className="card">
+        <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
+          <Shield size={18} className="text-primary" />
+          Access & Security
+        </h2>
+
+        <div className="space-y-4">
+          {/* Invite Code */}
+          <div>
+            <label className="block text-sm font-medium text-text-dark mb-1">
+              Invite Code
+            </label>
+            <div className="flex items-center gap-2">
+              <div
+                onClick={copyCode}
+                className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-highlight/30 border border-border rounded-xl hover:border-primary/30 transition-all"
+              >
+                <span className="font-mono font-bold text-lg tracking-[0.2em] text-primary">
+                  {currentGroup.code}
+                </span>
+                {codeCopied ? (
+                  <Check size={16} className="text-success" />
+                ) : (
+                  <Copy size={16} className="text-text-muted" />
+                )}
+              </div>
+              <button
+                onClick={handleRegenerateCode}
+                disabled={regenerating}
+                className="btn-ghost text-sm"
+                title="Regenerate invite code"
+              >
+                <RefreshCw size={14} className={regenerating ? "animate-spin" : ""} />
+                Regenerate
+              </button>
+            </div>
+            <p className="text-xs text-text-muted mt-1">
+              Regenerating invalidates the old code — members will need the new one to rejoin.
+            </p>
+          </div>
+
+          {/* Group PIN */}
+          <div>
+            <label className="block text-sm font-medium text-text-dark mb-1 flex items-center gap-1.5">
+              <KeyRound size={14} />
+              Group PIN
+              {currentGroup.has_pin && (
+                <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-success/10 text-success font-medium">
+                  Active
+                </span>
+              )}
+            </label>
+            <p className="text-xs text-text-muted mb-2">
+              Optional 4-8 character PIN required when joining via invite code. Leave empty to remove.
+            </p>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={pinInput}
+                onChange={(e) => setPinInput(e.target.value)}
+                className="input-field flex-1"
+                placeholder={currentGroup.has_pin ? "Enter new PIN (or empty to remove)" : "Set a PIN..."}
+                maxLength={8}
+              />
+              <button
+                onClick={handleSetPin}
+                disabled={pinSaving}
+                className="btn-primary text-sm"
+              >
+                <KeyRound size={14} />
+                {pinSaving ? "..." : pinInput.trim() ? "Set PIN" : "Remove PIN"}
+              </button>
+            </div>
+            {pinMessage && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-xs text-success mt-1"
+              >
+                {pinMessage}
+              </motion.p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Recurring Expenses */}
+      <RecurringManager />
 
       {/* Members */}
       <div className="card">

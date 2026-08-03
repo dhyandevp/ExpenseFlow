@@ -52,12 +52,32 @@ router.get("/:id/balances", (req, res, next) => {
       shareMap[row.member_id] = row.total_share;
     }
 
+    // Factor in recorded settlements
+    const settlementsSent = db
+      .prepare(
+        "SELECT from_member as member_id, SUM(amount) as total FROM settlements WHERE group_id = ? GROUP BY from_member"
+      )
+      .all(req.params.id);
+    const settlementsReceived = db
+      .prepare(
+        "SELECT to_member as member_id, SUM(amount) as total FROM settlements WHERE group_id = ? GROUP BY to_member"
+      )
+      .all(req.params.id);
+
+    const sentMap = {};
+    for (const row of settlementsSent) sentMap[row.member_id] = row.total;
+    const receivedMap = {};
+    for (const row of settlementsReceived) receivedMap[row.member_id] = row.total;
+
     const totalExpenses = Object.values(paidMap).reduce((s, v) => s + v, 0);
 
     const balances = members.map((m) => {
       const paid = paidMap[m.id] || 0;
       const share = shareMap[m.id] || 0;
-      const net = paid - share;
+      const settled_out = sentMap[m.id] || 0;
+      const settled_in = receivedMap[m.id] || 0;
+      // Net = what you paid - your fair share - what you already settled + what others settled to you
+      const net = (paid - share) - settled_out + settled_in;
       return {
         member_id: m.id,
         name: m.name,
