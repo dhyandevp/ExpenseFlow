@@ -41,10 +41,12 @@ export default function GroupSetup() {
   });
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
-  const { authMode, isLoaded } = useAuth();
+  const { authMode, isLoaded, user } = useAuth();
+
+  const isEmailVerified = user?.primaryEmailAddress?.verification?.status === 'verified';
 
   useEffect(() => {
-    if (isLoaded && authMode !== "clerk") {
+    if (isLoaded && authMode === 'guest') {
       navigate("/");
     }
   }, [authMode, isLoaded, navigate]);
@@ -182,6 +184,19 @@ export default function GroupSetup() {
             <span className="text-primary font-mono text-sm">{window.location.origin}/group/{createdGroup.code}</span>
           </p>
           <motion.button {...springScale} onClick={goToGroup} className="btn-primary w-full">Go to Group →</motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (isLoaded && authMode === 'clerk' && !isEmailVerified) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center p-4">
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="card max-w-md w-full text-center p-8">
+          <div className="text-5xl mb-4">✉️</div>
+          <h2 className="font-heading font-bold text-2xl text-text-dark mb-2">Verify your email</h2>
+          <p className="text-text-muted mb-6">You must verify your email address before you can create a group.</p>
+          <Link to="/" className="btn-primary w-full inline-block text-center">Go back</Link>
         </motion.div>
       </div>
     );

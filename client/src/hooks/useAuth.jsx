@@ -61,9 +61,12 @@ export function AuthProvider({ children }) {
           if (tokenResult.claims.guestGroupId) {
             setAuthMode("guest");
             setGroupAccess(tokenResult.claims.guestGroupId);
-          } else {
+          } else if (clerkUser) {
             setAuthMode("clerk");
             setGroupAccess("all");
+          } else {
+            setAuthMode(null);
+            setGroupAccess(null);
           }
         } catch (err) {
           console.error("Failed to parse token claims", err);
@@ -78,7 +81,7 @@ export function AuthProvider({ children }) {
     });
 
     return () => unsubscribe();
-  }, []);
+  }, [clerkUser]);
 
   const signOut = async () => {
     if (authMode === "clerk") {
