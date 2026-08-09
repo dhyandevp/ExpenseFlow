@@ -308,15 +308,16 @@
 ---
 
 ### Phase 17: Cloudinary Receipt Uploads
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement direct-to-Cloudinary receipt uploads and remove Firebase Storage.
 **Depends on**: Phase 16
 
 **Tasks**:
-- [ ] TBD (run /plan 17 to create)
+- [x] Remove Legacy Mock Upload
 
 **Verification**:
-- TBD
+- [x] Verified `useReceiptUpload.js` correctly implements Cloudinary XMLHttpRequest uploads.
+- [x] Verified legacy mocks are removed from `client.js`.
 
 ---
 
