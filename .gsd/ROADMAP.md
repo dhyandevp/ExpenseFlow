@@ -201,3 +201,16 @@
 4. Update README.md with final architecture description, setup instructions, and deployment guide
 5. Final end-to-end verification: auth flows, expense CRUD, balance calculation, receipt upload, CSV/PDF export, all pages render, all tests pass
 6. Run the complete Security Testing Checklist from Part 4 of the docs
+
+---
+
+### Phase 10: Desktop UI Redesign (Using Stitch MCP & Motion-AI)
+**Status**: ⬜ Not Started
+**Objective**: Build a Desktop-optimized view utilizing stitch mcp for layout primitives and npx motion-ai for interactions, applying multi-column grid layouts and strict Aurora Forest / Timeless Grey color constraints (no alarmist red).
+**Depends on**: Phase 9
+
+**Tasks**:
+- [ ] TBD (run /plan 10 to create)
+
+**Verification**:
+- TBD
