@@ -1,9 +1,14 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
+import { ClerkProvider } from "@clerk/clerk-react";
+import { AuthProvider } from "./hooks/useAuth";
 import Landing from "./pages/Landing";
 import GroupSetup from "./pages/GroupSetup";
 import JoinGroup from "./pages/JoinGroup";
 import AppLayout from "./components/AppLayout";
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
 
 // Lazy-load app pages for route-level code splitting
 const ExpenseLogger = lazy(() => import("./pages/ExpenseLogger"));
@@ -101,12 +106,14 @@ export default function App() {
   }, [currentGroup]);
 
   return (
-    <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
-      <Suspense fallback={<PageLoader />}>
-        <Routes>
-          <Route path="/" element={<Landing />} />
-          <Route path="/setup" element={<GroupSetup />} />
-          <Route path="/join/:code" element={<JoinGroup />} />
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={(to) => window.location.href = to}>
+      <AuthProvider>
+        <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/" element={<Landing />} />
+              <Route path="/setup" element={<GroupSetup />} />
+              <Route path="/join/:code" element={<JoinGroup />} />
           <Route
             path="/group/:code"
             element={
@@ -171,5 +178,7 @@ export default function App() {
         </Routes>
       </Suspense>
     </GroupContext.Provider>
+    </AuthProvider>
+    </ClerkProvider>
   );
 }
