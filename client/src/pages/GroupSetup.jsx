@@ -8,6 +8,7 @@ import { createGroup } from "../api/client";
 import { useGroup } from "../App";
 import AddCategoryModal from "../components/AddCategoryModal";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { useAuth } from "../hooks/useAuth";
 
 const EMOJIS = ["😊", "🦊", "🐱", "🐼", "🐸", "🐙", "🦄", "🌈"];
 const COLORS = ["#105D5E", "#009A6E", "#B3EDA9", "#E8E300", "#767F7D", "#C2CBC9", "#293E33", "#FFFFFF"];
@@ -34,6 +35,13 @@ export default function GroupSetup() {
   useDocumentTitle("Create a Group");
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
+  const { authMode, isLoaded } = useAuth();
+
+  useEffect(() => {
+    if (isLoaded && authMode !== "clerk") {
+      navigate("/");
+    }
+  }, [authMode, isLoaded, navigate]);
 
   const [step, setStep] = useState(1);
   const [groupName, setGroupName] = useState("");

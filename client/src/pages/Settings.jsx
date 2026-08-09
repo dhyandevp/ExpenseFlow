@@ -18,6 +18,7 @@ import { useGroup } from "../App";
 import { updateGroup, removeMember, regenerateCode, setGroupPin } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import RecurringManager from "../components/RecurringManager";
+import { useAuth } from "../hooks/useAuth";
 
 function getCategories(group) {
   return group?.categories?.length > 0
@@ -44,6 +45,7 @@ export default function SettingsPage() {
   useDocumentTitle("Group Settings");
   const { currentGroup, setCurrentGroup } = useGroup();
   const navigate = useNavigate();
+  const { authMode } = useAuth();
 
   const [groupName, setGroupName] = useState(currentGroup?.name || "");
   const [currency, setCurrency] = useState(currentGroup?.currency || "₹");
@@ -166,8 +168,13 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark">
+        <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark flex items-center gap-3">
           Settings
+          {authMode === "clerk" ? (
+            <span className="text-xs bg-success/20 text-success px-2 py-1 rounded-full font-medium">Signed In</span>
+          ) : (
+            <span className="text-xs bg-border text-text-muted px-2 py-1 rounded-full font-medium">Guest Access</span>
+          )}
         </h1>
         <p className="text-sm text-text-muted">Manage your group</p>
       </div>
