@@ -356,15 +356,17 @@
 ---
 
 ### Phase 20: Vitest Unit Testing
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Ensure comprehensive unit test coverage for all financial math and utilities.
 **Depends on**: Phase 19
 
 **Tasks**:
-- [ ] TBD (run /plan 20 to create)
+- [x] Vitest Setup and Utility Tests
+- [x] Financial Math and Split Integrity Tests
 
 **Verification**:
-- TBD
+- [x] Confirmed `npm run test:unit` passes.
+- [x] Verified Split Integrity test passes with exact logic.
 
 ---
 
