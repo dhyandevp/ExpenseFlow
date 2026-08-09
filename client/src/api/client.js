@@ -241,4 +241,3 @@ export const applyRecurringTemplate = async () => ({ success: true });
 export const applyDueRecurring = async () => ({ success: true });
 export const getFairnessModels = async () => [];
 export const updateFairnessModel = async () => ({ success: true });
-export const uploadReceipt = async (file) => ({ success: true, data: { path: "dummy" } }); // Phase 5 will implement real Cloudinary upload
