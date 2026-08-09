@@ -214,3 +214,185 @@
 
 **Verification**:
 - TBD
+
+---
+
+### Phase 11: Database Schema & Shared Architecture
+**Status**: ⬜ Not Started
+**Objective**: Correct the Firestore database schema structure and extract financial math logic into a shared directory for reuse between client and serverless functions.
+**Depends on**: Phase 10
+
+**Tasks**:
+- [ ] TBD (run /plan 11 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 12: Firestore Security Rules
+**Status**: ⬜ Not Started
+**Objective**: Implement strict deny-all default security rules with appropriate role-based access control.
+**Depends on**: Phase 11
+
+**Tasks**:
+- [ ] TBD (run /plan 12 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 13: Netlify Functions Infrastructure & Auth Bridge
+**Status**: ⬜ Not Started
+**Objective**: Scaffold the Netlify functions directory and implement the JWT token exchange for hybrid authentication.
+**Depends on**: Phase 12
+
+**Tasks**:
+- [ ] TBD (run /plan 13 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 14: Netlify Functions Webhooks & Triggers
+**Status**: ⬜ Not Started
+**Objective**: Implement server-side logic for balancing expenses and syncing Clerk users.
+**Depends on**: Phase 13
+
+**Tasks**:
+- [ ] TBD (run /plan 14 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 15: Authentication State & Landing Routing
+**Status**: ⬜ Not Started
+**Objective**: Implement the hybrid authentication hooks and dual call-to-action landing page.
+**Depends on**: Phase 14
+
+**Tasks**:
+- [ ] TBD (run /plan 15 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 16: PIN Verification Component
+**Status**: ⬜ Not Started
+**Objective**: Build a secure, accessible, and robust PIN entry component.
+**Depends on**: Phase 15
+
+**Tasks**:
+- [ ] TBD (run /plan 16 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 17: Cloudinary Receipt Uploads
+**Status**: ⬜ Not Started
+**Objective**: Implement direct-to-Cloudinary receipt uploads and remove Firebase Storage.
+**Depends on**: Phase 16
+
+**Tasks**:
+- [ ] TBD (run /plan 17 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 18: Mobile-First UI & Styling Enforcement
+**Status**: ⬜ Not Started
+**Objective**: Enforce strict mobile layouts, glassmorphism constraints, and palette adherence.
+**Depends on**: Phase 17
+
+**Tasks**:
+- [ ] TBD (run /plan 18 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 19: Data Export Functions
+**Status**: ⬜ Not Started
+**Objective**: Implement secure CSV and PDF data export endpoints.
+**Depends on**: Phase 18
+
+**Tasks**:
+- [ ] TBD (run /plan 19 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 20: Vitest Unit Testing
+**Status**: ⬜ Not Started
+**Objective**: Ensure comprehensive unit test coverage for all financial math and utilities.
+**Depends on**: Phase 19
+
+**Tasks**:
+- [ ] TBD (run /plan 20 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 21: Data Migration Script
+**Status**: ⬜ Not Started
+**Objective**: Safely migrate legacy SQLite data to the new Firestore structure.
+**Depends on**: Phase 20
+
+**Tasks**:
+- [ ] TBD (run /plan 21 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 22: Legal Pages & Footer
+**Status**: ⬜ Not Started
+**Objective**: Add required legal documentation and developer links.
+**Depends on**: Phase 21
+
+**Tasks**:
+- [ ] TBD (run /plan 22 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 23: SEO, Meta Tags & 404 Routing
+**Status**: ⬜ Not Started
+**Objective**: Finalize search engine optimization and routing fallbacks.
+**Depends on**: Phase 22
+
+**Tasks**:
+- [ ] TBD (run /plan 23 to create)
+
+**Verification**:
+- TBD
+
+---
+
+### Phase 24: Git Security & Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Clean the repository of legacy references and secure git commits.
+**Depends on**: Phase 23
+
+**Tasks**:
+- [ ] TBD (run /plan 24 to create)
+
+**Verification**:
+- TBD
