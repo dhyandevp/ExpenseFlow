@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
 import { AuthProvider } from "./hooks/useAuth";
+import { HelmetProvider } from "react-helmet-async";
 import Landing from "./pages/Landing";
 import GroupSetup from "./pages/GroupSetup";
 import JoinGroup from "./pages/JoinGroup";
@@ -106,79 +107,81 @@ export default function App() {
   }, [currentGroup]);
 
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={(to) => window.location.href = to}>
-      <AuthProvider>
-        <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/" element={<Landing />} />
-              <Route path="/setup" element={<GroupSetup />} />
-              <Route path="/join/:code" element={<JoinGroup />} />
-          <Route
-            path="/group/:code"
-            element={
-              currentGroup ? (
-                <AppLayout>
-                  <ExpenseLogger />
-                </AppLayout>
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/group/:code/dashboard"
-            element={
-              currentGroup ? (
-                <AppLayout>
-                  <Dashboard />
-                </AppLayout>
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/group/:code/scenarios"
-            element={
-              currentGroup ? (
-                <AppLayout>
-                  <ScenarioPlanner />
-                </AppLayout>
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/group/:code/report"
-            element={
-              currentGroup ? (
-                <AppLayout>
-                  <FairnessReport />
-                </AppLayout>
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route
-            path="/group/:code/settings"
-            element={
-              currentGroup ? (
-                <AppLayout>
-                  <Settings />
-                </AppLayout>
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Suspense>
-    </GroupContext.Provider>
-    </AuthProvider>
-    </ClerkProvider>
+    <HelmetProvider>
+      <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={(to) => window.location.href = to}>
+        <AuthProvider>
+          <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/" element={<Landing />} />
+                <Route path="/setup" element={<GroupSetup />} />
+                <Route path="/join/:code" element={<JoinGroup />} />
+            <Route
+              path="/group/:code"
+              element={
+                currentGroup ? (
+                  <AppLayout>
+                    <ExpenseLogger />
+                  </AppLayout>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route
+              path="/group/:code/dashboard"
+              element={
+                currentGroup ? (
+                  <AppLayout>
+                    <Dashboard />
+                  </AppLayout>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route
+              path="/group/:code/scenarios"
+              element={
+                currentGroup ? (
+                  <AppLayout>
+                    <ScenarioPlanner />
+                  </AppLayout>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route
+              path="/group/:code/report"
+              element={
+                currentGroup ? (
+                  <AppLayout>
+                    <FairnessReport />
+                  </AppLayout>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route
+              path="/group/:code/settings"
+              element={
+                currentGroup ? (
+                  <AppLayout>
+                    <Settings />
+                  </AppLayout>
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </Suspense>
+      </GroupContext.Provider>
+      </AuthProvider>
+      </ClerkProvider>
+    </HelmetProvider>
   );
 }

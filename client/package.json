@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.9",
+    "@headlessui/react": "^2.2.10",
+    "@heroicons/react": "^2.2.0",
     "firebase": "^12.17.1",
     "framer-motion": "^11.5.4",
     "html2canvas": "^1.4.1",
@@ -17,6 +19,7 @@
     "lucide-react": "^0.441.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-helmet-async": "^3.0.0",
     "react-router-dom": "^6.26.0",
     "recharts": "^2.12.7"
   },
