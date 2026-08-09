@@ -16,6 +16,7 @@
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.23",
     "firebase-admin": "^14.2.0",
+    "pdfkit": "^0.19.1",
     "svix": "^1.99.1"
   }
 }
