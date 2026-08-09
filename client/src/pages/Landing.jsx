@@ -74,13 +74,13 @@ export default function Landing() {
             onClick={() => setIsSignInOpen(true)}
             className="text-text-muted hover:text-text-dark text-sm font-medium transition-colors"
           >
-            Sign In
+            Sign In / Sign Up
           </button>
           <button
             onClick={() => setIsGuestJoinOpen(true)}
             className="btn-primary text-sm"
           >
-            Join Group
+            Join with Code
           </button>
         </div>
       </motion.nav>
@@ -116,7 +116,7 @@ export default function Landing() {
               className="flex flex-col sm:flex-row gap-3 mb-10"
             >
               <button onClick={() => setIsSignInOpen(true)} className="btn-primary text-base px-6 py-3">
-                Create a Group
+                Sign In to Create
                 <ArrowRight size={18} />
               </button>
               <button
@@ -124,7 +124,7 @@ export default function Landing() {
                 className="btn-secondary text-base px-6 py-3"
               >
                 <Users size={18} />
-                Join a Group
+                Join with Code & PIN
               </button>
             </motion.div>
           </div>

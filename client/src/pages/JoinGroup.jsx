@@ -39,8 +39,9 @@ export default function JoinGroup() {
       navigate("/", { replace: true });
       return;
     }
-    fetchGroup();
-  }, [code]);
+    setNeedsPin(true);
+    setLoading(false);
+  }, [code, navigate]);
 
   const handlePinSubmit = (e) => {
     e.preventDefault();
