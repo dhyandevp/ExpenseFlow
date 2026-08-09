@@ -244,15 +244,17 @@
 ---
 
 ### Phase 13: Netlify Functions Infrastructure & Auth Bridge
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Scaffold the Netlify functions directory and implement the JWT token exchange for hybrid authentication.
 **Depends on**: Phase 12
 
 **Tasks**:
-- [ ] TBD (run /plan 13 to create)
+- [x] Configure Netlify Functions Environment
+- [x] Implement jwt-bridge.js Core Logic
 
 **Verification**:
-- TBD
+- [x] Verified via npm list and grep "functions" netlify.toml
+- [x] Verified via npx vitest run tests/jwt-bridge.test.js
 
 ---
 
