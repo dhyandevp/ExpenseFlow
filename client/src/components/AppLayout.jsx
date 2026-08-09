@@ -245,7 +245,7 @@ export default function AppLayout({ children }) {
               <Link
                 key={item.label}
                 to={itemPath}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 rounded-xl transition-all ${
+                className={`flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all ${
                   isActive ? "text-primary" : "text-text-muted"
                 }`}
               >

@@ -26,6 +26,7 @@ import {
   applyDueRecurring,
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
+import { expandingCard } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../utils/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import FairnessTrend from "../components/FairnessTrend";
@@ -193,8 +194,11 @@ export default function Dashboard() {
             return (
               <motion.div
                 key={b.member_id}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
+                variants={expandingCard}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                layout
                 className="p-4 rounded-xl bg-highlight/20 snap-center min-w-[280px] md:min-w-0 flex-shrink-0"
               >
                 <div className="flex items-center justify-between mb-2">

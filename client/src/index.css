@@ -130,16 +130,20 @@
   .glass {
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-    background-color: rgba(235, 250, 219, 0.72);
-    border: 1px solid rgba(194, 203, 201, 0.4);
+    background-color: rgba(255, 255, 255, 0.5);
+    border-top: 1px solid rgba(255, 255, 255, 0.7);
+    border-left: 1px solid rgba(255, 255, 255, 0.7);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
   }
 
   .glass-nav {
-    @apply glass border-t border-b-0 border-l-0 border-r-0 shadow-[0_-4px_24px_rgba(41,62,51,0.06)];
+    @apply glass border-b-0 border-r-0 border-l-0 shadow-[0_-4px_24px_rgba(41,62,51,0.06)];
   }
 
   .glass-header {
-    @apply glass border-b border-t-0 border-l-0 border-r-0 shadow-[0_4px_24px_rgba(41,62,51,0.06)];
+    @apply glass border-t-0 border-l-0 border-r-0 shadow-[0_4px_24px_rgba(41,62,51,0.06)];
   }
 
   @media (prefers-reduced-transparency: reduce) {
