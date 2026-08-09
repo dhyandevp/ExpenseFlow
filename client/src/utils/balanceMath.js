@@ -33,8 +33,8 @@ export function calculateBalances(members, expenses, settlements = []) {
     const settled_out = sentMap[m.id] || 0;
     const settled_in = receivedMap[m.id] || 0;
     
-    // Net = what you paid - your fair share - what you already settled + what others settled to you
-    const net = (paid - share) - settled_out + settled_in;
+    // Net = what you paid - your fair share + what you already settled - what others settled to you
+    const net = (paid - share) + settled_out - settled_in;
     
     return {
       member_id: m.id,
@@ -82,11 +82,13 @@ function calculateSettlementSuggestions(balances) {
       });
     }
     
-    if (debt <= credit) {
+    if (debt === credit) {
+      di++;
+      ci++;
+    } else if (debt < credit) {
       cList[ci].net_balance -= debt;
       di++;
-    }
-    if (credit <= debt) {
+    } else {
       dList[di].net_balance += credit;
       ci++;
     }
