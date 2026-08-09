@@ -1,6 +1,7 @@
+import SEO from "../components/SEO";
 import React from 'react';
 
-export default function Terms() {
+function Terms() {
   return (
     <div className="container py-5 mt-5">
       <h1 className="mb-4">Terms of Service</h1>
@@ -23,5 +24,15 @@ export default function Terms() {
         <p>We reserve the right to modify these terms at any time. Continued use implies acceptance.</p>
       </div>
     </div>
+  );
+}
+
+
+export default function TermsWrapper(props) {
+  return (
+    <>
+      <SEO title="Terms" />
+      <Terms {...props} />
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -6,7 +7,7 @@ import { useGroup } from "../App";
 import { getGroupByCode } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 
-export default function JoinGroup() {
+function JoinGroup() {
   useDocumentTitle("Join Group");
   const { code } = useParams();
   const navigate = useNavigate();
@@ -102,5 +103,15 @@ export default function JoinGroup() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+
+export default function JoinGroupWrapper(props) {
+  return (
+    <>
+      <SEO title="JoinGroup" />
+      <JoinGroup {...props} />
+    </>
   );
 }

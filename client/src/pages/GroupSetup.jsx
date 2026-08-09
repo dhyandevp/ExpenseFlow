@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -33,7 +34,7 @@ const modelOptions = [
   { value: "custom", label: "Custom percentages" },
 ];
 
-export default function GroupSetup() {
+function GroupSetup() {
   useSEO({
     title: "Create Group",
     description: "Create a new group in ExpenseFlow to start tracking shared expenses with roommates or friends.",
@@ -458,5 +459,15 @@ export default function GroupSetup() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+
+export default function GroupSetupWrapper(props) {
+  return (
+    <>
+      <SEO title="GroupSetup" />
+      <GroupSetup {...props} />
+    </>
   );
 }

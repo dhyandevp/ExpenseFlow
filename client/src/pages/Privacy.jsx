@@ -1,6 +1,7 @@
+import SEO from "../components/SEO";
 import React from 'react';
 
-export default function Privacy() {
+function Privacy() {
   return (
     <div className="container py-5 mt-5">
       <h1 className="mb-4">Privacy Policy</h1>
@@ -23,5 +24,15 @@ export default function Privacy() {
         <p>If you have any questions about this Privacy Policy, please contact us.</p>
       </div>
     </div>
+  );
+}
+
+
+export default function PrivacyWrapper(props) {
+  return (
+    <>
+      <SEO title="Privacy" />
+      <Privacy {...props} />
+    </>
   );
 }

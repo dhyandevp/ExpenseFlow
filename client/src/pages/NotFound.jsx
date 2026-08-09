@@ -1,16 +1,13 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Home, Users, AlertTriangle } from "lucide-react";
-import { useSEO } from "../utils/seo";
+import SEO from "../components/SEO";
 
-export default function NotFound() {
-  useSEO({
-    title: "404 — Page Not Found",
-    description: "The page you are looking for does not exist.",
-  });
-
+function NotFound() {
   return (
-    <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+    <>
+      <SEO title="404 — Page Not Found" description="The page you are looking for does not exist." noindex={true} />
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -39,5 +36,8 @@ export default function NotFound() {
         </div>
       </motion.div>
     </div>
+    </>
   );
 }
+
+export default NotFound;

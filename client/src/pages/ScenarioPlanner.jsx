@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -52,7 +53,7 @@ const prebuiltExamples = [
   },
 ];
 
-export default function ScenarioPlanner() {
+function ScenarioPlanner() {
   useDocumentTitle("Scenario Planner");
   const { currentGroup } = useGroup();
   const members = currentGroup?.members || [];
@@ -432,5 +433,15 @@ export default function ScenarioPlanner() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+
+export default function ScenarioPlannerWrapper(props) {
+  return (
+    <>
+      <SEO title="ScenarioPlanner" />
+      <ScenarioPlanner {...props} />
+    </>
   );
 }

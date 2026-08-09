@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -41,7 +42,7 @@ const modelOptions = [
   { value: "pay_as_you_go", label: "Pay-as-you-go" },
 ];
 
-export default function SettingsPage() {
+function SettingsPage() {
   useDocumentTitle("Group Settings");
   const { currentGroup, setCurrentGroup } = useGroup();
   const navigate = useNavigate();
@@ -451,5 +452,15 @@ export default function SettingsPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+export default function SettingsPageWrapper(props) {
+  return (
+    <>
+      <SEO title="Settings" />
+      <SettingsPage {...props} />
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import {
@@ -62,7 +63,7 @@ function getDateRange(filter) {
   }
 }
 
-export default function FairnessReport() {
+function FairnessReport() {
   useDocumentTitle("Fairness Report");
   const { currentGroup } = useGroup();
   const [period, setPeriod] = useState("all");
@@ -370,5 +371,15 @@ export default function FairnessReport() {
         </div>
       )}
     </div>
+  );
+}
+
+
+export default function FairnessReportWrapper(props) {
+  return (
+    <>
+      <SEO title="FairnessReport" />
+      <FairnessReport {...props} />
+    </>
   );
 }

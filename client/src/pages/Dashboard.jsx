@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
@@ -66,7 +67,7 @@ function getDateRange(filter) {
   }
 }
 
-export default function Dashboard() {
+function Dashboard() {
   useDocumentTitle("Dashboard");
   const { currentGroup } = useGroup();
   const [timeFilter, setTimeFilter] = useState("all");
@@ -466,5 +467,15 @@ export default function Dashboard() {
       
       </div>
     </div>
+  );
+}
+
+
+export default function DashboardWrapper(props) {
+  return (
+    <>
+      <SEO title="Dashboard" />
+      <Dashboard {...props} />
+    </>
   );
 }

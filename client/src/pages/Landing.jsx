@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -23,7 +24,7 @@ const fadeUp = {
   }),
 };
 
-export default function Landing() {
+function Landing() {
   const navigate = useNavigate();
   useSEO({
     title: "ExpenseFlow — Free Expense Sharing App for Roommates & Couples",
@@ -250,5 +251,15 @@ export default function Landing() {
         </div>
       </footer>
     </div>
+  );
+}
+
+
+export default function LandingWrapper(props) {
+  return (
+    <>
+      <SEO title="Home" />
+      <Landing {...props} />
+    </>
   );
 }

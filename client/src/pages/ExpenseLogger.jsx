@@ -1,3 +1,4 @@
+import SEO from "../components/SEO";
 import { useState, useEffect, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -40,7 +41,7 @@ const categoryColors = {
   Other: "#C2CBC9",
 };
 
-export default function ExpenseLogger() {
+function ExpenseLogger() {
   useDocumentTitle("Log Expenses");
   const { currentGroup, setCurrentGroup } = useGroup();
   const location = useLocation();
@@ -381,5 +382,15 @@ export default function ExpenseLogger() {
         />
       )}
     </div>
+  );
+}
+
+
+export default function ExpenseLoggerWrapper(props) {
+  return (
+    <>
+      <SEO title="ExpenseLogger" />
+      <ExpenseLogger {...props} />
+    </>
   );
 }

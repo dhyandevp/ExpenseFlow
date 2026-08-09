@@ -1,7 +1,8 @@
+import SEO from "../components/SEO";
 import React from 'react';
 import { Mail, ExternalLink } from 'lucide-react';
 
-export default function Contact() {
+function Contact() {
   return (
     <div className="container py-5 mt-5">
       <h1 className="mb-4">Contact Us</h1>
@@ -29,5 +30,15 @@ export default function Contact() {
         </div>
       </div>
     </div>
+  );
+}
+
+
+export default function ContactWrapper(props) {
+  return (
+    <>
+      <SEO title="Contact" />
+      <Contact {...props} />
+    </>
   );
 }
