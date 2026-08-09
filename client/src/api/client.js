@@ -125,7 +125,7 @@ export const deleteExpense = async (groupId, id) => {
 export const getBalances = async (groupId, period = {}) => {
   const members = await getMembers(groupId);
   const { data: expenses } = await getExpenses(groupId, period);
-  const settlementsSnap = await getDocs(query(collection(db, "settlements"), where("group_id", "==", groupId)));
+  const settlementsSnap = await getDocs(query(collection(db, "groups", groupId, "settlements")));
   const settlements = settlementsSnap.docs.map(d => d.data());
   
   const result = calculateBalances(members, expenses, settlements);
@@ -167,7 +167,7 @@ export const getReport = async (groupId, period = {}) => {
   const group = (await getGroupById(groupId)).data;
   const members = await getMembers(groupId);
   const { data: expenses } = await getExpenses(groupId, period);
-  const settlementsSnap = await getDocs(query(collection(db, "settlements"), where("group_id", "==", groupId)));
+  const settlementsSnap = await getDocs(query(collection(db, "groups", groupId, "settlements")));
   
   // Ponytail: Just send raw data, let FairnessReport component format it
   const result = calculateCategoryBreakdown(members, expenses);

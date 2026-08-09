@@ -36,9 +36,10 @@ export const handler = async (event, context) => {
     const db = getFirestore();
 
     const expensesSnapshot = await db
+      .collection('groups')
+      .doc(groupId)
       .collection('expenses')
-      .where('group_id', '==', groupId)
-      .orderBy('date', 'desc')
+      .orderBy('createdAt', 'desc')
       .get();
 
     const header = 'Date,Description,Amount,Paid By,Category\n';
@@ -46,10 +47,10 @@ export const handler = async (event, context) => {
 
     expensesSnapshot.forEach((doc) => {
       const data = doc.data();
-      const date = data.date ? new Date(data.date.toMillis()).toISOString().split('T')[0] : '';
+      const date = data.createdAt ? new Date(new Date(data.createdAt).getTime()).toISOString().split('T')[0] : '';
       const desc = csvSafe(data.description || '');
       const amount = data.amount || 0;
-      const paidBy = csvSafe(data.paid_by || '');
+      const paidBy = csvSafe(data.paidBy || '');
       const category = csvSafe(data.category || '');
 
       csvData += `${date},${desc},${amount},${paidBy},${category}\n`;

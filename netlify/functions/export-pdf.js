@@ -45,9 +45,10 @@ export const handler = async (event, context) => {
     const groupData = groupDoc.data();
 
     const expensesSnapshot = await db
+      .collection('groups')
+      .doc(groupId)
       .collection('expenses')
-      .where('group_id', '==', groupId)
-      .orderBy('date', 'desc')
+      .orderBy('createdAt', 'desc')
       .get();
       
     let totalExpenses = 0;
@@ -87,8 +88,8 @@ export const handler = async (event, context) => {
       expensesSnapshot.forEach(expenseDoc => {
         if (count < 20) {
           const e = expenseDoc.data();
-          const date = e.date ? new Date(e.date.toMillis()).toISOString().split('T')[0] : '';
-          doc.fontSize(12).text(`${date} - ${e.description} (INR ${e.amount}) paid by ${e.paid_by}`);
+          const date = e.createdAt ? new Date(new Date(e.createdAt).getTime()).toISOString().split('T')[0] : '';
+          doc.fontSize(12).text(`${date} - ${e.description} (INR ${e.amount}) paid by ${e.paidBy}`);
           count++;
         }
       });
