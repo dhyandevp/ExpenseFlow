@@ -174,7 +174,7 @@
 ---
 
 ### Phase 8: Vitest Unit Tests
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Add comprehensive unit tests for all financial math logic using Vitest. At the end, all balance calculations, fairness scores, recurring logic, CSV safety, and split models are tested and passing.
 
 **Tasks** (ordered):
