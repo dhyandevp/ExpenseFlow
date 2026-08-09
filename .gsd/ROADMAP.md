@@ -83,7 +83,7 @@
 ---
 
 ### Phase 4: Clerk Hybrid Authentication
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement Clerk-based authentication with both authenticated and guest access modes, wired to Firebase custom tokens via the jwt-bridge function. At the end, users can sign in with Clerk or join with a code+PIN, and Firestore Security Rules enforce scoped access.
 
 **Tasks** (ordered):
