@@ -75,12 +75,12 @@ export const getMembers = async (groupId) => {
 
 // ── Expenses ────────────────────────────────────────────────────────────
 export const createExpense = async (groupId, data) => {
-  const { expense_date, receiptPath, receipt_url, paid_by, group_id, ...rest } = data;
   const expenseData = {
-    ...rest,
-    paidBy: paid_by || data.paidBy,
-    receiptUrl: receiptPath || receipt_url || data.receiptUrl || null,
-    createdAt: expense_date || data.createdAt || new Date().toISOString()
+    ...data,
+    paidBy: data.paidBy,
+    receiptUrl: data.receiptUrl || null,
+    createdAt: data.createdAt || new Date().toISOString(),
+    splits: data.splits || null
   };
   const docRef = await addDoc(collection(db, "groups", groupId, "expenses"), expenseData);
   return { success: true, data: { id: docRef.id, ...expenseData } };
@@ -91,21 +91,17 @@ export const getExpenses = async (groupId, filters = {}) => {
   // since group expense lists are small.
   const q = query(collection(db, "groups", groupId, "expenses"), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  let expenses = snap.docs.map(d => {
-    const data = d.data();
-    return { 
-      id: d.id, 
-      ...data,
-      paid_by: data.paidBy || data.paid_by,
-      expense_date: data.createdAt || data.expense_date,
-      receiptPath: data.receiptUrl || data.receiptPath || data.receipt_url
-    };
-  });
-  
+  let expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+  // Basic client-side filtering if needed
+  if (filters.startDate) {
+    expenses = expenses.filter(e => e.createdAt >= filters.startDate);
+  }
+  if (filters.endDate) {
+    expenses = expenses.filter(e => e.createdAt <= filters.endDate);
+  }
   if (filters.category) expenses = expenses.filter(e => e.category === filters.category);
-  if (filters.member_id) expenses = expenses.filter(e => e.paidBy === filters.member_id || e.paid_by === filters.member_id);
-  if (filters.start_date) expenses = expenses.filter(e => (e.createdAt || e.expense_date) >= filters.start_date);
-  if (filters.end_date) expenses = expenses.filter(e => (e.createdAt || e.expense_date) <= filters.end_date);
+  if (filters.member_id) expenses = expenses.filter(e => e.paidBy === filters.member_id);
   if (filters.limit) expenses = expenses.slice(0, filters.limit);
   
   return { success: true, data: expenses };
