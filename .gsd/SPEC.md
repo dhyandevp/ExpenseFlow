@@ -3,7 +3,8 @@
 **Project:** ExpenseFlow (expenseflow.site)  
 **Stack:** React 18 + Vite + TailwindCSS (Aurora Forest) · Netlify Functions (serverless) · Firebase (Firestore) · Clerk · Cloudinary  
 **Contact:** dhyandevp@proton.me · https://linktr.ee/DhyandevRTX  
-**Date:** August 2026
+**Date:** August 2026  
+**Status:** FINALIZED
 
 ---
 
