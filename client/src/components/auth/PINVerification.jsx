@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 export default function PINVerification({ pin, setPin, isError, onSubmit }) {
   const [showPin, setShowPin] = useState(false);
+  const [attempts, setAttempts] = useState(0);
   const inputRefs = useRef([]);
 
   // Auto-focus first input on mount
@@ -12,6 +13,21 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
       inputRefs.current[0].focus();
     }
   }, []);
+
+  // Track failed attempts
+  useEffect(() => {
+    if (isError) {
+      const newAttempts = attempts + 1;
+      setAttempts(newAttempts);
+      if (newAttempts >= 3) {
+        setPin("");
+        setAttempts(0);
+        if (inputRefs.current[0]) {
+          inputRefs.current[0].focus();
+        }
+      }
+    }
+  }, [isError]);
 
   const handleChange = (e, index) => {
     const value = e.target.value.replace(/[^0-9]/g, "");
@@ -44,6 +60,11 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
 
   return (
     <div className="flex flex-col items-center space-y-4">
+      {/* Accessibility live region for errors */}
+      <div aria-live="polite" className="sr-only">
+        {isError ? "Incorrect PIN entered. Please try again." : ""}
+      </div>
+
       <motion.div
         animate={isError ? { x: [-5, 5, -5, 5, 0] } : {}}
         transition={{ duration: 0.4 }}
@@ -56,6 +77,7 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
             type={showPin ? "text" : "password"}
             inputMode="numeric"
             maxLength={1}
+            aria-label={`Digit ${index + 1}`}
             value={pin[index] || ""}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
