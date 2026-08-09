@@ -36,3 +36,24 @@ export const listItem = {
   exit: { opacity: 0, x: -100 },
   transition: { duration: 0.2 }
 };
+
+export const hoverScale = {
+  whileHover: { scale: 1.02, backgroundColor: "var(--highlight)", transition: { duration: 0.2 } },
+  transition: { type: "spring", stiffness: 400, damping: 17 }
+};
+
+export const staggerContainer = {
+  initial: {},
+  animate: {
+    transition: {
+      staggerChildren: 0.1
+    }
+  }
+};
+
+export const modalSpring = {
+  initial: { scale: 0.9, opacity: 0, y: 20 },
+  animate: { scale: 1, opacity: 1, y: 0 },
+  exit: { scale: 0.9, opacity: 0, y: 20 },
+  transition: { type: "spring", stiffness: 300, damping: 24 }
+};

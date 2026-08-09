@@ -26,7 +26,7 @@ import {
   applyDueRecurring,
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
-import { expandingCard } from "../utils/motion";
+import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../utils/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useSEO } from "../utils/seo";
@@ -316,7 +316,7 @@ export default function Dashboard() {
           Net Balances
         </h2>
 
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:grid md:grid-cols-2 md:overflow-visible md:snap-none -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
+        <motion.div variants={staggerContainer} initial="initial" animate="animate" className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:grid md:grid-cols-2 md:overflow-visible md:snap-none -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
           {balances?.balances.map((b) => {
             const maxAbs = Math.max(
               ...balances.balances.map((x) => Math.abs(x.net_balance)),
@@ -329,9 +329,7 @@ export default function Dashboard() {
               <motion.div
                 key={b.member_id}
                 variants={expandingCard}
-                initial="initial"
-                animate="animate"
-                exit="exit"
+                whileHover={{ scale: 1.02, backgroundColor: "var(--highlight)" }}
                 layout
                 className="p-4 rounded-xl bg-highlight/20 snap-center min-w-[280px] md:min-w-0 flex-shrink-0"
               >
@@ -375,7 +373,7 @@ export default function Dashboard() {
               </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Settlement suggestion */}
         {balances?.settlement_suggestions?.length > 0 && (

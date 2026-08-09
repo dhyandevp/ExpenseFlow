@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
-import { sheetSlide } from "../utils/motion";
+import { sheetSlide, modalSpring } from "../utils/motion";
 import { useGroup } from "../App";
 import ReceiptUpload from "./ReceiptUpload";
 
@@ -41,7 +41,6 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
       document.body.style.overflow = '';
     };
   }, [isOpen]);
-
   useEffect(() => {
     if (initialData) {
       setForm({
@@ -112,7 +111,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
           onClick={onClose}
         >
           <motion.div
-            {...sheetSlide}
+            {...modalSpring}
             className="bg-surface rounded-t-2xl md:rounded-2xl w-full md:max-w-lg max-h-[90vh] overflow-auto p-6 md:m-4 pb-12 md:pb-6"
             onClick={(e) => e.stopPropagation()}
           >

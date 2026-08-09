@@ -4,7 +4,7 @@ import { HandCoins, Plus, Trash2, X, Loader2 } from "lucide-react";
 import { useGroup } from "../App";
 import { getSettlements, recordSettlement, deleteSettlement } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
-
+import { staggerContainer, hoverScale } from "../utils/motion";
 export default function SettlementHistory() {
   const { currentGroup } = useGroup();
   const [settlements, setSettlements] = useState([]);
@@ -168,9 +168,11 @@ export default function SettlementHistory() {
           No settlements recorded yet.
         </p>
       ) : (
-        <div className="space-y-4 max-h-60 overflow-y-auto relative pl-2 before:absolute before:inset-y-0 before:left-[11px] before:w-px before:bg-border/60">
+        <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-4 max-h-60 overflow-y-auto relative pl-2 before:absolute before:inset-y-0 before:left-[11px] before:w-px before:bg-border/60">
           {settlements.map((s) => (
-            <div
+            <motion.div
+              variants={hoverScale}
+              whileHover="whileHover"
               key={s.id}
               className="relative p-3 rounded-xl bg-surface border border-border/50 group shadow-sm ml-6"
             >
@@ -203,9 +205,9 @@ export default function SettlementHistory() {
               <p className="text-[10px] text-text-muted mt-2 border-t border-border/30 pt-2">
                 {new Date(s.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} {s.note && `· ${s.note}`}
               </p>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );
