@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSEO } from "../utils/seo";
 import { pageTransition, springScale } from "../utils/motion";
 import {
   ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock
@@ -33,7 +34,11 @@ const modelOptions = [
 ];
 
 export default function GroupSetup() {
-  useDocumentTitle("Create a Group");
+  useSEO({
+    title: "Create Group",
+    description: "Create a new group in ExpenseFlow to start tracking shared expenses with roommates or friends.",
+    url: "/setup"
+  });
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
   const { authMode, isLoaded } = useAuth();

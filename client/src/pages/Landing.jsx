@@ -8,6 +8,7 @@ import {
   ArrowRight,
   Users,
 } from "lucide-react";
+import { useSEO } from "../utils/seo";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import SignInModal from "../components/auth/SignInModal";
 import GuestJoinModal from "../components/auth/GuestJoinModal";
@@ -23,8 +24,13 @@ const fadeUp = {
 };
 
 export default function Landing() {
-  useDocumentTitle("Free Expense Sharing App for Roommates & Couples");
   const navigate = useNavigate();
+  useSEO({
+    title: "ExpenseFlow — Free Expense Sharing App for Roommates & Couples",
+    description: "Track shared expenses fairly over months, not just per bill. See who's contributing fairly with category insights, fairness scores, and scenario planning.",
+    url: "/"
+  });
+
   const { user, isLoaded, authMode } = useAuth();
   
   const [isSignInOpen, setIsSignInOpen] = useState(false);

@@ -29,6 +29,7 @@ import { formatINR } from "../utils/formatCurrency";
 import { expandingCard } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../utils/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { useSEO } from "../utils/seo";
 import FairnessTrend from "../components/FairnessTrend";
 import SettlementHistory from "../components/SettlementHistory";
 
@@ -74,6 +75,12 @@ export default function Dashboard() {
   const [breakdown, setBreakdown] = useState(null);
   const [fairness, setFairness] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  useSEO({
+    title: `Dashboard — ${currentGroup?.name || 'Group'}`,
+    description: "View group balances, upcoming dues, and fairness insights.",
+    url: `/group/${currentGroup?.code}/dashboard`
+  });
 
   useEffect(() => {
     if (!currentGroup) return;
