@@ -1,41 +1,8 @@
 [build]
-  # The build happens from the repo root, commands run there
-  command = "cd client && bun install && bun run build"
+  command = "cd client && npm run build"
   publish = "client/dist"
 
-# ── SPA routing: all non-file, non-API paths → index.html ─────
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-  conditions = { Path = ["!/api/*", "!/assets/*", "!/*.json", "!/*.ico", "!/*.png", "!/*.svg", "!/robots.txt", "!/sitemap.xml"] }
-
-# ── API proxy: forward /api/* to the backend server ───────────
-[[redirects]]
-  from = "/api/*"
-  to = "https://expenseflow-api.onrender.com/api/:splat"
-  status = 200
-  force = true
-
-# ── Headers for security and caching ──────────────────────────
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "DENY"
-    Referrer-Policy = "strict-origin-when-cross-origin"
-
-[[headers]]
-  for = "/robots.txt"
-  [headers.values]
-    Content-Type = "text/plain"
-
-[[headers]]
-  for = "/sitemap.xml"
-  [headers.values]
-    Content-Type = "application/xml"

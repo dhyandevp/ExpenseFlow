@@ -7,6 +7,7 @@ import Landing from "./pages/Landing";
 import GroupSetup from "./pages/GroupSetup";
 import JoinGroup from "./pages/JoinGroup";
 import AppLayout from "./components/AppLayout";
+import NotFound from "./pages/NotFound";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -176,7 +177,7 @@ export default function App() {
                 )
               }
             />
-            <Route path="*" element={<Navigate to="/" replace />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
       </GroupContext.Provider>
