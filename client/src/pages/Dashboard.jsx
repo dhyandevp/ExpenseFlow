@@ -161,7 +161,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start space-y-6 lg:space-y-0">
+      <div className="lg:col-span-2 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark">
           Dashboard
@@ -181,96 +182,6 @@ export default function Dashboard() {
             </button>
           ))}
         </div>
-      </div>
-
-      {/* Section A: Net Balance Summary */}
-      <div className="card">          <h2 className="font-heading font-semibold text-lg text-text-dark mb-4 flex items-center gap-2">
-          <Users size={18} className="text-primary" />
-          Net Balances
-        </h2>
-
-        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:grid md:grid-cols-2 md:overflow-visible md:snap-none -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
-          {balances?.balances.map((b) => {
-            const maxAbs = Math.max(
-              ...balances.balances.map((x) => Math.abs(x.net_balance)),
-              1
-            );
-            const pct = Math.abs(b.net_balance) / maxAbs;
-            const isPos = b.net_balance > 0;
-
-            return (
-              <motion.div
-                key={b.member_id}
-                variants={expandingCard}
-                initial="initial"
-                animate="animate"
-                exit="exit"
-                layout
-                className="p-4 rounded-xl bg-highlight/20 snap-center min-w-[280px] md:min-w-0 flex-shrink-0"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                      style={{ backgroundColor: b.color + "20" }}
-                    >
-                      {b.emoji}
-                    </div>
-                    <span className="font-medium text-text-dark">{b.name}</span>
-                  </div>
-                  <span
-                    className={`font-mono font-bold text-lg ${
-                      isPos ? "text-success" : b.net_balance < 0 ? "text-text-muted" : "text-text-dark"
-                    }`}
-                  >
-                    {isPos ? "+" : ""}
-                    {formatINR(b.net_balance)}
-                  </span>
-                </div>
-
-                {/* Visual bar */}
-                <div className="h-2 bg-border rounded-full overflow-hidden">
-                  <motion.div
-                    initial={{ width: 0 }}
-                    animate={{ width: `${Math.min(pct * 100, 100)}%` }}
-                    className={`h-full rounded-full ${
-                      isPos ? "bg-success" : "bg-border"
-                    }`}
-                    style={{
-                      marginLeft: isPos ? "0" : "auto",
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between text-xs text-text-muted mt-1">
-                  <span>Paid: {formatINR(b.total_paid)}</span>
-                  <span>Share: {formatINR(b.total_share)}</span>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-
-        {/* Settlement suggestion */}
-        {balances?.settlement_suggestions?.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="mt-4 p-4 rounded-xl bg-success/10 border border-success/30"
-          >
-            <p className="text-sm text-text-dark">
-              <span className="font-semibold">To settle up: </span>
-              {balances.settlement_suggestions.map((s, i) => (
-                <span key={i}>
-                  <strong>{s.from}</strong> pays <strong>{s.to}</strong>{" "}
-                  <span className="font-mono font-bold text-success">
-                    {formatINR(s.amount)}
-                  </span>
-                  {i < balances.settlement_suggestions.length - 1 && " → "}
-                </span>
-              ))}
-            </p>
-          </motion.div>
-        )}
       </div>
 
       {/* Settlement History */}
@@ -393,7 +304,104 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Section C: Fairness Score */}
+      {/* Fairness Trend */}
+      <FairnessTrend />
+      </div>
+
+      {/* Right Column: Balances & Fairness */}
+      <div className="lg:col-span-1 space-y-6 lg:sticky lg:top-6">
+        {/* Section A: Net Balance Summary */}
+      <div className="card">          <h2 className="font-heading font-semibold text-lg text-text-dark mb-4 flex items-center gap-2">
+          <Users size={18} className="text-primary" />
+          Net Balances
+        </h2>
+
+        <div className="flex overflow-x-auto snap-x snap-mandatory gap-3 pb-2 md:grid md:grid-cols-2 md:overflow-visible md:snap-none -mx-4 px-4 md:mx-0 md:px-0 hide-scrollbar">
+          {balances?.balances.map((b) => {
+            const maxAbs = Math.max(
+              ...balances.balances.map((x) => Math.abs(x.net_balance)),
+              1
+            );
+            const pct = Math.abs(b.net_balance) / maxAbs;
+            const isPos = b.net_balance > 0;
+
+            return (
+              <motion.div
+                key={b.member_id}
+                variants={expandingCard}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                layout
+                className="p-4 rounded-xl bg-highlight/20 snap-center min-w-[280px] md:min-w-0 flex-shrink-0"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
+                      style={{ backgroundColor: b.color + "20" }}
+                    >
+                      {b.emoji}
+                    </div>
+                    <span className="font-medium text-text-dark">{b.name}</span>
+                  </div>
+                  <span
+                    className={`font-mono font-bold text-lg ${
+                      isPos ? "text-success" : b.net_balance < 0 ? "text-text-muted" : "text-text-dark"
+                    }`}
+                  >
+                    {isPos ? "+" : ""}
+                    {formatINR(b.net_balance)}
+                  </span>
+                </div>
+
+                {/* Visual bar */}
+                <div className="h-2 bg-border rounded-full overflow-hidden">
+                  <motion.div
+                    initial={{ width: 0 }}
+                    animate={{ width: `${Math.min(pct * 100, 100)}%` }}
+                    className={`h-full rounded-full ${
+                      isPos ? "bg-success" : "bg-border"
+                    }`}
+                    style={{
+                      marginLeft: isPos ? "0" : "auto",
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-xs text-text-muted mt-1">
+                  <span>Paid: {formatINR(b.total_paid)}</span>
+                  <span>Share: {formatINR(b.total_share)}</span>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* Settlement suggestion */}
+        {balances?.settlement_suggestions?.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mt-4 p-4 rounded-xl bg-success/10 border border-success/30"
+          >
+            <p className="text-sm text-text-dark">
+              <span className="font-semibold">To settle up: </span>
+              {balances.settlement_suggestions.map((s, i) => (
+                <span key={i}>
+                  <strong>{s.from}</strong> pays <strong>{s.to}</strong>{" "}
+                  <span className="font-mono font-bold text-success">
+                    {formatINR(s.amount)}
+                  </span>
+                  {i < balances.settlement_suggestions.length - 1 && " → "}
+                </span>
+              ))}
+            </p>
+          </motion.div>
+        )}
+      </div>
+
+      
+        {/* Section C: Fairness Score */}
       {fairness && (
         <div className="card">
           <h2 className="font-heading font-semibold text-lg text-text-dark mb-4 flex items-center gap-2">
@@ -457,8 +465,8 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Fairness Trend */}
-      <FairnessTrend />
+      
+      </div>
     </div>
   );
 }
