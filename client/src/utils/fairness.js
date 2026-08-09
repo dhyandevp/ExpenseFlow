@@ -84,11 +84,13 @@ export function calculateSettlement(balances) {
       });
     }
 
-    if (debt <= credit) {
+    if (debt === credit) {
+      di++;
+      ci++;
+    } else if (debt < credit) {
       creditors[ci].net_balance -= debt;
       di++;
-    }
-    if (credit <= debt) {
+    } else {
       debtors[di].net_balance += credit;
       ci++;
     }
