@@ -20,7 +20,7 @@
 ## Phases
 
 ### Phase 1: Git Cleanup & Brand Rename
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Secure the repository by cleaning exposed credentials from git history, then rename every brand reference from BalanceBoard to ExpenseFlow. At the end, the app builds and runs as "ExpenseFlow" with no leaked secrets in the commit log.
 
 **Tasks** (ordered):
