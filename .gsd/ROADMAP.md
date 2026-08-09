@@ -274,15 +274,19 @@
 ---
 
 ### Phase 15: Authentication State & Landing Routing
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement the hybrid authentication hooks and dual call-to-action landing page.
 **Depends on**: Phase 14
 
 **Tasks**:
-- [ ] TBD (run /plan 15 to create)
+- [x] Enforce authMode in useAuth.js
+- [x] Block Guest Group Creation
+- [x] Add Auth Badge to Settings
+- [x] Update Landing Page CTAs
+- [x] Mandatory PIN in Join Flow
 
 **Verification**:
-- TBD
+- [x] Visually verified UI updates in Landing, JoinGroup, Settings, and GroupSetup.
 
 ---
 
