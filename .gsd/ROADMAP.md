@@ -108,7 +108,7 @@
 ---
 
 ### Phase 5: Cloudinary Receipt Uploads
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Replace Firebase Storage with Cloudinary for all receipt image uploads. At the end, receipts upload directly to Cloudinary with automatic WebP compression, and the Firestore expense document stores a permanent Cloudinary URL.
 
 **Tasks** (ordered):
