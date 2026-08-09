@@ -1,9 +1,9 @@
 # STATE.md
 
 ## Current Position
-- **Phase**: 11 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified
+- **Phase**: 21
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -37,4 +37,4 @@
 Phase 11 executed successfully. 3 plans completed. Standardized the schema and subcollections for expenses and settlements across both client API, backend functions, and shared math.
 
 ## Next Steps
-1. /plan 21
+1. /execute 21
