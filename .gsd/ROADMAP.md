@@ -259,15 +259,17 @@
 ---
 
 ### Phase 14: Netlify Functions Webhooks & Triggers
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Implement server-side logic for balancing expenses and syncing Clerk users.
 **Depends on**: Phase 13
 
 **Tasks**:
-- [ ] TBD (run /plan 14 to create)
+- [x] Configure Clerk webhook function (`clerk-webhook.js`)
+- [x] Implement Balance Trigger function (`balance-trigger.js`)
 
 **Verification**:
-- TBD
+- [x] Verified via `vitest run tests/clerk-webhook.test.js` (5 passing tests)
+- [x] Verified via `vitest run tests/balance-trigger.test.js` (4 passing tests)
 
 ---
 
