@@ -2,9 +2,9 @@
 
 ## Current Position
 - **Milestone**: v1.0 — Full ExpenseFlow Rebuild
-- **Phase**: 1 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified ✅
+- **Phase**: 2
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -20,10 +20,9 @@
 | 9 | Final Cleanup & Server Removal | ⬜ Not Started |
 
 ## Last Session Summary
-Phase 1 executed successfully. 3 plans, 7 tasks completed.
-- Git security: .gitignore hardened, pre-commit hook active, .env.example created
-- Brand rename: 42 replacements across 14 files — zero BalanceBoard references remain
-- Build verified: vite build succeeded, dist/ output clean
+Phase 2 planning completed with Ponytail Ultra simplifications.
+- **Ponytail applied**: Entire Netlify Functions backend for this phase has been eliminated. The math logic will be ported to the client side, avoiding the need for `balance-trigger.js`. CSV exports will be handled via client-side blobs, avoiding `export-csv.js`.
+- 3 plans created across 2 waves.
 
 ## Next Steps
-1. `/plan 2` — create Phase 2 execution plans (Firebase Firestore Migration)
+1. `/execute 2` — execute the Phase 2 plans.
