@@ -2,9 +2,9 @@
 
 ## Current Position
 - **Milestone**: v1.0 — Full ExpenseFlow Rebuild
-- **Phase**: 2 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified ✅
+- **Phase**: 3
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -20,13 +20,9 @@
 | 9 | Final Cleanup & Server Removal | ⬜ Not Started |
 
 ## Last Session Summary
-Phase 2 executed successfully using Ponytail Ultra. 3 plans executed.
-- `firebase` SDK installed and configured in client.
-- Express backend endpoints (`balances.js`, `reports.js`) eliminated. All math ported to pure frontend functions in `balanceMath.js`.
-- API client fully rewritten to use Firestore.
-- CSV export generated locally via Blobs.
-- SQLite to Firestore migration script created (`scripts/migrate-to-firestore.js`).
+Phase 3 planning completed.
+- **Ponytail applied**: Rate-limiting rules (Task 10) and service account-only writable fields (Task 6) were eliminated since we moved math to the client and avoid unneeded backend triggers.
+- 2 plans created across 2 waves.
 
 ## Next Steps
-1. Run the migration script locally using your Service Account key.
-2. Proceed to Phase 3.
+1. `/execute 3` — execute the Phase 3 plans.
