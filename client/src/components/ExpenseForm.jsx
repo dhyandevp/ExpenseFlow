@@ -28,7 +28,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     expense_date: new Date().toISOString().split("T")[0],
     split_type: "equal",
     split_members: [],
-    receipt_path: null,
+    receipt_url: null,
   });
 
   // Lock body scroll when modal is open
@@ -61,7 +61,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
         expense_date: new Date().toISOString().split("T")[0],
         split_type: "equal",
         split_members: [],
-        receipt_path: null,
+        receipt_url: null,
       });
     }
   }, [initialData, isOpen]);
@@ -83,7 +83,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
       description: form.description,
       expense_date: form.expense_date,
       split_type: form.split_type,
-      receipt_path: form.receipt_path,
+      receipt_url: form.receipt_url,
       split_members:
         form.split_members.length > 0
           ? form.split_members.map(Number)
@@ -220,8 +220,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
 
               {/* Receipt Upload */}
               <ReceiptUpload
-                value={form.receipt_path}
-                onChange={(path) => setForm((f) => ({ ...f, receipt_path: path }))}
+                value={form.receipt_url}
+                onChange={(url) => setForm((f) => ({ ...f, receipt_url: url }))}
               />
 
               {/* Date */}

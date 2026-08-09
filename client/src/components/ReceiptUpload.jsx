@@ -108,23 +108,29 @@ export default function ReceiptUpload({ value, onChange }) {
   );
 }
 
-// Small icon for expense list items that have a receipt
-export function ReceiptIndicator({ receiptPath, onClick }) {
-  if (!receiptPath) return null;
+// Small thumbnail indicator for expense list items that have a receipt
+export function ReceiptIndicator({ receiptUrl, onClick }) {
+  if (!receiptUrl) return null;
+  
+  // Apply Cloudinary transformation for a tiny thumbnail if it's a Cloudinary URL
+  const thumbUrl = receiptUrl.includes("/upload/") 
+    ? receiptUrl.replace("/upload/", "/upload/w_64,h_64,c_fill,f_auto,q_auto/")
+    : receiptUrl;
+
   return (
     <button
       onClick={onClick}
-      className="p-1 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors"
+      className="p-0.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors mr-1"
       title="View receipt"
     >
-      <ImageIcon size={14} />
+      <img src={thumbUrl} alt="Receipt thumbnail" className="w-6 h-6 object-cover rounded-md" loading="lazy" />
     </button>
   );
 }
 
 // Lightbox modal for viewing receipt images
-export function ReceiptLightbox({ receiptPath, onClose }) {
-  if (!receiptPath) return null;
+export function ReceiptLightbox({ receiptUrl, onClose }) {
+  if (!receiptUrl) return null;
   return (
     <AnimatePresence>
       <motion.div
@@ -142,7 +148,7 @@ export function ReceiptLightbox({ receiptPath, onClose }) {
           onClick={(e) => e.stopPropagation()}
         >
           <img
-            src={receiptPath}
+            src={receiptUrl}
             alt="Receipt"
             className="rounded-2xl shadow-xl max-h-[80vh] object-contain"
           />

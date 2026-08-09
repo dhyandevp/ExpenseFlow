@@ -321,10 +321,10 @@ export default function ExpenseLogger() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity items-center">
                     <ReceiptIndicator
-                      receiptPath={expense.receipt_path}
-                      onClick={() => setReceiptView(expense.receipt_path)}
+                      receiptUrl={expense.receipt_url}
+                      onClick={() => setReceiptView(expense.receipt_url)}
                     />
                     <button
                       onClick={() => handleDelete(expense.id)}
@@ -354,7 +354,7 @@ export default function ExpenseLogger() {
       {/* Receipt Lightbox */}
       {receiptView && (
         <ReceiptLightbox
-          receiptPath={receiptView}
+          receiptUrl={receiptView}
           onClose={() => setReceiptView(null)}
         />
       )}
