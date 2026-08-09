@@ -125,4 +125,28 @@
   .skeleton {
     @apply animate-pulse bg-border bg-opacity-50 rounded-lg;
   }
+
+  /* Liquid Glass Utilities */
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    background-color: rgba(235, 250, 219, 0.72);
+    border: 1px solid rgba(194, 203, 201, 0.4);
+  }
+
+  .glass-nav {
+    @apply glass border-t border-b-0 border-l-0 border-r-0 shadow-[0_-4px_24px_rgba(41,62,51,0.06)];
+  }
+
+  .glass-header {
+    @apply glass border-b border-t-0 border-l-0 border-r-0 shadow-[0_4px_24px_rgba(41,62,51,0.06)];
+  }
+
+  @media (prefers-reduced-transparency: reduce) {
+    .glass, .glass-nav, .glass-header {
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      background-color: var(--background);
+    }
+  }
 }
