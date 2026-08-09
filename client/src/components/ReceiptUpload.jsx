@@ -1,40 +1,22 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, Paperclip, Image as ImageIcon } from "lucide-react";
-import { uploadReceipt } from "../api/client";
+import { useReceiptUpload } from "../hooks/useReceiptUpload";
 
 export default function ReceiptUpload({ value, onChange }) {
-  const [uploading, setUploading] = useState(false);
+  const { uploadReceipt, isUploading, progress, error: uploadError } = useReceiptUpload();
   const [preview, setPreview] = useState(value || null);
   const [dragOver, setDragOver] = useState(false);
-  const [error, setError] = useState("");
 
   const handleFile = async (file) => {
     if (!file) return;
 
-    // Validate client-side
-    const allowed = ["image/jpeg", "image/png", "image/webp"];
-    if (!allowed.includes(file.type)) {
-      setError("Only JPEG, PNG, and WebP images are allowed.");
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setError("File too large. Maximum size is 5MB.");
-      return;
-    }
-
-    setError("");
-    setUploading(true);
-
     try {
-      const res = await uploadReceipt(file);
-      const path = res.data.path;
-      setPreview(path);
-      onChange(path);
+      const url = await uploadReceipt(file);
+      setPreview(url);
+      onChange(url);
     } catch (err) {
-      setError(err.message || "Upload failed.");
-    } finally {
-      setUploading(false);
+      // Error is handled by the hook
     }
   };
 
@@ -90,7 +72,7 @@ export default function ReceiptUpload({ value, onChange }) {
                 dragOver
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border text-text-muted hover:border-primary/40 hover:text-text-dark"
-              } ${uploading ? "opacity-60 cursor-not-allowed" : ""}`}
+              } ${isUploading ? "opacity-60 cursor-not-allowed" : ""}`}
               onDragOver={(e) => {
                 e.preventDefault();
                 setDragOver(true);
@@ -98,10 +80,10 @@ export default function ReceiptUpload({ value, onChange }) {
               onDragLeave={() => setDragOver(false)}
               onDrop={handleDrop}
             >
-              {uploading ? (
+              {isUploading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
-                  Uploading...
+                  Uploading... {progress}%
                 </>
               ) : (
                 <>
@@ -114,14 +96,14 @@ export default function ReceiptUpload({ value, onChange }) {
                 accept="image/jpeg,image/png,image/webp"
                 className="hidden"
                 onChange={(e) => handleFile(e.target.files[0])}
-                disabled={uploading}
+                disabled={isUploading}
               />
             </label>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {error && <p className="text-accent text-xs mt-1">{error}</p>}
+      {uploadError && <p className="text-accent text-xs mt-1">{uploadError}</p>}
     </div>
   );
 }
