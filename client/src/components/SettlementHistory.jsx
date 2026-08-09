@@ -168,38 +168,41 @@ export default function SettlementHistory() {
           No settlements recorded yet.
         </p>
       ) : (
-        <div className="space-y-1.5 max-h-60 overflow-y-auto">
+        <div className="space-y-4 max-h-60 overflow-y-auto relative pl-2 before:absolute before:inset-y-0 before:left-[11px] before:w-px before:bg-border/60">
           {settlements.map((s) => (
             <div
               key={s.id}
-              className="flex items-center justify-between p-2.5 rounded-xl bg-highlight/20 group"
+              className="relative p-3 rounded-xl bg-surface border border-border/50 group shadow-sm ml-6"
             >
-              <div className="flex items-center gap-2 text-sm min-w-0">
-                <span className="flex items-center gap-1">
-                  <span>{s.from_emoji}</span>
-                  <span className="font-medium text-text-dark">{s.from_name}</span>
-                </span>
-                <span className="text-text-muted text-xs">→</span>
-                <span className="flex items-center gap-1">
-                  <span>{s.to_emoji}</span>
-                  <span className="font-medium text-text-dark">{s.to_name}</span>
-                </span>
+              <div className="absolute top-4 -left-[30px] w-2.5 h-2.5 rounded-full bg-success ring-4 ring-surface" />
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-sm min-w-0">
+                  <span className="flex items-center gap-1">
+                    <span>{s.from_emoji}</span>
+                    <span className="font-medium text-text-dark">{s.from_name}</span>
+                  </span>
+                  <span className="text-text-muted text-[10px]">→</span>
+                  <span className="flex items-center gap-1">
+                    <span>{s.to_emoji}</span>
+                    <span className="font-medium text-text-dark">{s.to_name}</span>
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono font-bold text-success text-sm">
+                    {formatINR(s.amount)}
+                  </span>
+                  <button
+                    onClick={() => handleDelete(s.id)}
+                    className="p-1 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Undo settlement"
+                  >
+                    <Trash2 size={12} />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-success text-sm">
-                  {formatINR(s.amount)}
-                </span>
-                <span className="text-[10px] text-text-muted">
-                  {new Date(s.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}
-                </span>
-                <button
-                  onClick={() => handleDelete(s.id)}
-                  className="p-1 rounded-lg text-text-muted hover:text-accent hover:bg-accent/10 transition-colors opacity-0 group-hover:opacity-100"
-                  title="Undo settlement"
-                >
-                  <Trash2 size={12} />
-                </button>
-              </div>
+              <p className="text-[10px] text-text-muted mt-2 border-t border-border/30 pt-2">
+                {new Date(s.date).toLocaleDateString("en-IN", { day: "numeric", month: "short" })} {s.note && `· ${s.note}`}
+              </p>
             </div>
           ))}
         </div>

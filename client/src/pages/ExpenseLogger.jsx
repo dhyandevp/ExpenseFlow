@@ -20,6 +20,7 @@ import { getBalances } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ReceiptIndicator, ReceiptLightbox } from "../components/ReceiptUpload";
 import SettlementHistory from "../components/SettlementHistory";
+import { springScale } from "../utils/motion";
 
 const categoryIcons = {
   Rent: Home,
@@ -127,17 +128,30 @@ export default function ExpenseLogger() {
           </h1>
           <p className="text-xs text-text-muted font-mono">#{currentGroup.code}</p>
         </div>
-        <button
+        <motion.button
+          {...springScale}
           onClick={() => {
             setEditingExpense(null);
             setShowForm(true);
           }}
-          className="btn-primary"
+          className="btn-primary hidden md:flex"
         >
           <Plus size={18} />
           Add Expense
-        </button>
+        </motion.button>
       </div>
+
+      {/* Mobile FAB */}
+      <motion.button
+        {...springScale}
+        onClick={() => {
+          setEditingExpense(null);
+          setShowForm(true);
+        }}
+        className="md:hidden fixed bottom-[76px] right-4 w-14 h-14 rounded-full bg-primary text-background shadow-lg flex items-center justify-center z-40"
+      >
+        <Plus size={24} />
+      </motion.button>
 
       {/* Balance Chips */}
       {balances && (
@@ -267,14 +281,21 @@ export default function ExpenseLogger() {
               const payer = members.find((m) => m.id === expense.paid_by);
 
               return (
-                <motion.div
-                  key={expense.id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -100 }}
-                  layout
-                  className="card-hover p-4 flex items-start gap-3 group"
-                >
+                <div key={expense.id} className="relative overflow-hidden rounded-xl mb-2 group">
+                  <div className="absolute inset-y-0 right-0 w-24 bg-accent flex items-center justify-end px-6 rounded-xl">
+                    <Trash2 size={20} className="text-text-dark" />
+                  </div>
+                  <motion.div
+                    drag="x"
+                    dragConstraints={{ left: -80, right: 0 }}
+                    onDragEnd={(e, info) => {
+                      if (info.offset.x < -50) {
+                        handleDelete(expense.id);
+                      }
+                    }}
+                    style={{ willChange: "transform" }}
+                    className="card-hover p-4 flex items-start gap-3 bg-surface relative z-10"
+                  >
                   {/* Category icon */}
                   <div
                     className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
@@ -333,7 +354,8 @@ export default function ExpenseLogger() {
                       <Trash2 size={14} />
                     </button>
                   </div>
-                </motion.div>
+                  </motion.div>
+                </div>
               );
             })}
           </AnimatePresence>

@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { sheetSlide } from "../utils/motion";
 import { useGroup } from "../App";
 import ReceiptUpload from "./ReceiptUpload";
 
@@ -111,11 +112,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
           onClick={onClose}
         >
           <motion.div
-            initial={{ y: "100%", opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: "100%", opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="bg-surface rounded-2xl md:rounded-2xl w-full md:max-w-lg max-h-[90vh] overflow-auto p-6 md:m-4"
+            {...sheetSlide}
+            className="bg-surface rounded-t-2xl md:rounded-2xl w-full md:max-w-lg max-h-[90vh] overflow-auto p-6 md:m-4 pb-12 md:pb-6"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">
