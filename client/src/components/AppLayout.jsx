@@ -48,7 +48,14 @@ export default function AppLayout({ children }) {
   );
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex relative z-0">
+      {/* Background Blobs */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+        <div className="absolute -top-[10%] -left-[10%] w-[50vh] h-[50vh] rounded-full bg-highlight opacity-40 blur-[100px] mix-blend-multiply" />
+        <div className="absolute top-[20%] -right-[10%] w-[40vh] h-[40vh] rounded-full bg-success opacity-15 blur-[120px] mix-blend-multiply" />
+        <div className="absolute -bottom-[10%] left-[20%] w-[60vh] h-[60vh] rounded-full bg-highlight opacity-30 blur-[100px] mix-blend-multiply" />
+      </div>
+
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-surface border-r border-border min-h-screen p-4 sticky top-0">
         <div className="px-3 py-4 mb-2">
@@ -230,8 +237,8 @@ export default function AppLayout({ children }) {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="flex-1 md:pt-0 pt-[60px] pb-[72px] md:pb-0 min-h-screen overflow-auto">
-        <div className="max-w-4xl mx-auto px-4 py-6">{children}</div>
+      <main className="flex-1 md:pt-0 pt-[60px] pb-[72px] md:pb-0 min-h-screen overflow-auto relative z-10">
+        <div className="max-w-7xl mx-auto px-4 py-6">{children}</div>
       </main>
 
       {/* Mobile Bottom Nav */}

@@ -38,7 +38,7 @@ export const listItem = {
 };
 
 export const hoverScale = {
-  whileHover: { scale: 1.02, backgroundColor: "var(--highlight)", transition: { duration: 0.2 } },
+  whileHover: { scale: 1.01, y: -2, backgroundColor: "var(--highlight)", transition: { duration: 0.2 } },
   transition: { type: "spring", stiffness: 400, damping: 17 }
 };
 
