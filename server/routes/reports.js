@@ -230,7 +230,7 @@ router.get("/:id/report/csv", (req, res, next) => {
     }
 
     res.setHeader("Content-Type", "text/csv");
-    res.setHeader("Content-Disposition", "attachment; filename=balanceboard-report.csv");
+    res.setHeader("Content-Disposition", "attachment; filename=expenseflow-report.csv");
     res.send(csv);
   } catch (err) {
     next(err);

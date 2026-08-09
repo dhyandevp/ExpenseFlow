@@ -2,7 +2,7 @@ import { useEffect } from "react";
 
 const PAGE_DESCRIPTIONS = {
   "Create a Group": "Create a new expense-sharing group. Add members, set categories, and start tracking who pays what.",
-  "Join Group": "Join an existing BalanceBoard group with an invite code.",
+  "Join Group": "Join an existing ExpenseFlow group with an invite code.",
   "Log Expenses": "Log and track shared expenses. See who paid and how costs are split among group members.",
   "Dashboard": "View expense summaries, net balances, category breakdowns, and fairness scores for your group.",
   "Scenario Planner": "Simulate future expenses before they happen. See how payments would affect fairness.",
@@ -14,7 +14,7 @@ export default function useDocumentTitle(title) {
   useEffect(() => {
     const prevTitle = document.title;
     if (title) {
-      document.title = title + " — BalanceBoard";
+      document.title = title + " — ExpenseFlow";
     }
 
     // Set per-page meta description

@@ -40,9 +40,9 @@ export default function Landing() {
         className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto"
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl" role="img" aria-label="BalanceBoard logo">⚖️</span>
+          <span className="text-2xl" role="img" aria-label="ExpenseFlow logo">💸</span>
           <span className="font-heading font-bold text-xl text-text-dark">
-            BalanceBoard
+            ExpenseFlow
           </span>
         </div>
         <Link
@@ -71,7 +71,7 @@ export default function Landing() {
                 <span className="text-primary"> who paid what</span>.
               </h1>
               <p className="text-lg text-text-muted leading-relaxed mb-8 max-w-lg">
-                BalanceBoard tracks shared expenses over weeks and months,
+                ExpenseFlow tracks shared expenses over weeks and months,
                 showing you who's contributing fairly — not just who owes what
                 right now.
               </p>
@@ -187,7 +187,7 @@ export default function Landing() {
           viewport={{ once: true }}
           className="font-heading font-bold text-2xl md:text-3xl text-text-dark text-center mb-12"
         >
-          Why BalanceBoard?
+          Why ExpenseFlow?
         </motion.h2>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -259,7 +259,7 @@ export default function Landing() {
               {
                 step: "2",
                 title: "Log expenses together",
-                desc: "Add bills as they happen. Categorize them. BalanceBoard handles the math.",
+                desc: "Add bills as they happen. Categorize them. ExpenseFlow handles the math.",
               },
               {
                 step: "3",
@@ -317,7 +317,7 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-text-muted text-sm">
             <span>⚖️</span>
-            <span>BalanceBoard — Fair sharing, clear minds.</span>
+            <span>ExpenseFlow — Fair sharing, clear minds.</span>
           </div>
           <p className="text-text-muted text-xs">
             Made for roommates, couples, and close friends.

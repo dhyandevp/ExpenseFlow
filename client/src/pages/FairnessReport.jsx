@@ -102,13 +102,13 @@ export default function FairnessReport() {
       format: [canvas.width / 2, canvas.height / 2],
     });
     pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
-    pdf.save(`BalanceBoard-${currentGroup.name}-Report.pdf`);
+    pdf.save(`ExpenseFlow-${currentGroup.name}-Report.pdf`);
   };
 
   const handleShare = async () => {
     const shareData = {
-      title: `BalanceBoard Report - ${currentGroup.name}`,
-      text: `Check out the fairness report for ${currentGroup.name} on BalanceBoard!`,
+      title: `ExpenseFlow Report - ${currentGroup.name}`,
+      text: `Check out the fairness report for ${currentGroup.name} on ExpenseFlow!`,
       url: window.location.href,
     };
 

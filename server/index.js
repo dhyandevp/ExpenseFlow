@@ -64,7 +64,7 @@ app.use("/api/upload", uploadLimiter, uploadRouter);
 app.get("/api/health", (req, res) => {
   res.json({
     success: true,
-    message: "BalanceBoard API is running 🌿",
+    message: "ExpenseFlow API is running 🌿",
     environment: process.env.NODE_ENV || "development",
     timestamp: new Date().toISOString(),
   });
@@ -89,7 +89,7 @@ app.use(errorHandler);
 // ── Start Server ─────────────────────────────────────────────
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`
-  🌿 BalanceBoard API
+  🌿 ExpenseFlow API
   ─────────────────────
   Port:       ${PORT}
   Environment: ${process.env.NODE_ENV || "development"}

@@ -19,7 +19,7 @@ export function useGroup() {
 }
 
 // --- Recent Groups (multi-group switching) ---
-const RECENT_GROUPS_KEY = "balanceboard_recent_groups";
+const RECENT_GROUPS_KEY = "expenseflow_recent_groups";
 const MAX_RECENT_GROUPS = 5;
 
 function getStoredRecentGroups() {
@@ -66,7 +66,7 @@ export function useRecentGroups() {
 // --- Current Group ---
 function getStoredGroup() {
   try {
-    const stored = localStorage.getItem("balanceboard_group");
+    const stored = localStorage.getItem("expenseflow_group");
     return stored ? JSON.parse(stored) : null;
   } catch {
     return null;
@@ -94,9 +94,9 @@ export default function App() {
 
   useEffect(() => {
     if (currentGroup) {
-      localStorage.setItem("balanceboard_group", JSON.stringify(currentGroup));
+      localStorage.setItem("expenseflow_group", JSON.stringify(currentGroup));
     } else {
-      localStorage.removeItem("balanceboard_group");
+      localStorage.removeItem("expenseflow_group");
     }
   }, [currentGroup]);
 

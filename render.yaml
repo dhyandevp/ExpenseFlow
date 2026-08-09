@@ -1,10 +1,10 @@
-# ── BalanceBoard Backend Web Service ────────────────────────────
+# ── ExpenseFlow Backend Web Service ────────────────────────────
 # The frontend is deployed separately via Netlify (see netlify.toml)
 # Update FRONTEND_URL after the Netlify site is live.
 
 services:
   - type: web
-    name: balanceboard-api
+    name: expenseflow-api
     env: node
     region: ohio
     plan: free
@@ -17,8 +17,8 @@ services:
       - key: PORT
         value: "10000"
       - key: FRONTEND_URL
-        value: https://balanceboard.netlify.app
+        value: https://expenseflow.netlify.app
       - key: DATABASE_URL
         sync: false
     domains:
-      - balanceboard-api.onrender.com
+      - expenseflow-api.onrender.com
