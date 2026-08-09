@@ -42,8 +42,8 @@
 ---
 
 ### Phase 2: Firebase Firestore Migration
-**Status**: ⬜ Not Started
-**Objective**: Replace SQLite + Express with Firestore as the data layer and create the Netlify Functions for server-side operations. At the end, all data is stored in Firestore, the balance trigger function keeps currentBalances denormalized, and the app runs fully serverless.
+**Status**: ✅ Complete
+**Objective**: Replace SQLite + Express with Firestore as the data layer. At the end, all data is stored in Firestore, balances are calculated dynamically on the frontend (Ponytail Ultra), and the app runs fully serverless without Netlify Functions.
 
 **Tasks** (ordered):
 1. Install `firebase` in client and `firebase-admin` in netlify/functions (Prompt 2)

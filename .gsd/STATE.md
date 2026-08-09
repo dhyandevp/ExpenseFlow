@@ -2,15 +2,15 @@
 
 ## Current Position
 - **Milestone**: v1.0 — Full ExpenseFlow Rebuild
-- **Phase**: 2
-- **Task**: Planning complete
-- **Status**: Ready for execution
+- **Phase**: 2 (completed)
+- **Task**: All tasks complete
+- **Status**: Verified ✅
 
 ## Phase Summary
 | Phase | Name | Status |
 |-------|------|--------|
 | 1 | Git Cleanup & Brand Rename | ✅ Complete |
-| 2 | Firebase Firestore Migration | ⬜ Not Started |
+| 2 | Firebase Firestore Migration | ✅ Complete |
 | 3 | Firestore Security Rules | ⬜ Not Started |
 | 4 | Clerk Hybrid Authentication | ⬜ Not Started |
 | 5 | Cloudinary Receipt Uploads | ⬜ Not Started |
@@ -20,9 +20,13 @@
 | 9 | Final Cleanup & Server Removal | ⬜ Not Started |
 
 ## Last Session Summary
-Phase 2 planning completed with Ponytail Ultra simplifications.
-- **Ponytail applied**: Entire Netlify Functions backend for this phase has been eliminated. The math logic will be ported to the client side, avoiding the need for `balance-trigger.js`. CSV exports will be handled via client-side blobs, avoiding `export-csv.js`.
-- 3 plans created across 2 waves.
+Phase 2 executed successfully using Ponytail Ultra. 3 plans executed.
+- `firebase` SDK installed and configured in client.
+- Express backend endpoints (`balances.js`, `reports.js`) eliminated. All math ported to pure frontend functions in `balanceMath.js`.
+- API client fully rewritten to use Firestore.
+- CSV export generated locally via Blobs.
+- SQLite to Firestore migration script created (`scripts/migrate-to-firestore.js`).
 
 ## Next Steps
-1. `/execute 2` — execute the Phase 2 plans.
+1. Run the migration script locally using your Service Account key.
+2. Proceed to Phase 3.
