@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import { pageTransition, springScale } from "../utils/motion";
 import {
   ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock
 } from "lucide-react";
@@ -175,7 +176,7 @@ export default function GroupSetup() {
             Or share this link:<br />
             <span className="text-primary font-mono text-sm">{window.location.origin}/group/{createdGroup.code}</span>
           </p>
-          <button onClick={goToGroup} className="btn-primary w-full">Go to Group →</button>
+          <motion.button {...springScale} onClick={goToGroup} className="btn-primary w-full">Go to Group →</motion.button>
         </motion.div>
       </div>
     );
@@ -203,7 +204,7 @@ export default function GroupSetup() {
         <AnimatePresence mode="wait">
           {/* Step 1: Group Name & Members */}
           {step === 1 && (
-            <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="step1" {...pageTransition}>
               <h2 className="font-heading font-bold text-xl text-text-dark mb-1">Name your group</h2>
               <p className="text-text-muted text-sm mb-6">Something like "Flat 4B", "The Squad", or "Us"</p>
 
@@ -237,16 +238,16 @@ export default function GroupSetup() {
                 ))}
               </div>
 
-              <button onClick={() => setStep(2)} className="btn-primary w-full"
+              <motion.button {...springScale} onClick={() => setStep(2)} className="btn-primary w-full"
                 disabled={!groupName.trim() || members.filter((m) => m.name.trim()).length < 2}>
                 Continue →
-              </button>
+              </motion.button>
             </motion.div>
           )}
 
           {/* Step 2: Custom Categories */}
           {step === 2 && (
-            <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="step2" {...pageTransition}>
               <h2 className="font-heading font-bold text-xl text-text-dark mb-1">Fairness per category</h2>
               <p className="text-text-muted text-sm mb-6">Choose how each type of expense should be split. Add your own categories too.</p>
 
@@ -353,15 +354,15 @@ export default function GroupSetup() {
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(1)} className="btn-secondary flex-1">Back</button>
-                <button onClick={() => setStep(3)} className="btn-primary flex-1">Review & Create →</button>
+                <motion.button {...springScale} onClick={() => setStep(1)} className="btn-secondary flex-1">Back</motion.button>
+                <motion.button {...springScale} onClick={() => setStep(3)} className="btn-primary flex-1">Review & Create →</motion.button>
               </div>
             </motion.div>
           )}
 
           {/* Step 3: Review & Create */}
           {step === 3 && (
-            <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
+            <motion.div key="step3" {...pageTransition}>
               <h2 className="font-heading font-bold text-xl text-text-dark mb-1">Review & Create</h2>
               <p className="text-text-muted text-sm mb-6">Looks good? Let's go!</p>
 
@@ -399,10 +400,10 @@ export default function GroupSetup() {
               {error && <p className="text-accent text-sm mb-4">{error}</p>}
 
               <div className="flex gap-3">
-                <button onClick={() => setStep(2)} className="btn-secondary flex-1">Back</button>
-                <button onClick={handleCreate} disabled={creating} className="btn-primary flex-1">
+                <motion.button {...springScale} onClick={() => setStep(2)} className="btn-secondary flex-1">Back</motion.button>
+                <motion.button {...springScale} onClick={handleCreate} disabled={creating} className="btn-primary flex-1">
                   {creating ? <><Loader2 size={18} className="animate-spin" /> Creating...</> : <><Shuffle size={18} /> Create Group</>}
-                </button>
+                </motion.button>
               </div>
             </motion.div>
           )}

@@ -131,7 +131,7 @@ export default function Landing() {
             className="hidden lg:flex items-center justify-center"
           >
             <div className="relative">
-              <div className="w-72 h-72 rounded-3xl bg-primary/5 p-6 shadow-xl" style={{ boxShadow: '0 2px 12px rgba(41, 62, 51, 0.08)' }}>
+              <div className="w-72 h-72 rounded-3xl glass p-6 shadow-xl">
                 <div className="space-y-3">
                   {[
                     { name: "Alex", amount: "+₹3,400", color: "#009A6E" },

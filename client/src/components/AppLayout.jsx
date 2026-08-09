@@ -144,7 +144,7 @@ export default function AppLayout({ children }) {
       </aside>
 
       {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-30 bg-surface/80 backdrop-blur-md border-b border-border px-4 py-3 flex items-center justify-between">
+      <div className="md:hidden fixed top-0 left-0 right-0 z-30 glass-header px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-xl">⚖️</span>
           <div>
@@ -235,7 +235,7 @@ export default function AppLayout({ children }) {
       </main>
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-surface/90 backdrop-blur-md border-t border-border safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
         <div className="flex items-center justify-around py-2">
           {navItems.slice(0, 5).map((item) => {
             const basePath = `/group/${code}`;
