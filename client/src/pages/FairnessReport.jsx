@@ -22,6 +22,7 @@ import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { csvSafe } from "../utils/balanceMath";
 //import { getCategoryColor } from "../utils/fairness.js";
 // getCategoryColor not currently used in this component
 
@@ -80,8 +81,36 @@ export default function FairnessReport() {
 
   if (!currentGroup) return null;
 
-  const handleExportCSV = () => {
-    window.open(`/api/groups/${currentGroup.id}/report/csv`, "_blank");
+  const handleExportCSV = async () => {
+    try {
+      const { data: expenses } = await getReport(currentGroup.id, getDateRange(period));
+      // getReport was modified to return raw data, but wait, the Expenses are not returned in getReport!
+      // I should fetch expenses directly here to get descriptions and amounts for the CSV.
+      const { getExpenses } = await import("../api/client");
+      const { data: expenseData } = await getExpenses(currentGroup.id, getDateRange(period));
+      const { getMembers } = await import("../api/client");
+      const members = await getMembers(currentGroup.id);
+      const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]));
+
+      let csv = "Date,Category,Description,Amount,Paid By\\n";
+      for (const e of expenseData) {
+        const safeDesc = csvSafe(e.description);
+        const safeCat = csvSafe(e.category);
+        const safeName = csvSafe(memberMap[e.paid_by] || e.paid_by);
+        csv += `${e.expense_date},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\\n`;
+      }
+
+      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", `ExpenseFlow-${currentGroup.name}-report.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      console.error("Export CSV failed", err);
+    }
   };
 
   const handleExportPDF = async () => {
