@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { motion } from "framer-motion";
 
 export default function PINVerification({ pin, setPin, isError, onSubmit }) {
   const [showPin, setShowPin] = useState(false);
@@ -43,7 +44,11 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
 
   return (
     <div className="flex flex-col items-center space-y-4">
-      <div className={`flex space-x-2 ${isError ? "animate-[shake_0.5s_ease-in-out]" : ""}`}>
+      <motion.div
+        animate={isError ? { x: [-5, 5, -5, 5, 0] } : {}}
+        transition={{ duration: 0.4 }}
+        className="flex space-x-2"
+      >
         {[0, 1, 2, 3, 4, 5].map((index) => (
           <input
             key={index}
@@ -54,17 +59,17 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
             value={pin[index] || ""}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
-            className={`w-12 h-14 text-center text-2xl font-bold bg-dark-card border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary ${
-              isError ? "border-red-500 text-red-500" : "border-dark-border text-dark-text"
+            className={`w-12 h-14 text-center text-2xl font-bold bg-surface border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
+              isError ? "border-accent text-accent" : "border-border text-text-dark"
             }`}
           />
         ))}
-      </div>
+      </motion.div>
       
       <button 
         type="button"
         onClick={() => setShowPin(!showPin)}
-        className="text-sm text-dark-text-muted hover:text-primary flex items-center space-x-1"
+        className="text-sm text-text-muted hover:text-primary flex items-center space-x-1 transition-colors"
       >
         {showPin ? (
           <>
@@ -76,15 +81,6 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
           </>
         )}
       </button>
-      
-      {/* Required for the shake animation */}
-      <style>{`
-        @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-          20%, 40%, 60%, 80% { transform: translateX(5px); }
-        }
-      `}</style>
     </div>
   );
 }
