@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateFairnessScore, calculateBalances, csvSafe } from '../balanceMath';
+import { calculateFairnessScore, calculateBalances, csvSafe } from '../../../../shared/balanceMath';
 
 describe('balanceMath.js', () => {
   describe('calculateFairnessScore', () => {

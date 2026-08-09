@@ -27,7 +27,7 @@ import {
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
-import { getFairnessColor, getCategoryColor } from "../utils/fairness";
+import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useSEO } from "../utils/seo";
 import FairnessTrend from "../components/FairnessTrend";

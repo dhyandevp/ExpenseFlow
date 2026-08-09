@@ -96,7 +96,7 @@ export default function ExpenseLogger() {
 
   const handleAddExpense = async (data) => {
     try {
-      await createExpense(data);
+      await createExpense(currentGroup.id, data);
       setShowForm(false);
       loadData();
     } catch (err) {
@@ -107,7 +107,7 @@ export default function ExpenseLogger() {
   const handleDelete = async (id) => {
     if (!confirm("Delete this expense?")) return;
     try {
-      await deleteExpense(id);
+      await deleteExpense(currentGroup.id, id);
       loadData();
     } catch (err) {
       console.error("Failed to delete expense:", err);

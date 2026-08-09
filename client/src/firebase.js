@@ -22,4 +22,4 @@ enableIndexedDbPersistence(db).catch((err) => {
   }
 });
 
-export { db };
+export { db, app };

@@ -37,6 +37,11 @@ describe("Firestore Security Rules", () => {
   const guestDb = (uid, groupId) => testEnv.authenticatedContext(uid, { guestGroupId: groupId }).firestore();
 
   describe("Groups", () => {
+    it("Unauthenticated user cannot read a group", async () => {
+      const db = unauthDb();
+      await assertFails(db.collection("groups").doc("group1").get());
+    });
+
     it("Unauthenticated user cannot create a group", async () => {
       const db = unauthDb();
       await assertFails(db.collection("groups").doc("group1").set({ name: "Test Group" }));
@@ -61,32 +66,60 @@ describe("Firestore Security Rules", () => {
       const db = guestDb("guest1", "group1");
       await assertFails(db.collection("groups").doc("group2").get());
     });
-  });
 
-  describe("Expenses", () => {
-    it("Unauthenticated user cannot read expenses", async () => {
-      const db = unauthDb();
-      await assertFails(db.collection("expenses").doc("exp1").get());
-    });
-
-    it("Clerk user can read expenses for a group", async () => {
-      // Setup data bypassing rules
+    it("Updating restricted fields on a group fails for users", async () => {
+      const db = clerkDb("user1");
+      
+      // Setup initial document bypassing rules
       await testEnv.withSecurityRulesDisabled(async (context) => {
-        await context.firestore().collection("expenses").doc("exp1").set({ group_id: "group1", amount: 100 });
+        await context.firestore().collection("groups").doc("group3").set({ name: "Group 3", currentBalances: {} });
       });
 
+      // Try to update restricted field
+      await assertFails(db.collection("groups").doc("group3").update({ currentBalances: { "user1": 100 } }));
+      
+      // Try to update non-restricted field should succeed
+      await assertSucceeds(db.collection("groups").doc("group3").update({ name: "Group 3 Updated" }));
+    });
+  });
+
+  describe("Subcollections (Expenses & Settlements)", () => {
+    beforeEach(async () => {
+      // Create groups to test against
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection("groups").doc("group1").set({ name: "Group 1" });
+        await context.firestore().collection("groups").doc("group2").set({ name: "Group 2" });
+      });
+    });
+
+    it("Unauthenticated user cannot read expenses", async () => {
+      const db = unauthDb();
+      await assertFails(db.collection("groups").doc("group1").collection("expenses").doc("exp1").get());
+    });
+
+    it("Clerk user can read expenses for their group", async () => {
       const db = clerkDb("user1");
-      await assertSucceeds(db.collection("expenses").doc("exp1").get());
+      await assertSucceeds(db.collection("groups").doc("group1").collection("expenses").doc("exp1").get());
     });
 
     it("Guest user can create an expense in their assigned group", async () => {
       const db = guestDb("guest1", "group1");
-      await assertSucceeds(db.collection("expenses").doc("exp2").set({ group_id: "group1", amount: 50 }));
+      await assertSucceeds(db.collection("groups").doc("group1").collection("expenses").doc("exp2").set({ amount: 50 }));
     });
 
     it("Guest user cannot create an expense in a different group", async () => {
       const db = guestDb("guest1", "group1");
-      await assertFails(db.collection("expenses").doc("exp3").set({ group_id: "group2", amount: 50 }));
+      await assertFails(db.collection("groups").doc("group2").collection("expenses").doc("exp3").set({ amount: 50 }));
+    });
+
+    it("Settlements cannot be edited or deleted by anyone", async () => {
+      const db = clerkDb("user1");
+      // Creating should work
+      await assertSucceeds(db.collection("groups").doc("group1").collection("settlements").doc("set1").set({ amount: 100 }));
+      // Updating should fail
+      await assertFails(db.collection("groups").doc("group1").collection("settlements").doc("set1").update({ amount: 150 }));
+      // Deleting should fail
+      await assertFails(db.collection("groups").doc("group1").collection("settlements").doc("set1").delete());
     });
   });
 });

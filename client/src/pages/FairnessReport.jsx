@@ -22,8 +22,8 @@ import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import { csvSafe } from "../utils/balanceMath";
-//import { getCategoryColor } from "../utils/fairness.js";
+import { csvSafe } from "../../../shared/balanceMath";
+//import { getCategoryColor } from "../../../shared/fairness.js";
 // getCategoryColor not currently used in this component
 
 const periodOptions = [

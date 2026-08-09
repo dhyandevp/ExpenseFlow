@@ -17,7 +17,8 @@ export function calculateBalances(members, expenses, settlements = []) {
   const equalShare = members.length > 0 ? (expenses.reduce((s, e) => s + e.amount, 0) / members.length) : 0;
 
   for (const e of expenses) {
-    paidMap[e.paid_by] = (paidMap[e.paid_by] || 0) + e.amount;
+    const payer = e.paidBy || e.paid_by;
+    paidMap[payer] = (paidMap[payer] || 0) + e.amount;
     totalExpenses += e.amount;
   }
 
@@ -119,7 +120,8 @@ export function calculateCategoryBreakdown(members, expenses) {
 
   for (const e of expenses) {
     if (breakdown[e.category]) {
-      breakdown[e.category].members[e.paid_by].amount += e.amount;
+      const payer = e.paidBy || e.paid_by;
+      breakdown[e.category].members[payer].amount += e.amount;
     }
   }
 
@@ -162,7 +164,8 @@ export function calculateFairnessScore(members, expenses) {
 
   const memberPaid = {};
   for (const e of expenses) {
-    memberPaid[e.paid_by] = (memberPaid[e.paid_by] || 0) + e.amount;
+    const payer = e.paidBy || e.paid_by;
+    memberPaid[payer] = (memberPaid[payer] || 0) + e.amount;
   }
 
   const scores = members.map((m) => {

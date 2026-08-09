@@ -12,7 +12,7 @@ import {
 import { useGroup } from "../App";
 import { simulateScenario, saveScenario, getScenarios } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
-import { getFairnessColor } from "../utils/fairness";
+import { getFairnessColor } from "../../../shared/fairness";
 import {
   BarChart,
   Bar,

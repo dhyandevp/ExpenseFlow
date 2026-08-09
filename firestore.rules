@@ -8,88 +8,69 @@ service cloud.firestore {
     }
 
     // Clerk authenticated users will NOT have the guestGroupId custom claim (or it will be null)
-    function isClerkAuthenticated() {
+    function isClerkMember() {
       return isAuthenticated() && !("guestGroupId" in request.auth.token);
     }
 
     // Guest users will have the guestGroupId custom claim set in their token
-    function isGuest() {
+    function isGuestMember() {
       return isAuthenticated() && "guestGroupId" in request.auth.token;
     }
 
     // Check if the user has access to the specific group
-    function hasGroupAccess(groupId) {
-      // If clerk authenticated, we assume access for now (Phase 4 will refine)
+    function isGroupMember(groupId) {
+      // If clerk authenticated, we assume access for now (Phase 15 will refine)
       // If guest, they MUST match the guestGroupId claim
       return isAuthenticated() && (
-        isClerkAuthenticated() || 
-        (isGuest() && request.auth.token.guestGroupId == groupId)
+        isClerkMember() || 
+        (isGuestMember() && request.auth.token.guestGroupId == groupId)
       );
     }
 
-    // Check if user is requesting access to a resource based on group_id field
-    function hasResourceAccess(resourceData, requestData) {
-      // For reads/deletes (resource exists), check resource.data.group_id
-      // For creates/updates (request data exists), check request.resource.data.group_id
-      let groupId = resourceData != null ? resourceData.group_id : requestData.group_id;
-      return hasGroupAccess(groupId);
+    function isUpdatingRestrictedFields() {
+      let affected = request.resource.data.diff(resource.data).affectedKeys();
+      return affected.hasAny(['currentBalances', 'settlementSuggestions', 'fairnessScores']);
     }
 
     // --- Rules ---
-
     match /groups/{groupId} {
-      // Users can read the group if they have access to it.
-      // We also allow listing groups to find by code for the join flow.
-      allow read: if hasGroupAccess(groupId) || (
-        // Allow querying by code for join process
-        // In a real production app, this might be restricted further.
-        isAuthenticated()
-      );
+      // Users can only read their specific group. Unauthenticated users cannot read/list groups.
+      allow read: if isGroupMember(groupId);
       
       // Only fully authenticated Clerk users can create new groups
-      allow create: if isClerkAuthenticated();
+      allow create: if isClerkMember();
       
-      // Anyone with access to the group can update it
-      allow update: if hasGroupAccess(groupId);
+      // Anyone with access to the group can update it, EXCEPT restricted fields
+      allow update: if isGroupMember(groupId) && !isUpdatingRestrictedFields();
       
       // Deletion not explicitly allowed in MVP by clients
       allow delete: if false;
+
+      // --- Subcollections ---
+      
+      match /members/{memberId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+
+      match /expenses/{expenseId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+
+      match /categories/{categoryId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+
+      match /settlements/{settlementId} {
+        // Lock down settlements so they cannot be edited or deleted by anyone
+        allow read, create: if isGroupMember(groupId);
+        allow update, delete: if false;
+      }
+
+      match /scenarios/{scenarioId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
     }
 
-    // Sub-collections or linked collections (flat structure)
-    
-    match /members/{memberId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /expenses/{expenseId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /categories/{categoryId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /settlements/{settlementId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /scenarios/{scenarioId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /recurring_templates/{templateId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /fairness_snapshots/{snapshotId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-
-    match /fairness_models/{modelId} {
-      allow read, create, update, delete: if hasResourceAccess(resource == null ? null : resource.data, request.resource == null ? null : request.resource.data);
-    }
-    
     // Explicitly deny everything else
     match /{document=**} {
       allow read, write: if false;

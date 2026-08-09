@@ -3,7 +3,7 @@ import {
   calculateSettlement, 
   getFairnessColor, 
   getBalanceColor 
-} from '../fairness';
+} from '../../../../shared/fairness';
 
 describe('fairness.js', () => {
   describe('calculateSettlement', () => {

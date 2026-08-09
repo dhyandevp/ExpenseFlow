@@ -3,16 +3,22 @@ import {
   collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, 
   query, where, orderBy, limit as firestoreLimit
 } from "firebase/firestore";
-import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore } from "../utils/balanceMath";
+import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore } from "../../../shared/balanceMath";
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 const generateId = () => Math.random().toString(36).substring(2, 15);
 
 // ── Groups ──────────────────────────────────────────────────────────────
 export const createGroup = async (groupData) => {
+  const { pin, ...restData } = groupData;
   const docRef = await addDoc(collection(db, "groups"), {
-    ...groupData,
-    created_at: new Date().toISOString()
+    name: groupData.name || "Untitled Group",
+    code: groupData.code,
+    pinHash: pin || groupData.pinHash || null,
+    currency: groupData.currency || "USD",
+    settlementThreshold: groupData.settlementThreshold || 0,
+    currentBalances: {},
+    createdAt: new Date().toISOString()
   });
   return { success: true, data: { id: docRef.id, ...groupData } };
 };
@@ -22,7 +28,7 @@ export const getGroupByCode = async (code, pin) => {
   const snapshot = await getDocs(q);
   if (snapshot.empty) throw new Error("Group not found");
   const data = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
-  if (pin && data.pin && data.pin !== pin) throw new Error("Invalid PIN");
+  if (pin && data.pinHash && data.pinHash !== pin) throw new Error("Invalid PIN");
   return { success: true, data };
 };
 
@@ -44,62 +50,74 @@ export const regenerateCode = async (groupId) => {
 };
 
 export const setGroupPin = async (groupId, data) => {
-  await updateDoc(doc(db, "groups", groupId), { pin: data.pin });
+  await updateDoc(doc(db, "groups", groupId), { pinHash: data.pin });
   return { success: true };
 };
 
 // ── Members ─────────────────────────────────────────────────────────────
 export const addMember = async (groupId, data) => {
-  const docRef = await addDoc(collection(db, "members"), {
-    ...data,
-    group_id: groupId
+  const docRef = await addDoc(collection(db, "groups", groupId, "members"), {
+    ...data
   });
   return { success: true, data: { id: docRef.id, ...data } };
 };
 
 export const removeMember = async (groupId, memberId) => {
-  await deleteDoc(doc(db, "members", memberId));
+  await deleteDoc(doc(db, "groups", groupId, "members", memberId));
   return { success: true };
 };
 
 export const getMembers = async (groupId) => {
-  const q = query(collection(db, "members"), where("group_id", "==", groupId));
+  const q = query(collection(db, "groups", groupId, "members"));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
 
 // ── Expenses ────────────────────────────────────────────────────────────
-export const createExpense = async (data) => {
-  const docRef = await addDoc(collection(db, "expenses"), {
-    ...data,
-    created_at: new Date().toISOString()
-  });
-  return { success: true, data: { id: docRef.id, ...data } };
+export const createExpense = async (groupId, data) => {
+  const { expense_date, receiptPath, receipt_url, paid_by, group_id, ...rest } = data;
+  const expenseData = {
+    ...rest,
+    paidBy: paid_by || data.paidBy,
+    receiptUrl: receiptPath || receipt_url || data.receiptUrl || null,
+    createdAt: expense_date || data.createdAt || new Date().toISOString()
+  };
+  const docRef = await addDoc(collection(db, "groups", groupId, "expenses"), expenseData);
+  return { success: true, data: { id: docRef.id, ...expenseData } };
 };
 
 export const getExpenses = async (groupId, filters = {}) => {
   // Ponytail simplification: fetch all for group, filter client-side for complex queries
   // since group expense lists are small.
-  const q = query(collection(db, "expenses"), where("group_id", "==", groupId), orderBy("expense_date", "desc"));
+  const q = query(collection(db, "groups", groupId, "expenses"), orderBy("createdAt", "desc"));
   const snap = await getDocs(q);
-  let expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  let expenses = snap.docs.map(d => {
+    const data = d.data();
+    return { 
+      id: d.id, 
+      ...data,
+      paid_by: data.paidBy || data.paid_by,
+      expense_date: data.createdAt || data.expense_date,
+      receiptPath: data.receiptUrl || data.receiptPath || data.receipt_url
+    };
+  });
   
   if (filters.category) expenses = expenses.filter(e => e.category === filters.category);
-  if (filters.member_id) expenses = expenses.filter(e => e.paid_by === filters.member_id);
-  if (filters.start_date) expenses = expenses.filter(e => e.expense_date >= filters.start_date);
-  if (filters.end_date) expenses = expenses.filter(e => e.expense_date <= filters.end_date);
+  if (filters.member_id) expenses = expenses.filter(e => e.paidBy === filters.member_id || e.paid_by === filters.member_id);
+  if (filters.start_date) expenses = expenses.filter(e => (e.createdAt || e.expense_date) >= filters.start_date);
+  if (filters.end_date) expenses = expenses.filter(e => (e.createdAt || e.expense_date) <= filters.end_date);
   if (filters.limit) expenses = expenses.slice(0, filters.limit);
   
   return { success: true, data: expenses };
 };
 
-export const updateExpense = async (id, data) => {
-  await updateDoc(doc(db, "expenses", id), data);
+export const updateExpense = async (groupId, id, data) => {
+  await updateDoc(doc(db, "groups", groupId, "expenses", id), data);
   return { success: true };
 };
 
-export const deleteExpense = async (id) => {
-  await deleteDoc(doc(db, "expenses", id));
+export const deleteExpense = async (groupId, id) => {
+  await deleteDoc(doc(db, "groups", groupId, "expenses", id));
   return { success: true };
 };
 
@@ -130,12 +148,12 @@ export const getFairnessScore = async (groupId, period = {}) => {
 
 // ── Scenarios ───────────────────────────────────────────────────────────
 export const getScenarios = async (groupId) => {
-  const snap = await getDocs(query(collection(db, "scenarios"), where("group_id", "==", groupId)));
+  const snap = await getDocs(query(collection(db, "groups", groupId, "scenarios")));
   return { success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
 };
 
 export const saveScenario = async (groupId, data) => {
-  await addDoc(collection(db, "scenarios"), { ...data, group_id: groupId });
+  await addDoc(collection(db, "groups", groupId, "scenarios"), { ...data });
   return { success: true };
 };
 
@@ -166,7 +184,7 @@ export const getReport = async (groupId, period = {}) => {
 
 // ── Categories ──────────────────────────────────────────────────────────
 export const getCategories = async (groupId) => {
-  const snap = await getDocs(query(collection(db, "categories"), where("group_id", "==", groupId), orderBy("sort_order")));
+  const snap = await getDocs(query(collection(db, "groups", groupId, "categories"), orderBy("sort_order")));
   if (snap.empty) {
     return { success: true, data: [
       { id: "1", name: "Rent", emoji: "🏠", color: "#4A90E2" },
@@ -177,17 +195,17 @@ export const getCategories = async (groupId) => {
 };
 
 export const createCategory = async (groupId, data) => {
-  const docRef = await addDoc(collection(db, "categories"), { ...data, group_id: groupId });
+  const docRef = await addDoc(collection(db, "groups", groupId, "categories"), { ...data });
   return { success: true, data: { id: docRef.id, ...data } };
 };
 
 export const updateCategory = async (groupId, catId, data) => {
-  await updateDoc(doc(db, "categories", catId), data);
+  await updateDoc(doc(db, "groups", groupId, "categories", catId), data);
   return { success: true };
 };
 
 export const deleteCategory = async (groupId, catId) => {
-  await deleteDoc(doc(db, "categories", catId));
+  await deleteDoc(doc(db, "groups", groupId, "categories", catId));
   return { success: true };
 };
 
@@ -198,17 +216,17 @@ export const reorderCategories = async (groupId, order) => {
 
 // ── Settlements ─────────────────────────────────────────────────────────
 export const getSettlements = async (groupId) => {
-  const snap = await getDocs(query(collection(db, "settlements"), where("group_id", "==", groupId), orderBy("date", "desc")));
+  const snap = await getDocs(query(collection(db, "groups", groupId, "settlements"), orderBy("date", "desc")));
   return { success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
 };
 
 export const recordSettlement = async (groupId, data) => {
-  await addDoc(collection(db, "settlements"), { ...data, group_id: groupId, date: new Date().toISOString() });
+  await addDoc(collection(db, "groups", groupId, "settlements"), { ...data, date: new Date().toISOString() });
   return { success: true };
 };
 
 export const deleteSettlement = async (groupId, sid) => {
-  await deleteDoc(doc(db, "settlements", sid));
+  await deleteDoc(doc(db, "groups", groupId, "settlements", sid));
   return { success: true };
 };
 
