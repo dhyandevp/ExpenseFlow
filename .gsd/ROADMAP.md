@@ -375,15 +375,19 @@
 ---
 
 ### Phase 21: Data Migration Script
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Safely migrate legacy SQLite data to the new Firestore structure.
 **Depends on**: Phase 20
 
 **Tasks**:
-- [ ] TBD (run /plan 21 to create)
+- [x] Create migration script (`scripts/migrate.js`).
+- [x] Implement 500-doc batching and proper relational data mapping.
+- [x] Add verification counts and logs.
+- [x] Ignore `scripts/` from Netlify deployment via `.netlifyignore`.
 
 **Verification**:
-- TBD
+- [x] Confirmed `.netlifyignore` contains `scripts/`.
+- [x] Confirmed `migrate.js` contains batched writing logic and validation checks.
 
 ---
 
