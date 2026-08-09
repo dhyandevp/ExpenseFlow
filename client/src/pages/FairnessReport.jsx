@@ -96,8 +96,8 @@ export default function FairnessReport() {
       for (const e of expenseData) {
         const safeDesc = csvSafe(e.description);
         const safeCat = csvSafe(e.category);
-        const safeName = csvSafe(memberMap[e.paid_by] || e.paid_by);
-        csv += `${e.expense_date},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\\n`;
+        const safeName = csvSafe(memberMap[e.paidBy] || e.paidBy);
+        csv += `${e.createdAt},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\\n`;
       }
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });

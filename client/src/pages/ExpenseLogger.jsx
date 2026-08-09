@@ -278,7 +278,7 @@ export default function ExpenseLogger() {
                 return <Icon size={18} style={{ color: catColor }} />;
               };
               const catColor = getExpenseCatColor(expense.category);
-              const payer = members.find((m) => m.id === expense.paid_by);
+              const payer = members.find((m) => m.id === expense.paidBy);
 
               return (
                 <div key={expense.id} className="relative overflow-hidden rounded-xl mb-2 group">
@@ -313,7 +313,7 @@ export default function ExpenseLogger() {
                         </p>
                         <p className="text-xs text-text-muted mt-0.5">
                           {expense.payer_emoji} {expense.payer_name} ·{" "}
-                          {new Date(expense.expense_date).toLocaleDateString(
+                          {new Date(expense.createdAt).toLocaleDateString(
                             "en-IN",
                             { day: "numeric", month: "short" }
                           )}
@@ -344,8 +344,8 @@ export default function ExpenseLogger() {
                   {/* Actions */}
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity items-center">
                     <ReceiptIndicator
-                      receiptUrl={expense.receipt_url}
-                      onClick={() => setReceiptView(expense.receipt_url)}
+                      receiptUrl={expense.receiptUrl}
+                      onClick={() => setReceiptView(expense.receiptUrl)}
                     />
                     <button
                       onClick={() => handleDelete(expense.id)}

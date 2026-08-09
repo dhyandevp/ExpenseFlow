@@ -35,19 +35,19 @@ const prebuiltExamples = [
   {
     name: "What if Alex pays next 2 grocery runs?",
     actions: [
-      { paid_by_index: 0, category: "Groceries", amount: 1500, count: 2 },
+      { paidBy_index: 0, category: "Groceries", amount: 1500, count: 2 },
     ],
   },
   {
     name: "What if Jamie covers internet for 3 months?",
     actions: [
-      { paid_by_index: 1, category: "Utilities", amount: 800, count: 3 },
+      { paidBy_index: 1, category: "Utilities", amount: 800, count: 3 },
     ],
   },
   {
     name: "What if Sam pays this month's rent?",
     actions: [
-      { paid_by_index: 2, category: "Rent", amount: 12000, count: 1 },
+      { paidBy_index: 2, category: "Rent", amount: 12000, count: 1 },
     ],
   },
 ];
@@ -58,7 +58,7 @@ export default function ScenarioPlanner() {
   const members = currentGroup?.members || [];
 
   const [actions, setActions] = useState([
-    { paid_by: "", category: "Other", amount: "", count: 1 },
+    { paidBy: "", category: "Other", amount: "", count: 1 },
   ]);
   const [simulation, setSimulation] = useState(null);
   const [simulating, setSimulating] = useState(false);
@@ -76,7 +76,7 @@ export default function ScenarioPlanner() {
   }, [currentGroup]);
 
   const addAction = () => {
-    setActions([...actions, { paid_by: "", category: "Other", amount: "", count: 1 }]);
+    setActions([...actions, { paidBy: "", category: "Other", amount: "", count: 1 }]);
   };
 
   const updateAction = (idx, field, value) => {
@@ -89,14 +89,14 @@ export default function ScenarioPlanner() {
   };
 
   const handleSimulate = async () => {
-    const validActions = actions.filter((a) => a.paid_by && a.amount);
+    const validActions = actions.filter((a) => a.paidBy && a.amount);
     if (validActions.length === 0) return;
 
     setSimulating(true);
     try {
       const data = {
         actions: validActions.map((a) => ({
-          paid_by: parseInt(a.paid_by),
+          paidBy: parseInt(a.paidBy),
           category: a.category,
           amount: parseFloat(a.amount),
           count: parseInt(a.count) || 1,
@@ -133,7 +133,7 @@ export default function ScenarioPlanner() {
 
   const applyPrebuilt = (example) => {
     const mappedActions = example.actions.map((a) => ({
-      paid_by: members[a.paid_by_index]?.id?.toString() || "",
+      paidBy: members[a.paidBy_index]?.id?.toString() || "",
       category: a.category,
       amount: a.amount.toString(),
       count: a.count,
@@ -205,8 +205,8 @@ export default function ScenarioPlanner() {
                     Who pays
                   </label>
                   <select
-                    value={action.paid_by}
-                    onChange={(e) => updateAction(idx, "paid_by", e.target.value)}
+                    value={action.paidBy}
+                    onChange={(e) => updateAction(idx, "paidBy", e.target.value)}
                     className="input-field text-sm"
                   >
                     <option value="">Select...</option>

@@ -23,7 +23,7 @@ export default function RecurringManager() {
   const [showForm, setShowForm] = useState(false);
   const [applying, setApplying] = useState(null);
   const [form, setForm] = useState({
-    paid_by: "",
+    paidBy: "",
     amount: "",
     category: "Rent",
     description: "",
@@ -51,16 +51,16 @@ export default function RecurringManager() {
 
   const handleCreate = async (e) => {
     e.preventDefault();
-    if (!form.paid_by || !form.amount) return;
+    if (!form.paidBy || !form.amount) return;
     try {
       await createRecurringTemplate(currentGroup.id, {
         ...form,
-        paid_by: parseInt(form.paid_by),
+        paidBy: parseInt(form.paidBy),
         amount: parseFloat(form.amount),
       });
       setShowForm(false);
       setForm({
-        paid_by: "", amount: "", category: "Rent", description: "",
+        paidBy: "", amount: "", category: "Rent", description: "",
         split_type: "equal", frequency: "monthly",
         next_due: new Date().toISOString().split("T")[0],
       });
@@ -126,8 +126,8 @@ export default function RecurringManager() {
                   Who pays
                 </label>
                 <select
-                  value={form.paid_by}
-                  onChange={(e) => setForm({ ...form, paid_by: e.target.value })}
+                  value={form.paidBy}
+                  onChange={(e) => setForm({ ...form, paidBy: e.target.value })}
                   className="input-field text-sm"
                   required
                 >

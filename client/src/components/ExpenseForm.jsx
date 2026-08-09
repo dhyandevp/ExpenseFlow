@@ -23,13 +23,13 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
   const { currentGroup } = useGroup();
   const [form, setForm] = useState({
     amount: "",
-    paid_by: "",
+    paidBy: "",
     category: "Other",
     description: "",
-    expense_date: new Date().toISOString().split("T")[0],
+    createdAt: new Date().toISOString().split("T")[0],
     split_type: "equal",
     split_members: [],
-    receipt_url: null,
+    receiptUrl: null,
   });
 
   // Lock body scroll when modal is open
@@ -45,23 +45,23 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     if (initialData) {
       setForm({
         amount: String(initialData.amount),
-        paid_by: String(initialData.paid_by),
+        paidBy: String(initialData.paidBy),
         category: initialData.category,
         description: initialData.description || "",
-        expense_date: initialData.expense_date,
+        createdAt: initialData.createdAt,
         split_type: initialData.split_type || "equal",
         split_members: initialData.splits?.map((s) => s.member_id) || [],
       });
     } else {
       setForm({
         amount: "",
-        paid_by: "",
+        paidBy: "",
         category: "Other",
         description: "",
-        expense_date: new Date().toISOString().split("T")[0],
+        createdAt: new Date().toISOString().split("T")[0],
         split_type: "equal",
         split_members: [],
-        receipt_url: null,
+        receiptUrl: null,
       });
     }
   }, [initialData, isOpen]);
@@ -73,17 +73,17 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     e.preventDefault();
     const amount = parseFloat(form.amount);
     if (!amount || amount <= 0) return;
-    if (!form.paid_by) return;
+    if (!form.paidBy) return;
 
     onSubmit({
       group_id: currentGroup.id,
-      paid_by: parseInt(form.paid_by),
+      paidBy: parseInt(form.paidBy),
       amount,
       category: form.category,
       description: form.description,
-      expense_date: form.expense_date,
+      createdAt: form.createdAt,
       split_type: form.split_type,
-      receipt_url: form.receipt_url,
+      receiptUrl: form.receiptUrl,
       split_members:
         form.split_members.length > 0
           ? form.split_members.map(Number)
@@ -159,9 +159,9 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                   Paid by
                 </label>
                 <select
-                  value={form.paid_by}
+                  value={form.paidBy}
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, paid_by: e.target.value }))
+                    setForm((f) => ({ ...f, paidBy: e.target.value }))
                   }
                   className="input-field"
                   required
@@ -217,8 +217,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
 
               {/* Receipt Upload */}
               <ReceiptUpload
-                value={form.receipt_url}
-                onChange={(url) => setForm((f) => ({ ...f, receipt_url: url }))}
+                value={form.receiptUrl}
+                onChange={(url) => setForm((f) => ({ ...f, receiptUrl: url }))}
               />
 
               {/* Date */}
@@ -228,9 +228,9 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </label>
                 <input
                   type="date"
-                  value={form.expense_date}
+                  value={form.createdAt}
                   onChange={(e) =>
-                    setForm((f) => ({ ...f, expense_date: e.target.value }))
+                    setForm((f) => ({ ...f, createdAt: e.target.value }))
                   }
                   className="input-field"
                 />
@@ -298,7 +298,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 <button
                   type="submit"
                   className="btn-primary flex-1"
-                  disabled={!form.amount || !form.paid_by}
+                  disabled={!form.amount || !form.paidBy}
                 >
                   {isEditing ? "Update" : "Add Expense"}
                 </button>
