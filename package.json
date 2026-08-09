@@ -9,10 +9,12 @@
     "dev:client": "cd client && bun run dev",
     "build": "cd client && npm install && npm run build",
     "start": "cd server && node index.js",
-    "install:all": "cd server && bun install && cd ../client && bun install"
+    "install:all": "cd server && bun install && cd ../client && bun install",
+    "test:rules": "firebase emulators:exec 'vitest run tests/firestore.rules.test.js'"
   },
-  "dependencies": {},
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "concurrently": "^8.2.2",
+    "vitest": "^4.1.10"
   }
 }
