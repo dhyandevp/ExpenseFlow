@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGroup } from "../App";
+import { useAuth } from "../hooks/useAuth";
 
 const navItems = [
   { path: "", icon: PlusCircle, label: "Expenses" },
@@ -23,11 +24,19 @@ const navItems = [
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
+const mobileNavItems = [
+  { path: "/dashboard", icon: LayoutDashboard, label: "Home" },
+  { path: "", icon: PlusCircle, label: "Add" },
+  { path: "/settings", icon: Users, label: "Groups" },
+  { path: "/report", icon: FileText, label: "Reports" },
+];
+
 export default function AppLayout({ children }) {
   const { code } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
   const { currentGroup, setCurrentGroup, recentGroups } = useGroup();
+  const { authMode } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [groupSwitcherOpen, setGroupSwitcherOpen] = useState(false);
 
@@ -161,12 +170,19 @@ export default function AppLayout({ children }) {
             <p className="text-[10px] text-text-muted font-mono">#{currentGroup.code}</p>
           </div>
         </div>
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="p-2 rounded-lg hover:bg-background transition-colors"
-        >
-          {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        <div className="flex items-center gap-2">
+          {authMode === "clerk" ? (
+            <span className="text-[10px] bg-success/20 text-success px-2 py-1 rounded-full font-medium">Signed In</span>
+          ) : (
+            <span className="text-[10px] bg-border text-text-muted px-2 py-1 rounded-full font-medium">Guest</span>
+          )}
+          <button
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="p-1.5 rounded-lg hover:bg-background transition-colors"
+          >
+            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu Overlay */}
@@ -237,17 +253,37 @@ export default function AppLayout({ children }) {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="flex-1 md:pt-0 pt-[60px] pb-[72px] md:pb-0 min-h-screen overflow-auto relative z-10">
-        <div className="max-w-7xl mx-auto px-4 py-6">{children}</div>
+      <main className="flex-1 md:pt-0 pt-[60px] pb-[72px] md:pb-0 min-h-screen overflow-hidden relative z-10">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, transition: { duration: 0.15 } }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="max-w-7xl mx-auto px-4 py-6 h-full"
+          >
+            {children}
+          </motion.div>
+        </AnimatePresence>
       </main>
+
+      {/* Mobile FAB */}
+      <Link
+        to={`/group/${code}`}
+        className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center"
+        aria-label="Add Expense"
+      >
+        <PlusCircle size={28} />
+      </Link>
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
         <div className="flex items-center justify-around py-2">
-          {navItems.slice(0, 5).map((item) => {
+          {mobileNavItems.map((item) => {
             const basePath = `/group/${code}`;
             const itemPath = `${basePath}${item.path}`;
-            const isActive = location.pathname === itemPath;
+            const isActive = location.pathname === itemPath || (item.path === "" && location.pathname === basePath);
             return (
               <Link
                 key={item.label}
