@@ -1,12 +1,8 @@
 node_modules/
 dist/
-*.db
-*.db-wal
-*.db-shm
 .DS_Store
 
 # Environment files (defense-in-depth)
 .env
 .env.*
 !.env.example
-server/.env

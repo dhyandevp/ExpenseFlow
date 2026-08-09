@@ -4,17 +4,13 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently -k -n \"server,client\" -c \"yellow,cyan\" \"npm run dev:server\" \"npm run dev:client\"",
-    "dev:server": "cd server && node --watch index.js",
-    "dev:client": "cd client && bun run dev",
-    "build": "cd client && npm install && npm run build",
-    "start": "cd server && node index.js",
-    "install:all": "cd server && bun install && cd ../client && bun install",
+    "dev": "cd client && bun run dev",
+    "build": "cd client && bun install && bun run build",
+    "install:all": "cd client && bun install",
     "test:rules": "firebase emulators:exec 'vitest run tests/firestore.rules.test.js'"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
-    "concurrently": "^8.2.2",
     "vitest": "^4.1.10"
   }
 }
