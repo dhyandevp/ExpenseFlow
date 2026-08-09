@@ -233,13 +233,20 @@ export default function Landing() {
       {/* Footer */}
       <footer className="px-6 py-8 border-t border-border mt-20">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2 text-text-muted text-sm">
-            <span>⚖️</span>
-            <span>ExpenseFlow — Fair sharing, clear minds.</span>
+          <div className="flex flex-col items-center md:items-start gap-1">
+            <div className="flex items-center gap-2 text-text-muted text-sm">
+              <span>⚖️</span>
+              <span>ExpenseFlow — Fair sharing, clear minds.</span>
+            </div>
+            <p className="text-text-muted text-xs">
+              Made for roommates, couples, and close friends.
+            </p>
           </div>
-          <p className="text-text-muted text-xs">
-            Made for roommates, couples, and close friends.
-          </p>
+          <div className="flex items-center gap-4 text-xs text-text-muted">
+            <Link to="/terms" className="hover:text-text-dark transition-colors">Terms of Service</Link>
+            <Link to="/privacy" className="hover:text-text-dark transition-colors">Privacy Policy</Link>
+            <Link to="/contact" className="hover:text-text-dark transition-colors">Contact</Link>
+          </div>
         </div>
       </footer>
     </div>

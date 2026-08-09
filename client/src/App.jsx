@@ -8,6 +8,9 @@ import GroupSetup from "./pages/GroupSetup";
 import JoinGroup from "./pages/JoinGroup";
 import AppLayout from "./components/AppLayout";
 import NotFound from "./pages/NotFound";
+import Terms from "./pages/Terms";
+import Privacy from "./pages/Privacy";
+import Contact from "./pages/Contact";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -115,6 +118,9 @@ export default function App() {
             <Suspense fallback={<PageLoader />}>
               <Routes>
                 <Route path="/" element={<Landing />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/setup" element={<GroupSetup />} />
                 <Route path="/join/:code" element={<JoinGroup />} />
             <Route
