@@ -96,7 +96,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
                 onSubmit={handleSubmit} 
               />
               {errorMsg && (
-                <p className="text-red-500 text-sm text-center mt-2">{errorMsg}</p>
+                <p className="text-accent text-sm text-center mt-2">{errorMsg}</p>
               )}
             </div>
             

@@ -226,12 +226,12 @@ export default function FairnessReport() {
 
           {/* Category × Member Grid */}
           {categories.length > 0 && (
-            <div className="card overflow-x-auto">
+            <div className="card">
               <h3 className="font-heading font-semibold text-text-dark mb-3">
                 Expense Breakdown
               </h3>
-              <table className="w-full text-sm">
-                <thead>
+              <table className="w-full text-sm block md:table">
+                <thead className="hidden md:table-header-group">
                   <tr className="border-b border-border">
                     {gridColumns.map((col) => (
                       <th
@@ -245,10 +245,10 @@ export default function FairnessReport() {
                     ))}
                   </tr>
                 </thead>
-                <tbody>
+                <tbody className="block md:table-row-group">
                   {report.member_summary?.map((member) => (
-                    <tr key={member.name} className="border-b border-border/50">
-                      <td className="py-2 px-3">
+                    <tr key={member.name} className="block md:table-row mb-4 md:mb-0 border-b border-border/50 md:border-b-0 pb-2 md:pb-0">
+                      <td className="py-2 px-3 block md:table-cell bg-highlight/10 md:bg-transparent mb-1 md:mb-0 rounded md:rounded-none">
                         <div className="flex items-center gap-2">
                           <span>{member.emoji}</span>
                           <span className="font-medium text-text-dark">
@@ -262,25 +262,29 @@ export default function FairnessReport() {
                             ?.id
                         ] || 0;
                         return (
-                          <td key={cat} className="py-2 px-3 font-mono text-xs">
-                            {amount > 0 ? formatINR(amount) : "-"}
+                          <td key={cat} className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono text-xs border-b border-border/10 md:border-none">
+                            <span className="md:hidden font-sans text-text-muted">{cat}</span>
+                            <span>{amount > 0 ? formatINR(amount) : "-"}</span>
                           </td>
                         );
                       })}
-                      <td className="py-2 px-3 font-mono font-semibold text-right">
-                        {formatINR(member.total_paid)}
+                      <td className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono font-semibold md:text-right border-t border-border/50 md:border-none mt-1 md:mt-0 pt-2">
+                        <span className="md:hidden font-sans font-medium">Total</span>
+                        <span>{formatINR(member.total_paid)}</span>
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-highlight/20 font-medium">
-                    <td className="py-2 px-3 text-text-muted text-xs">Total</td>
+                  <tr className="bg-highlight/20 font-medium block md:table-row mt-4 md:mt-0 rounded-xl md:rounded-none p-3 md:p-0">
+                    <td className="py-2 px-3 text-text-muted text-xs block md:table-cell text-center md:text-left mb-2 md:mb-0">Group Totals</td>
                     {categories.map((cat) => (
-                      <td key={cat} className="py-2 px-3 font-mono text-xs">
-                        {formatINR(report.category_grid[cat]?.total || 0)}
+                      <td key={cat} className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono text-xs border-b border-border/20 md:border-none">
+                        <span className="md:hidden font-sans text-text-muted">{cat}</span>
+                        <span>{formatINR(report.category_grid[cat]?.total || 0)}</span>
                       </td>
                     ))}
-                    <td className="py-2 px-3 font-mono text-right">
-                      {formatINR(report.total_expenses)}
+                    <td className="py-2 px-3 flex md:table-cell justify-between items-center font-mono md:text-right border-t border-border/30 md:border-none mt-2 md:mt-0 pt-2">
+                      <span className="md:hidden font-sans font-medium">Grand Total</span>
+                      <span>{formatINR(report.total_expenses)}</span>
                     </td>
                   </tr>
                 </tbody>
