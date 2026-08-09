@@ -1,9 +1,9 @@
 # STATE.md
 
 ## Current Position
-- **Phase**: 23 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified
+- **Phase**: 24
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -37,4 +37,4 @@
 Phase 23 executed successfully. 2 plans completed. Implemented global `<SEO>` wrapper via react-helmet-async on all pages, configured Netlify SPA fallbacks, and generated the sitemap.xml.
 
 ## Next Steps
-1. /plan 24
+1. /execute 24
