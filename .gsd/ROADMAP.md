@@ -218,15 +218,19 @@
 ---
 
 ### Phase 11: Database Schema & Shared Architecture
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Correct the Firestore database schema structure and extract financial math logic into a shared directory for reuse between client and serverless functions.
 **Depends on**: Phase 10
 
 **Tasks**:
-- [ ] TBD (run /plan 11 to create)
+- [x] Fix client API to query `settlements` subcollection.
+- [x] Fix export functions to query `expenses` subcollection.
+- [x] Standardize expense schema to `paidBy`, `createdAt`, `receiptUrl` in API and Math logic.
+- [x] Standardize frontend components to strictly use new schema fields.
 
 **Verification**:
-- TBD
+- [x] Confirmed unit tests pass with updated schema fields.
+- [x] Codebase successfully grep'd for elimination of legacy fields (`paid_by`, `expense_date`).
 
 ---
 
