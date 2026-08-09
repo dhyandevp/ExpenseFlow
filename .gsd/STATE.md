@@ -2,9 +2,9 @@
 
 ## Current Position
 - **Milestone**: v1.0 — Full ExpenseFlow Rebuild
-- **Phase**: 4 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified ✅
+- **Phase**: 5
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -20,11 +20,9 @@
 | 9 | Final Cleanup & Server Removal | ⬜ Not Started |
 
 ## Last Session Summary
-Phase 4 executed successfully. 3 plans executed.
-- Repurposed existing `server/index.js` into an Auth Bridge instead of deploying Netlify Functions.
-- Implemented `/api/auth/jwt-bridge` to seamlessly issue Firebase Custom Tokens mapped to Clerk sessions and Code+PIN Guest log-ins.
-- Developed `SignInModal`, `GuestJoinModal`, and `PINVerification` UI flows, fully replacing the old join form.
-- Introduced `useAuth` hook and `AuthContext` to manage auth state efficiently across the app.
+Phase 5 planning completed.
+- Researched Cloudinary unsigned upload API. 
+- Created 3 execution plans to replace Firebase Storage with Cloudinary for receipt uploads, leveraging XHR for progress tracking and Cloudinary URL transformations.
 
 ## Next Steps
-1. Proceed to Phase 5 (Cloudinary Receipt Uploads)
+1. `/execute 5` — execute the Phase 5 plans.
