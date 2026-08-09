@@ -2,9 +2,9 @@
 
 ## Current Position
 - **Milestone**: v1.0 — Full ExpenseFlow Rebuild
-- **Phase**: 3 (completed)
-- **Task**: All tasks complete
-- **Status**: Verified ✅
+- **Phase**: 4
+- **Task**: Planning complete
+- **Status**: Ready for execution
 
 ## Phase Summary
 | Phase | Name | Status |
@@ -20,10 +20,9 @@
 | 9 | Final Cleanup & Server Removal | ⬜ Not Started |
 
 ## Last Session Summary
-Phase 3 executed successfully. 2 plans executed.
-- Created robust `firestore.rules` enforcing scoped access for fully authenticated users (Clerk) and guest users (via `guestGroupId` custom claim).
-- Setup Firebase Emulator test suite (`tests/firestore.rules.test.js`) covering 10 authentication edge cases.
-- **Ponytail Ultra**: Skipped complex backend rate limiting for pure read lookups as it violates the serverless MVP architecture.
+Phase 4 planning completed.
+- **Ponytail Architectural Pivot**: Instead of introducing Netlify Functions (which requires new infrastructure and deployment pipelines), we are adding the Auth Bridge (`jwt-bridge` and `clerk-webhook`) directly into the existing Express server (`server/index.js`). 
+- 3 plans created across 3 waves.
 
 ## Next Steps
-1. Proceed to Phase 4 (Clerk Hybrid Authentication)
+1. `/execute 4` — execute the Phase 4 plans.
