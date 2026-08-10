@@ -1,0 +1,8 @@
+- generic [ref=f19e4]:
+  - heading "Page Not Found" [level=1] [ref=f19e8]
+  - paragraph [ref=f19e9]: We couldn't find the page you were looking for. It might have been moved or doesn't exist.
+  - generic [ref=f19e10]:
+    - link "Go Home" [ref=f19e11] [cursor=pointer]:
+      - /url: /
+    - link "Join or Create Group" [ref=f19e15] [cursor=pointer]:
+      - /url: /setup

@@ -181,7 +181,7 @@ This document contains the complete, atomic implementation roadmap for the Expen
 
 ------------------------------------------------------------------------
 
-## Phase 11: Data Migration Script
+## Phase 21: Data Migration Script
 
 **Objective:** Safely migrate legacy SQLite data to the new Firestore structure.
 
@@ -198,7 +198,7 @@ This document contains the complete, atomic implementation roadmap for the Expen
 
 ------------------------------------------------------------------------
 
-## Phase 12: Legal Pages & Footer
+## Phase 22: Legal Pages & Footer
 
 **Objective:** Add required legal documentation and developer links.
 
@@ -214,7 +214,7 @@ This document contains the complete, atomic implementation roadmap for the Expen
 
 ------------------------------------------------------------------------
 
-## Phase 13: SEO, Meta Tags & 404 Routing
+## Phase 23: SEO, Meta Tags & 404 Routing
 
 **Objective:** Finalize search engine optimization and routing fallbacks.
 
@@ -232,7 +232,7 @@ This document contains the complete, atomic implementation roadmap for the Expen
 
 ------------------------------------------------------------------------
 
-## Phase 14: Git Security & Cleanup
+## Phase 24: Git Security & Cleanup
 
 **Objective:** Clean the repository of legacy references and secure git commits.
 

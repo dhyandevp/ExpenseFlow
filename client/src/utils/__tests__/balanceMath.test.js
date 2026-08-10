@@ -9,8 +9,8 @@ describe('balanceMath.js', () => {
         { id: 2, name: 'Bob' }
       ];
       const expenses = [
-        { paid_by: 1, amount: 100 },
-        { paid_by: 2, amount: 100 }
+        { paidBy: 1, amount: 100 },
+        { paidBy: 2, amount: 100 }
       ];
       const result = calculateFairnessScore(members, expenses);
       
@@ -26,7 +26,7 @@ describe('balanceMath.js', () => {
         { id: 2, name: 'Bob' }
       ];
       const expenses = [
-        { paid_by: 1, amount: 200 }
+        { paidBy: 1, amount: 200 }
       ];
       // Total 200, equal share 100. 
       // Alice paid 200, diff 100, ratio 1. score = 100 - 50 = 50.
@@ -57,7 +57,7 @@ describe('balanceMath.js', () => {
         { id: 2, name: 'Bob' }
       ];
       const expenses = [
-        { paid_by: 1, amount: 100 }
+        { paidBy: 1, amount: 100 }
       ];
       
       const { balances, total_expenses } = calculateBalances(members, expenses);
@@ -83,8 +83,8 @@ describe('balanceMath.js', () => {
         { id: 3, name: 'Charlie' }
       ];
       const expenses = [
-        { paid_by: 1, amount: 90 },
-        { paid_by: 2, amount: 30 }
+        { paidBy: 1, amount: 90 },
+        { paidBy: 2, amount: 30 }
       ];
       // Total 120. Fair share 40.
       // Alice paid 90, net +50
@@ -106,7 +106,7 @@ describe('balanceMath.js', () => {
         { id: 2, name: 'Bob' }
       ];
       const expenses = [
-        { paid_by: 1, amount: 100 }
+        { paidBy: 1, amount: 100 }
       ];
       const settlements = [
         { from_member: 2, to_member: 1, amount: 50 }

@@ -1,0 +1,153 @@
+[    1441ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[    1457ms] [WARNING] [2026-08-10T14:46:36.863Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[    1460ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   25491ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   25497ms] [WARNING] [2026-08-10T14:47:00.903Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   25500ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   26273ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   26284ms] [WARNING] [2026-08-10T14:47:01.690Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   26286ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   26452ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   26455ms] [WARNING] [2026-08-10T14:47:01.862Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   26457ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   26578ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   26585ms] [WARNING] [2026-08-10T14:47:01.992Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   26587ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   26717ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   26722ms] [WARNING] [2026-08-10T14:47:02.128Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   26723ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   27401ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   27406ms] [WARNING] [2026-08-10T14:47:02.813Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   27407ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   27553ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   27557ms] [WARNING] [2026-08-10T14:47:02.964Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   27558ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   38435ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=3e2f7e8e:21550
+[   38439ms] [WARNING] [2026-08-10T14:47:13.845Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:1100
+[   38440ms] FirebaseError: Firebase: Error (auth/invalid-api-key).
+    at createErrorInternal (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:700:38)
+    at _assert (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:704:11)
+    at Component.instanceFactory (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8124:7)
+    at Provider.getOrInitializeService (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:986:33)
+    at Provider.initialize (http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=3e2f7e8e:934:27)
+    at initializeAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:3300:25)
+    at getAuth (http://localhost:5173/node_modules/.vite/deps/firebase_auth.js?v=98545b71:8194:16)
+    at http://localhost:5173/src/hooks/useAuth.jsx:7:14
+[   67630ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[   67635ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   68636ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   69638ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   70639ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   71641ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   72643ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   73645ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   75611ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:21550
+[   75621ms] [WARNING] [2026-08-10T14:47:51.027Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=fb368038:1100
+[   75661ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[   75667ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[   75666ms] [ERROR] The above error occurred in the <ClerkProviderBase> component:
+
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7034:11)
+    at Hoc (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:3877:5)
+    at _a (http://localhost:5173/node_modules/.vite/deps/react-helmet-async.js?v=fb368038:627:5)
+    at App (http://localhost:5173/src/App.jsx:79:46)
+    at Router (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:4535:15)
+    at BrowserRouter (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:5273:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14031
+[   75669ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19753:22)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19116:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:18736:28)

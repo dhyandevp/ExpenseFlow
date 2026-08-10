@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
 import { ClerkProvider } from "@clerk/clerk-react";
-import { AuthProvider } from "./hooks/useAuth";
+import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { HelmetProvider } from "react-helmet-async";
 import Landing from "./pages/Landing";
 import GroupSetup from "./pages/GroupSetup";
@@ -12,7 +12,7 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_ZGVjZW50LWFscGFjYS01MC5jbGVyay5hY2NvdW50cy5kZXYk";
 
 
 // Lazy-load app pages for route-level code splitting
@@ -92,6 +92,13 @@ function PageLoader() {
   );
 }
 
+function ProtectedRoute({ children }) {
+  const { user, isLoaded } = useAuth();
+  if (!isLoaded) return <PageLoader />;
+  if (!user) return <Navigate to="/" replace />;
+  return children;
+}
+
 export default function App() {
   const [currentGroup, setCurrentGroupRaw] = useState(getStoredGroup);
   const { recentGroups, updateRecent } = useRecentGroups();
@@ -121,7 +128,7 @@ export default function App() {
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/contact" element={<Contact />} />
-                <Route path="/setup" element={<GroupSetup />} />
+                <Route path="/setup" element={<ProtectedRoute><GroupSetup /></ProtectedRoute>} />
                 <Route path="/join/:code" element={<JoinGroup />} />
             <Route
               path="/group/:code"

@@ -1,0 +1,89 @@
+- generic [ref=f23e1]:
+  - generic [ref=f23e3]:
+    - navigation [ref=f23e4]:
+      - generic [ref=f23e5]:
+        - img [ref=f23e63]: 💸
+        - generic [ref=f23e7]: ExpenseFlow
+      - generic [ref=f23e8]:
+        - button [ref=f23e64] [cursor=pointer]: Sign In / Sign Up
+        - button [ref=f23e65] [cursor=pointer]: Join with Code
+    - generic [ref=f23e13]:
+      - generic [ref=f23e14]:
+        - generic [ref=f23e15]: Fair sharing, clear minds.
+        - heading [level=1] [ref=f23e66]: Stop arguing about who paid what.
+        - paragraph [ref=f23e19]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+      - generic [ref=f23e20]:
+        - button [ref=f23e67] [cursor=pointer]: Sign In to Create
+        - button [ref=f23e68] [cursor=pointer]: Join with Code & PIN
+    - generic [ref=f23e30]:
+      - heading [level=2] [ref=f23e69]: Why ExpenseFlow?
+      - generic [ref=f23e32]:
+        - generic [ref=f23e33]:
+          - heading [level=3] [ref=f23e70]: Long-term fairness
+          - paragraph [ref=f23e39]: Track who pays what over months, not just per bill. See the big picture.
+        - generic [ref=f23e40]:
+          - heading [level=3] [ref=f23e71]: Category insights
+          - paragraph [ref=f23e45]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+        - generic [ref=f23e46]:
+          - heading [level=3] [ref=f23e72]: Scenario planning
+          - paragraph [ref=f23e51]: Simulate future expenses before they happen. Plan ahead with confidence.
+    - contentinfo [ref=f23e52]:
+      - generic [ref=f23e53]:
+        - generic [ref=f23e54]:
+          - generic [ref=f23e55]:
+            - generic [ref=f23e56]: ⚖️
+            - generic [ref=f23e57]: ExpenseFlow — Fair sharing, clear minds.
+          - paragraph [ref=f23e58]: Made for roommates, couples, and close friends.
+        - generic [ref=f23e59]:
+          - link [ref=f23e73] [cursor=pointer]:
+            - /url: /terms
+            - text: Terms of Service
+          - link [ref=f23e74] [cursor=pointer]:
+            - /url: /privacy
+            - text: Privacy Policy
+          - link [ref=f23e75] [cursor=pointer]:
+            - /url: /contact
+            - text: Contact
+  - generic:
+    - generic:
+      - generic:
+        - dialog [active]:
+          - generic [ref=f23e78]:
+            - button [ref=f23e79] [cursor=pointer]
+            - generic [ref=f23e84]:
+              - generic [ref=f23e85]:
+                - generic [ref=f23e87]:
+                  - heading "Sign in to My Application" [level=1] [ref=f23e88]
+                  - paragraph [ref=f23e89]: Welcome back! Please sign in to continue
+                - generic [ref=f23e90]:
+                  - button "Sign in with Google Continue with Google" [ref=f23e93] [cursor=pointer]:
+                    - generic [ref=f23e94]:
+                      - img "Sign in with Google" [ref=f23e96]
+                      - generic [ref=f23e97]: Continue with Google
+                  - paragraph [ref=f23e100]: or
+                  - generic [ref=f23e102]:
+                    - generic [ref=f23e103]:
+                      - generic [ref=f23e106]:
+                        - generic [ref=f23e107]: Email address
+                        - textbox "Email address" [ref=f23e109]:
+                          - /placeholder: Enter your email address
+                      - generic:
+                        - generic:
+                          - generic:
+                            - generic: Password
+                            - generic:
+                              - textbox "Password":
+                                - /placeholder: Enter your password
+                              - button "Show password"
+                    - button "Continue" [ref=f23e112] [cursor=pointer]
+              - generic [ref=f23e116]:
+                - generic [ref=f23e117]:
+                  - generic [ref=f23e118]: Don’t have an account?
+                  - link "Sign up" [ref=f23e119] [cursor=pointer]:
+                    - /url: https://decent-alpaca-50.accounts.dev/sign-up?__clerk_db_jwt=dvb_3HjEzJT9juAAGObUtVKRDRWlxXF
+                - generic [ref=f23e121]:
+                  - generic [ref=f23e123]:
+                    - paragraph [ref=f23e124]: Secured by
+                    - link "Clerk logo" [ref=f23e125] [cursor=pointer]:
+                      - /url: https://go.clerk.com/components
+                  - paragraph [ref=f23e131]: Development mode

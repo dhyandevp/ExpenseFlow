@@ -1,0 +1,104 @@
+[     133ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:21550
+[     149ms] [WARNING] [2026-08-10T14:48:37.105Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=fb368038:1100
+[     203ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[     215ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[     206ms] [ERROR] The above error occurred in the <ClerkProviderBase> component:
+
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7034:11)
+    at Hoc (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:3877:5)
+    at _a (http://localhost:5173/node_modules/.vite/deps/react-helmet-async.js?v=fb368038:627:5)
+    at App (http://localhost:5173/src/App.jsx:79:46)
+    at Router (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:4535:15)
+    at BrowserRouter (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:5273:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14031
+[     215ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19753:22)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19116:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:18736:28)
+[    6478ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:21550
+[    6482ms] [WARNING] [2026-08-10T14:48:43.437Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=fb368038:1100
+[    6508ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[    6509ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at HTMLUnknownElement.callCallback2 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3674:22)
+    at Object.invokeGuardedCallbackDev (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3699:24)
+    at invokeGuardedCallback (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:3733:39)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19765:15)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+[    6509ms] [ERROR] The above error occurred in the <ClerkProviderBase> component:
+
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7034:11)
+    at Hoc (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:3877:5)
+    at _a (http://localhost:5173/node_modules/.vite/deps/react-helmet-async.js?v=fb368038:627:5)
+    at App (http://localhost:5173/src/App.jsx:79:46)
+    at Router (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:4535:15)
+    at BrowserRouter (http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:5273:5)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14031
+[    6510ms] Error: @clerk/clerk-react: The publishableKey passed to Clerk is invalid. You can get your Publishable key at https://dashboard.clerk.com/last-active?path=api-keys. (key=pk_test_cGxhY2Vob2xkZXI=)
+    at Object.throwInvalidPublishableKeyError (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:235:13)
+    at ClerkProviderBase (http://localhost:5173/node_modules/.vite/deps/@clerk_clerk-react.js?v=fb368038:7040:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:11548:26)
+    at mountIndeterminateComponent (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:14926:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:15914:22)
+    at beginWork$1 (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19753:22)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19201:20)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19137:13)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:19116:15)
+    at recoverFromConcurrentError (http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:18736:28)
+[   12427ms] [LOG] [vite] server connection lost. Polling for restart... @ http://localhost:5173/@vite/client:559
+[   12435ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   13437ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   14438ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   15439ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   16441ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   17443ms] [ERROR] Failed to load resource: net::ERR_CONNECTION_REFUSED @ http://localhost:5173/:0
+[   19294ms] [INFO] %cDownload the React DevTools for a better development experience: https://reactjs.org/link/react-devtools font-weight:bold @ http://localhost:5173/node_modules/.vite/deps/chunk-3ZJ2S23Y.js?v=fb368038:21550
+[   19297ms] [WARNING] [2026-08-10T14:48:56.253Z]  @firebase/firestore: Firestore (12.17.0): enableIndexedDbPersistence() will be deprecated in the future, you can use `FirestoreSettings.cache` instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-6BIPZP2W.js?v=fb368038:1100
+[   19346ms] [WARNING] ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition. @ http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:4426
+[   19346ms] [WARNING] ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath. @ http://localhost:5173/node_modules/.vite/deps/react-router-dom.js?v=fb368038:4426
+[   20323ms] [WARNING] Clerk: Clerk has been loaded with development keys. Development instances have strict usage limits and should not be used when deploying your application to production. Learn more: https://clerk.com/docs/deployments/overview @ https://decent-alpaca-50.clerk.accounts.dev/npm/@clerk/clerk-js@5/dist/clerk.browser.js:18

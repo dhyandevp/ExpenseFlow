@@ -1,0 +1,57 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - img "BalanceBoard logo" [ref=e6]: ⚖️
+      - generic [ref=e7]: BalanceBoard
+    - link "Create a Group" [ref=e8] [cursor=pointer]:
+      - /url: /setup
+  - generic [ref=e11]:
+    - generic [ref=e12]:
+      - generic [ref=e13]: Fair sharing, clear minds.
+      - heading "Stop arguing about who paid what." [level=1] [ref=e16]
+      - paragraph [ref=e17]: BalanceBoard tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+    - generic [ref=e18]:
+      - link "Create a Group" [ref=e19] [cursor=pointer]:
+        - /url: /setup
+      - button "Join a Group" [ref=e22] [cursor=pointer]
+    - generic [ref=e28]:
+      - textbox "Enter group code (e.g. ABC123)" [ref=e29]
+      - button "Join" [disabled] [ref=e30]
+  - generic [ref=e31]:
+    - heading "Why BalanceBoard?" [level=2] [ref=e32]
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - heading "Long-term fairness" [level=3] [ref=e39]
+        - paragraph [ref=e40]: Track who pays what over months, not just per bill. See the big picture.
+      - generic [ref=e41]:
+        - heading "Category insights" [level=3] [ref=e45]
+        - paragraph [ref=e46]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+      - generic [ref=e47]:
+        - heading "Scenario planning" [level=3] [ref=e51]
+        - paragraph [ref=e52]: Simulate future expenses before they happen. Plan ahead with confidence.
+  - generic [ref=e54]:
+    - heading "How it works" [level=2] [ref=e55]
+    - generic [ref=e56]:
+      - generic [ref=e57]:
+        - generic [ref=e58]: "1"
+        - heading "Create your group" [level=3] [ref=e59]
+        - paragraph [ref=e60]: Add roommates, friends, or partners. Pick colors and emojis so everyone's easy to spot.
+      - generic [ref=e61]:
+        - generic [ref=e62]: "2"
+        - heading "Log expenses together" [level=3] [ref=e63]
+        - paragraph [ref=e64]: Add bills as they happen. Categorize them. BalanceBoard handles the math.
+      - generic [ref=e65]:
+        - generic [ref=e66]: "3"
+        - heading "See who's being fair" [level=3] [ref=e67]
+        - paragraph [ref=e68]: Check fairness scores, category breakdowns, and settlement suggestions anytime.
+  - generic [ref=e70]:
+    - heading "Ready for calm money conversations?" [level=2] [ref=e71]
+    - paragraph [ref=e72]: No sign-up required. Create a group in seconds and start tracking fairly.
+    - link "Get Started Free" [ref=e73] [cursor=pointer]:
+      - /url: /setup
+  - contentinfo [ref=e76]:
+    - generic [ref=e77]:
+      - generic [ref=e78]:
+        - generic [ref=e79]: ⚖️
+        - generic [ref=e80]: BalanceBoard — Fair sharing, clear minds.
+      - paragraph [ref=e81]: Made for roommates, couples, and close friends.
