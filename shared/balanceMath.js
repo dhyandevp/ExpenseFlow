@@ -73,7 +73,7 @@ function calculateSettlementSuggestions(balances) {
     const credit = cList[ci].net_balance;
     const amount = Math.min(debt, credit);
     
-    if (amount > 1) {
+    if (amount > 0.01) {
       suggestions.push({
         from: dList[di].name,
         to: cList[ci].name,
@@ -83,14 +83,15 @@ function calculateSettlementSuggestions(balances) {
       });
     }
     
-    if (debt === credit) {
+    // Use epsilon comparison instead of strict equality to handle floating-point drift
+    if (Math.abs(debt - credit) < 0.01) {
       di++;
       ci++;
     } else if (debt < credit) {
-      cList[ci].net_balance -= debt;
+      cList[ci].net_balance = Math.round((cList[ci].net_balance - debt) * 100) / 100;
       di++;
     } else {
-      dList[di].net_balance += credit;
+      dList[di].net_balance = Math.round((dList[di].net_balance + credit) * 100) / 100;
       ci++;
     }
   }

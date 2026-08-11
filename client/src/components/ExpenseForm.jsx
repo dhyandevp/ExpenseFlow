@@ -31,6 +31,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     split_members: [],
     receiptUrl: null,
   });
+  const [errors, setErrors] = useState({});
 
   // Lock body scroll when modal is open
   useEffect(() => {
@@ -72,8 +73,16 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
   const handleSubmit = (e) => {
     e.preventDefault();
     const amount = parseFloat(form.amount);
-    if (!amount || amount <= 0) return;
-    if (!form.paidBy) return;
+    const newErrors = {};
+    if (!amount || amount <= 0) newErrors.amount = "Please enter a valid amount.";
+    if (!form.paidBy) newErrors.paidBy = "Please select who paid.";
+    if (!form.category) newErrors.category = "Please select a category.";
+    
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
 
     onSubmit({
       group_id: currentGroup.id,
@@ -120,6 +129,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 {isEditing ? "Edit Expense" : "Add Expense"}
               </h3>
               <button
+                aria-label="Close"
                 onClick={onClose}
                 className="p-2 rounded-lg hover:bg-background transition-colors"
               >
@@ -143,14 +153,16 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                     min="0"
                     required
                     value={form.amount}
-                    onChange={(e) =>
-                      setForm((f) => ({ ...f, amount: e.target.value }))
-                    }
-                    className="input-field pl-8"
+                    onChange={(e) => {
+                      setForm((f) => ({ ...f, amount: e.target.value }));
+                      if (errors.amount) setErrors(err => ({ ...err, amount: null }));
+                    }}
+                    className={`input-field pl-8 ${errors.amount ? 'border-accent ring-1 ring-accent' : ''}`}
                     placeholder="0.00"
                     autoFocus
                   />
                 </div>
+                {errors.amount && <p className="text-accent text-xs mt-1">{errors.amount}</p>}
               </div>
 
               {/* Paid By */}
@@ -160,9 +172,10 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </label>
                 <select
                   value={form.paidBy}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, paidBy: e.target.value }))
-                  }
+                  onChange={(e) => {
+                    setForm((f) => ({ ...f, paidBy: e.target.value }));
+                    if (errors.paidBy) setErrors(err => ({ ...err, paidBy: null }));
+                  }}
                   className="input-field"
                   required
                 >
@@ -173,6 +186,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                     </option>
                   ))}
                 </select>
+                {errors.paidBy && <p className="text-accent text-xs mt-1">{errors.paidBy}</p>}
               </div>
 
               {/* Category */}

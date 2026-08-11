@@ -6,3 +6,10 @@ dist/
 .env
 .env.*
 !.env.example
+
+# Debug logs
+firestore-debug.log
+*.log
+
+# Local Netlify folder
+.netlify

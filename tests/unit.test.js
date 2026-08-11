@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { csvSafe } from '../shared/csv.js';
+import { csvSafe } from '../shared/balanceMath.js';
 import { applyRecurringTemplate } from '../client/src/api/client.js';
 import { calculateFairnessScore, calculateBalances } from '../shared/balanceMath.js';
 import { calculateSettlement } from '../shared/fairness.js';

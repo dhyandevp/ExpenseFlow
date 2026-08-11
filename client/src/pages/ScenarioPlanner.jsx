@@ -1,5 +1,5 @@
 import SEO from "../components/SEO";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
@@ -67,14 +67,26 @@ function ScenarioPlanner() {
   const [savedScenarios, setSavedScenarios] = useState([]);
   const [saving, setSaving] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const loadScenarios = useCallback(() => {
     if (currentGroup) {
-      getScenarios(currentGroup.id)
+      setLoading(true);
+      setError(null);
+      Promise.race([
+        getScenarios(currentGroup.id),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
+      ])
         .then((res) => setSavedScenarios(res.data))
-        .catch(console.error);
+        .catch((err) => setError(err.message || "Failed to load scenarios."))
+        .finally(() => setLoading(false));
     }
   }, [currentGroup]);
+
+  useEffect(() => {
+    loadScenarios();
+  }, [loadScenarios]);
 
   const addAction = () => {
     setActions([...actions, { paidBy: "", category: "Other", amount: "", count: 1 }]);
@@ -107,6 +119,7 @@ function ScenarioPlanner() {
       setSimulation(res.data);
     } catch (err) {
       console.error("Simulation failed:", err);
+      setError("Simulation failed.");
     } finally {
       setSimulating(false);
     }
@@ -122,11 +135,10 @@ function ScenarioPlanner() {
         projected_balances: simulation.projectedBalances,
       });
       setScenarioName("");
-      getScenarios(currentGroup.id).then((res) =>
-        setSavedScenarios(res.data)
-      );
+      loadScenarios();
     } catch (err) {
       console.error("Failed to save scenario:", err);
+      setError("Failed to save scenario.");
     } finally {
       setSaving(false);
     }
@@ -170,6 +182,13 @@ function ScenarioPlanner() {
           Saved ({savedScenarios.length})
         </button>
       </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-[#E8E300]/10 border border-[#E8E300]/20 rounded-xl flex items-center justify-between">
+          <p className="text-[#E8E300] font-medium text-sm">{error}</p>
+          <button onClick={loadScenarios} className="px-3 py-1 bg-surface rounded-lg text-xs font-semibold text-text-dark">Retry</button>
+        </div>
+      )}
 
       {/* Pre-built examples */}
       <div className="flex flex-wrap gap-2">

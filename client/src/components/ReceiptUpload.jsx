@@ -53,6 +53,7 @@ export default function ReceiptUpload({ value, onChange }) {
               className="w-20 h-20 object-cover rounded-xl border border-border"
             />
             <button
+              aria-label="Remove receipt"
               type="button"
               onClick={handleRemove}
               className="absolute -top-2 -right-2 w-6 h-6 bg-accent text-white rounded-full flex items-center justify-center shadow-sm hover:bg-accent/80 transition-colors"
@@ -119,6 +120,7 @@ export function ReceiptIndicator({ receiptUrl, onClick }) {
 
   return (
     <button
+      aria-label="View receipt"
       onClick={onClick}
       className="p-0.5 rounded-lg text-text-muted hover:text-primary hover:bg-primary/10 transition-colors mr-1"
       title="View receipt"
@@ -153,6 +155,7 @@ export function ReceiptLightbox({ receiptUrl, onClose }) {
             className="rounded-2xl shadow-xl max-h-[80vh] object-contain"
           />
           <button
+            aria-label="Close lightbox"
             onClick={onClose}
             className="absolute -top-3 -right-3 w-8 h-8 bg-surface text-text-dark rounded-full flex items-center justify-center shadow-md hover:bg-background transition-colors"
           >

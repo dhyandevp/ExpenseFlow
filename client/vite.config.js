@@ -27,6 +27,9 @@ export default defineConfig({
           vendor: ["react", "react-dom", "react-router-dom"],
           charts: ["recharts"],
           motion: ["framer-motion"],
+          clerk: ["@clerk/clerk-react"],
+          firebase: ["firebase/app", "firebase/firestore", "firebase/auth", "firebase/storage"],
+          pdf: ["jspdf", "html2canvas"]
         },
       },
     },

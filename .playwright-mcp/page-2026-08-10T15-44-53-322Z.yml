@@ -1,0 +1,101 @@
+- generic [ref=f5e3]:
+  - complementary [ref=f5e4]:
+    - generic [ref=f5e6]:
+      - generic [ref=f5e7]: ⚖️
+      - generic [ref=f5e8]:
+        - heading "Test Group" [level=2] [ref=f5e9]
+        - paragraph [ref=f5e10]: "#TEST"
+    - navigation [ref=f5e11]:
+      - link "Expenses" [ref=f5e12] [cursor=pointer]:
+        - /url: /group/TEST
+      - link "Dashboard" [ref=f5e15] [cursor=pointer]:
+        - /url: /group/TEST/dashboard
+      - link "Scenarios" [ref=f5e21] [cursor=pointer]:
+        - /url: /group/TEST/scenarios
+      - link "Report" [ref=f5e25] [cursor=pointer]:
+        - /url: /group/TEST/report
+      - link "Settings" [ref=f5e29] [cursor=pointer]:
+        - /url: /group/TEST/settings
+    - button "Leave Group" [ref=f5e33] [cursor=pointer]
+  - main [ref=f5e37]:
+    - generic [ref=f5e39]:
+      - generic [ref=f5e40]:
+        - generic [ref=f5e41]:
+          - heading "Test Group" [level=1] [ref=f5e42]
+          - paragraph [ref=f5e43]: "#TEST"
+        - button "Add Expense" [ref=f5e44] [cursor=pointer]
+      - generic [ref=f5e46]:
+        - generic [ref=f5e47]:
+          - heading "Settlement History" [level=3] [ref=f5e48]
+          - button "Record" [ref=f5e55] [cursor=pointer]
+        - paragraph [ref=f5e57]: No settlements recorded yet.
+      - generic [ref=f5e58]:
+        - combobox [ref=f5e59]:
+          - option "All Categories" [selected]
+          - option "Rent"
+          - option "Utilities"
+          - option "Groceries"
+          - option "Repairs"
+          - option "Outings"
+          - option "Other"
+        - combobox [ref=f5e60]:
+          - option "All Members" [selected]
+          - option "😎 Alex"
+          - option "🚀 Sam"
+      - generic [ref=f5e61]:
+        - generic [ref=f5e62]: 🧾
+        - heading "No expenses yet" [level=3] [ref=f5e63]
+        - paragraph [ref=f5e64]: Start tracking by adding your first expense.
+        - button "Add your first expense" [ref=f5e65] [cursor=pointer]
+      - generic [ref=f5e68]:
+        - generic [ref=f5e69]:
+          - heading "Add Expense" [level=3] [ref=f5e70]
+          - button [ref=f5e71] [cursor=pointer]
+        - generic [ref=f5e75]:
+          - generic [ref=f5e76]:
+            - generic [ref=f5e77]: Amount
+            - generic [ref=f5e78]:
+              - generic [ref=f5e79]: ₹
+              - spinbutton "0.00" [ref=f5e80]: "1000"
+          - generic [ref=f5e81]:
+            - generic [ref=f5e82]: Paid by
+            - combobox [ref=f5e83]:
+              - option "Select a member..." [selected]
+              - option "😎 Alex"
+              - option "🚀 Sam"
+          - generic [ref=f5e84]:
+            - generic [ref=f5e85]: Category
+            - generic [ref=f5e86]:
+              - button "🏠 Rent" [ref=f5e87] [cursor=pointer]
+              - button "⚡ Utilities" [ref=f5e88] [cursor=pointer]
+              - button "🛒 Groceries" [ref=f5e89] [cursor=pointer]
+              - button "🔧 Repairs" [ref=f5e90] [cursor=pointer]
+              - button "🎉 Outings" [ref=f5e91] [cursor=pointer]
+              - button "📦 Other" [ref=f5e92] [cursor=pointer]
+          - generic [ref=f5e93]:
+            - generic [ref=f5e94]: Description (optional)
+            - textbox "What was this for?" [ref=f5e95]
+          - generic [ref=f5e96]:
+            - generic [ref=f5e97]: Receipt (optional)
+            - generic [ref=f5e98]: Attach receipt photo
+          - generic [ref=f5e102]:
+            - generic [ref=f5e103]: Date
+            - textbox [ref=f5e104]: 2026-08-10
+          - generic [ref=f5e105]:
+            - generic [ref=f5e106]: Split type
+            - combobox [ref=f5e107]:
+              - option "Equal split" [selected]
+              - option "Custom amounts"
+              - option "Custom percentages"
+          - generic [ref=f5e108]:
+            - generic [ref=f5e109]: Split between (all by default)
+            - generic [ref=f5e110]:
+              - button "😎 Alex" [ref=f5e111] [cursor=pointer]:
+                - generic [ref=f5e112]: 😎
+                - text: Alex
+              - button "🚀 Sam" [ref=f5e113] [cursor=pointer]:
+                - generic [ref=f5e114]: 🚀
+                - text: Sam
+          - generic [ref=f5e115]:
+            - button "Cancel" [ref=f5e116] [cursor=pointer]
+            - button "Add Expense" [disabled] [ref=f5e117]

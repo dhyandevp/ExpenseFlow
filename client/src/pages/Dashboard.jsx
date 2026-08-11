@@ -1,5 +1,5 @@
 import SEO from "../components/SEO";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   BarChart3,
@@ -24,14 +24,11 @@ import {
   getBalances,
   getBreakdown,
   getFairnessScore,
-  applyDueRecurring,
 } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import { useSEO } from "../utils/seo";
-import FairnessTrend from "../components/FairnessTrend";
 import SettlementHistory from "../components/SettlementHistory";
 
 const timeFilters = [
@@ -76,42 +73,49 @@ function Dashboard() {
   const [breakdown, setBreakdown] = useState(null);
   const [fairness, setFairness] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  useSEO({
-    title: `Dashboard — ${currentGroup?.name || 'Group'}`,
-    description: "View group balances, upcoming dues, and fairness insights.",
-    url: `/group/${currentGroup?.code}/dashboard`
-  });
-
-  useEffect(() => {
+  const fetchData = useCallback(() => {
     if (!currentGroup) return;
     const period = getDateRange(timeFilter);
 
     setLoading(true);
-    Promise.all([
-      getBalances(currentGroup.id, period),
+    setError(null);
+    Promise.race([
+      Promise.all([
+        getBalances(currentGroup.id, period),
       getBreakdown(currentGroup.id, period),
-      getFairnessScore(currentGroup.id, period),
+        getFairnessScore(currentGroup.id, period),
+      ]),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
     ])
       .then(([balRes, breakRes, fairRes]) => {
         setBalances(balRes.data);
         setBreakdown(breakRes.data);
         setFairness(fairRes.data);
       })
-      .catch(console.error)
+      .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
   }, [currentGroup, timeFilter]);
 
-  // Auto-apply overdue recurring expenses on mount
   useEffect(() => {
-    if (currentGroup) {
-      applyDueRecurring(currentGroup.id).catch(() => {});
-    }
-  }, [currentGroup]);
+    fetchData();
+  }, [fetchData]);
+
+
 
   if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
+
+  if (error) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <p className="text-accent">{error}</p>
+        <button onClick={fetchData} className="btn-primary">Retry</button>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
@@ -162,8 +166,7 @@ function Dashboard() {
   }
 
   return (
-    <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start space-y-6 lg:space-y-0">
-      <div className="lg:col-span-2 space-y-6">
+    <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark">
           Dashboard
@@ -185,7 +188,9 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Settlement History */}
+      <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:items-start space-y-6 lg:space-y-0">
+        <div className="lg:col-span-2 space-y-6">
+          {/* Settlement History */}
       <SettlementHistory />
 
       {/* Bar chart */}
@@ -305,8 +310,6 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Fairness Trend */}
-      <FairnessTrend />
       </div>
 
       {/* Right Column: Balances & Fairness */}
@@ -465,6 +468,7 @@ function Dashboard() {
       )}
 
       
+        </div>
       </div>
     </div>
   );

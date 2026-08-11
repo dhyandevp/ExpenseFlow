@@ -2,7 +2,6 @@ import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSEO } from "../utils/seo";
 import { pageTransition, springScale } from "../utils/motion";
 import {
   ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock
@@ -35,11 +34,7 @@ const modelOptions = [
 ];
 
 function GroupSetup() {
-  useSEO({
-    title: "Create Group",
-    description: "Create a new group in ExpenseFlow to start tracking shared expenses with roommates or friends.",
-    url: "/setup"
-  });
+
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
   const { authMode, isLoaded, user } = useAuth();
@@ -61,7 +56,7 @@ function GroupSetup() {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES.map((c, i) => ({ ...c, sort_order: i })));
   const [settlementThreshold, setSettlementThreshold] = useState(500);
   const [creating, setCreating] = useState(false);
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState({});
   const [createdGroup, setCreatedGroup] = useState(null);
   const [copied, setCopied] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
@@ -85,11 +80,17 @@ function GroupSetup() {
   };
 
   const handleCreate = async () => {
-    if (!groupName.trim()) { setError("Please enter a group name."); return; }
+    const newErrors = {};
+    if (!groupName.trim()) newErrors.groupName = "Please enter a group name.";
     const validMembers = members.filter((m) => m.name.trim());
-    if (validMembers.length < 2) { setError("Please add at least 2 members."); return; }
+    if (validMembers.length < 2) newErrors.members = "Please add at least 2 members.";
 
-    setCreating(true); setError("");
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setCreating(true); setErrors({});
     try {
       const res = await createGroup({
         name: groupName.trim(),
@@ -97,12 +98,10 @@ function GroupSetup() {
         settlement_threshold: settlementThreshold,
         fairness_models: categories.map((c) => ({ category: c.name, model_type: c.split_model })),
       });
-      const groupRes = await fetch(`/api/groups/id/${res.data.id}`);
-      const groupData = await groupRes.json();
-      setCreatedGroup({ ...groupData.data, code: res.data.code });
-      setCurrentGroup(groupData.data);
+      setCreatedGroup({ ...res.data, code: res.data.code });
+      setCurrentGroup(res.data);
     } catch (err) {
-      setError(err.message || "Failed to create group.");
+      setErrors({ global: err.message || "Failed to create group." });
     } finally { setCreating(false); }
   };
 
@@ -229,12 +228,17 @@ function GroupSetup() {
               <h2 className="font-heading font-bold text-xl text-text-dark mb-1">Name your group</h2>
               <p className="text-text-muted text-sm mb-6">Something like "Flat 4B", "The Squad", or "Us"</p>
 
-              <input type="text" value={groupName} onChange={(e) => setGroupName(e.target.value)} placeholder="e.g. Flat 4B" className="input-field mb-8 text-lg" autoFocus />
+              <div className="mb-8">
+                <input type="text" value={groupName} onChange={(e) => { setGroupName(e.target.value); if (errors.groupName) setErrors(err => ({ ...err, groupName: null })); }} placeholder="e.g. Flat 4B" className={`input-field text-lg ${errors.groupName ? 'border-accent ring-1 ring-accent' : ''}`} autoFocus />
+                {errors.groupName && <p className="text-accent text-xs mt-1">{errors.groupName}</p>}
+              </div>
 
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-heading font-semibold text-text-dark">Members</h3>
                 <button onClick={addMember} disabled={members.length >= 8} className="btn-ghost text-sm"><Plus size={16} /> Add</button>
               </div>
+
+              {errors.members && <p className="text-accent text-xs mb-2">{errors.members}</p>}
 
               <div className="space-y-3 mb-8">
                 {members.map((member, idx) => (
@@ -418,7 +422,7 @@ function GroupSetup() {
                 </div>
               </div>
 
-              {error && <p className="text-accent text-sm mb-4">{error}</p>}
+              {errors.global && <p className="text-accent text-sm mb-4">{errors.global}</p>}
 
               <div className="flex gap-3">
                 <motion.button {...springScale} onClick={() => setStep(2)} className="btn-secondary flex-1">Back</motion.button>

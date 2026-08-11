@@ -60,11 +60,14 @@ export function getCategoryColor(category) {
  * Calculate suggested settlement between members
  */
 export function calculateSettlement(balances) {
+  // Clone to prevent mutation of caller's data
   const debtors = balances
     .filter((b) => b.net_balance < 0)
+    .map((b) => ({ ...b }))
     .sort((a, b) => a.net_balance - b.net_balance);
   const creditors = balances
     .filter((b) => b.net_balance > 0)
+    .map((b) => ({ ...b }))
     .sort((a, b) => b.net_balance - a.net_balance);
 
   const settlements = [];
@@ -76,7 +79,7 @@ export function calculateSettlement(balances) {
     const credit = creditors[ci].net_balance;
     const amount = Math.min(debt, credit);
 
-    if (amount > 1) {
+    if (amount > 0.01) {
       settlements.push({
         from: debtors[di].name,
         to: creditors[ci].name,
@@ -84,14 +87,15 @@ export function calculateSettlement(balances) {
       });
     }
 
-    if (debt === credit) {
+    // Use epsilon comparison instead of strict equality to handle floating-point drift
+    if (Math.abs(debt - credit) < 0.01) {
       di++;
       ci++;
     } else if (debt < credit) {
-      creditors[ci].net_balance -= debt;
+      creditors[ci].net_balance = Math.round((creditors[ci].net_balance - debt) * 100) / 100;
       di++;
     } else {
-      debtors[di].net_balance += credit;
+      debtors[di].net_balance = Math.round((debtors[di].net_balance + credit) * 100) / 100;
       ci++;
     }
   }

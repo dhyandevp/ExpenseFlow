@@ -26,19 +26,16 @@ export function AuthProvider({ children }) {
           const sessionToken = await session.getToken();
           const res = await fetch("/api/auth/jwt-bridge", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              type: "clerk",
-              sessionId: session.id,
-              sessionToken,
-              userId: clerkUser.id,
-            }),
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${sessionToken}`,
+            },
           });
           
           if (!res.ok) throw new Error("Failed to bridge JWT");
           
-          const { token } = await res.json();
-          await signInWithCustomToken(auth, token);
+          const { firebaseToken } = await res.json();
+          await signInWithCustomToken(auth, firebaseToken);
         } catch (err) {
           console.error("Clerk->Firebase Auth Bridge failed", err);
         }

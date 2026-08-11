@@ -8,8 +8,10 @@ import {
   BarChart3,
   ArrowRight,
   Users,
+  Home,
+  Star,
+  LogIn
 } from "lucide-react";
-import { useSEO } from "../utils/seo";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import SignInModal from "../components/auth/SignInModal";
 import GuestJoinModal from "../components/auth/GuestJoinModal";
@@ -26,12 +28,6 @@ const fadeUp = {
 
 function Landing() {
   const navigate = useNavigate();
-  useSEO({
-    title: "ExpenseFlow — Free Expense Sharing App for Roommates & Couples",
-    description: "Track shared expenses fairly over months, not just per bill. See who's contributing fairly with category insights, fairness scores, and scenario planning.",
-    url: "/"
-  });
-
   const { user, isLoaded, authMode } = useAuth();
   
   const [isSignInOpen, setIsSignInOpen] = useState(false);
@@ -40,14 +36,17 @@ function Landing() {
   // If already authenticated, redirect
   useEffect(() => {
     if (isLoaded && user) {
+      const stored = localStorage.getItem("expenseflow_group");
+      if (stored) {
+        try {
+          const group = JSON.parse(stored);
+          navigate(`/group/${group.code}/dashboard`);
+          return;
+        } catch(e) {}
+      }
       if (authMode === "clerk") {
         navigate("/setup"); // Or a group selection dashboard
       } else if (authMode === "guest") {
-        // Guests only have access to one group, so redirect to it
-        // We'll just go to dashboard if group context handles it, but typically guests need the code.
-        // Actually, GuestJoinModal sets up Firebase Auth, the app will handle fetching group info in a protected route.
-        // For now, redirect to a safe place. Wait, how do we know the group code?
-        // App.jsx routing relies on currentGroup context. We might need a bridge, but for now just navigate to a placeholder or let App handle it.
         navigate("/setup"); // They can't access setup, but we'll secure it in App.jsx
       }
     }
@@ -65,17 +64,21 @@ function Landing() {
         className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto"
       >
         <div className="flex items-center gap-2">
-          <span className="text-2xl" role="img" aria-label="ExpenseFlow logo">💸</span>
-          <span className="font-heading font-bold text-xl text-text-dark">
+          <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ExpenseFlow logo">
+            <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+            <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
+          <span className="font-heading font-bold text-xl text-text-dark tracking-tight">
             ExpenseFlow
           </span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
           <button
             onClick={() => setIsSignInOpen(true)}
-            className="text-text-muted hover:text-text-dark text-sm font-medium transition-colors"
+            className="text-[#105D5E] font-semibold hover:bg-white/50 px-4 py-2 rounded-xl transition-all text-sm"
           >
-            Sign In / Sign Up
+            Sign In
           </button>
           <button
             onClick={() => setIsGuestJoinOpen(true)}
@@ -87,7 +90,7 @@ function Landing() {
       </motion.nav>
 
       {/* Hero */}
-      <section className="px-6 pt-16 pb-20 max-w-6xl mx-auto">
+      <section className="px-6 pt-10 pb-12 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <motion.div
@@ -138,7 +141,7 @@ function Landing() {
             className="hidden lg:flex items-center justify-center"
           >
             <div className="relative">
-              <div className="w-72 h-72 rounded-3xl glass p-6 shadow-xl">
+              <div className="w-72 h-72 rounded-3xl glass p-6 shadow-xl" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
                 <div className="space-y-3">
                   {[
                     { name: "Alex", amount: "+₹3,400", color: "#009A6E" },
@@ -155,7 +158,7 @@ function Landing() {
                       </span>
                       <span
                         className={`font-mono text-sm font-bold ${
-                          p.color === "#4CAF82"
+                          p.color === "#009A6E"
                             ? "text-success"
                             : "text-text-muted"
                         }`}
@@ -174,7 +177,7 @@ function Landing() {
       </section>
 
       {/* Value Props */}
-      <section className="px-6 py-16 max-w-6xl mx-auto">
+      <section id="features" className="px-6 py-16 max-w-6xl mx-auto">
         <motion.h2
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
@@ -232,11 +235,15 @@ function Landing() {
       </section>
 
       {/* Footer */}
-      <footer className="px-6 py-8 border-t border-border mt-20">
+      <footer className="px-6 pt-8 pb-24 md:py-8 border-t border-border mt-20">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex flex-col items-center md:items-start gap-1">
             <div className="flex items-center gap-2 text-text-muted text-sm">
-              <span>⚖️</span>
+              <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+                <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+                <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+              </svg>
               <span>ExpenseFlow — Fair sharing, clear minds.</span>
             </div>
             <p className="text-text-muted text-xs">
@@ -250,6 +257,45 @@ function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Public FAB */}
+      <button
+        onClick={() => setIsGuestJoinOpen(true)}
+        className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center bg-primary text-background"
+        aria-label="Join with Code"
+      >
+        <Users size={24} />
+      </button>
+
+      {/* Public Bottom Nav */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
+        <div className="flex items-center justify-around py-2">
+          <button
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all text-primary"
+          >
+            <Home size={20} />
+            <span className="text-[10px] font-medium">Home</span>
+          </button>
+          <button
+            onClick={() => {
+               const el = document.getElementById('features');
+               if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all text-text-muted hover:text-text-dark"
+          >
+            <Star size={20} />
+            <span className="text-[10px] font-medium">Features</span>
+          </button>
+          <button
+            onClick={() => setIsSignInOpen(true)}
+            className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all text-text-muted hover:text-text-dark"
+          >
+            <LogIn size={20} />
+            <span className="text-[10px] font-medium">Sign In</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 }

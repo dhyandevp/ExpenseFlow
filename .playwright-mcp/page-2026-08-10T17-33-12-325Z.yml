@@ -1,0 +1,94 @@
+- generic [ref=f4e3]:
+  - generic [ref=f4e4]:
+    - generic [ref=f4e5]:
+      - generic [ref=f4e6]: ⚖️
+      - generic [ref=f4e7]:
+        - heading "Test Group" [level=2] [ref=f4e8]
+        - paragraph [ref=f4e9]: "#TEST01"
+    - generic [ref=f4e10]:
+      - generic [ref=f4e11]: Guest
+      - button [ref=f4e12] [cursor=pointer]
+  - main [ref=f4e14]:
+    - generic [ref=f4e16]:
+      - generic [ref=f4e18]:
+        - heading "Test Group" [level=1] [ref=f4e19]
+        - paragraph [ref=f4e20]: "#TEST01"
+      - button [ref=f4e21] [cursor=pointer]
+      - generic [ref=f4e24]:
+        - heading "Settlement History" [level=3] [ref=f4e25]
+        - button "Record" [ref=f4e32] [cursor=pointer]
+      - generic [ref=f4e35]:
+        - combobox [ref=f4e36]:
+          - option "All Categories" [selected]
+          - option "Rent"
+          - option "Utilities"
+          - option "Groceries"
+          - option "Repairs"
+          - option "Outings"
+          - option "Other"
+        - combobox [ref=f4e37]:
+          - option "All Members" [selected]
+          - option "👩 Alice"
+          - option "👨 Bob"
+      - generic [ref=f4e49]:
+        - generic [ref=f4e50]:
+          - heading "Add Expense" [level=3] [ref=f4e51]
+          - button [ref=f4e52] [cursor=pointer]
+        - generic [ref=f4e56]:
+          - generic [ref=f4e57]:
+            - generic [ref=f4e58]: Amount
+            - generic [ref=f4e59]:
+              - generic [ref=f4e60]: ₹
+              - spinbutton "0.00" [ref=f4e61]: "1000"
+          - generic [ref=f4e62]:
+            - generic [ref=f4e63]: Paid by
+            - combobox [ref=f4e64]:
+              - option "Select a member..."
+              - option "👩 Alice" [selected]
+              - option "👨 Bob"
+          - generic [ref=f4e65]:
+            - generic [ref=f4e66]: Category
+            - generic [ref=f4e67]:
+              - button "🏠 Rent" [ref=f4e68] [cursor=pointer]
+              - button "⚡ Utilities" [ref=f4e69] [cursor=pointer]
+              - button "🛒 Groceries" [ref=f4e70] [cursor=pointer]
+              - button "🔧 Repairs" [ref=f4e71] [cursor=pointer]
+              - button "🎉 Outings" [ref=f4e72] [cursor=pointer]
+              - button "📦 Other" [ref=f4e73] [cursor=pointer]
+          - generic [ref=f4e74]:
+            - generic [ref=f4e75]: Description (optional)
+            - textbox "What was this for?" [ref=f4e76]: E2E Auto Test
+          - generic [ref=f4e77]:
+            - generic [ref=f4e78]: Receipt (optional)
+            - generic [ref=f4e79]: Attach receipt photo
+          - generic [ref=f4e83]:
+            - generic [ref=f4e84]: Date
+            - textbox [ref=f4e85]: 2026-08-10
+          - generic [ref=f4e86]:
+            - generic [ref=f4e87]: Split type
+            - combobox [ref=f4e88]:
+              - option "Equal split" [selected]
+              - option "Custom amounts"
+              - option "Custom percentages"
+          - generic [ref=f4e89]:
+            - generic [ref=f4e90]: Split between (all by default)
+            - generic [ref=f4e91]:
+              - button "👩 Alice" [ref=f4e92] [cursor=pointer]:
+                - generic [ref=f4e93]: 👩
+                - text: Alice
+              - button "👨 Bob" [ref=f4e94] [cursor=pointer]:
+                - generic [ref=f4e95]: 👨
+                - text: Bob
+          - generic [ref=f4e96]:
+            - button "Cancel" [ref=f4e97] [cursor=pointer]
+            - button "Add Expense" [ref=f4e98] [cursor=pointer]
+  - navigation [ref=f4e99]:
+    - generic [ref=f4e100]:
+      - link "Home" [ref=f4e101] [cursor=pointer]:
+        - /url: /group/TEST01/dashboard
+      - link "Add" [ref=f4e108] [cursor=pointer]:
+        - /url: /group/TEST01
+      - link "Groups" [ref=f4e112] [cursor=pointer]:
+        - /url: /group/TEST01/settings
+      - link "Reports" [ref=f4e119] [cursor=pointer]:
+        - /url: /group/TEST01/report

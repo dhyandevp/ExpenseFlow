@@ -18,7 +18,6 @@ import {
 import { useGroup } from "../App";
 import { updateGroup, removeMember, regenerateCode, setGroupPin } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
-import RecurringManager from "../components/RecurringManager";
 import { useAuth } from "../hooks/useAuth";
 
 function getCategories(group) {
@@ -337,9 +336,6 @@ function SettingsPage() {
           </div>
         </div>
       </div>
-
-      {/* Recurring Expenses */}
-      <RecurringManager />
 
       {/* Members */}
       <div className="card">

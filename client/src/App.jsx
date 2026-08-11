@@ -3,19 +3,18 @@ import { useState, useEffect, createContext, useContext, lazy, Suspense } from "
 import { ClerkProvider } from "@clerk/clerk-react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { HelmetProvider } from "react-helmet-async";
-import Landing from "./pages/Landing";
-import GroupSetup from "./pages/GroupSetup";
-import JoinGroup from "./pages/JoinGroup";
-import AppLayout from "./components/AppLayout";
 import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
 
-const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || "pk_test_ZGVjZW50LWFscGFjYS01MC5jbGVyay5hY2NvdW50cy5kZXYk";
-
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Lazy-load app pages for route-level code splitting
+const Landing = lazy(() => import("./pages/Landing"));
+const GroupSetup = lazy(() => import("./pages/GroupSetup"));
+const JoinGroup = lazy(() => import("./pages/JoinGroup"));
+const AppLayout = lazy(() => import("./components/AppLayout"));
 const ExpenseLogger = lazy(() => import("./pages/ExpenseLogger"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ScenarioPlanner = lazy(() => import("./pages/ScenarioPlanner"));

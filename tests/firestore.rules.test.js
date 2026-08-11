@@ -44,17 +44,17 @@ describe("Firestore Security Rules", () => {
 
     it("Unauthenticated user cannot create a group", async () => {
       const db = unauthDb();
-      await assertFails(db.collection("groups").doc("group1").set({ name: "Test Group" }));
+      await assertFails(db.collection("groups").doc("group1").set({ name: "Test Group", allowedUsers: ["user1"] }));
     });
 
     it("Clerk user can create a group", async () => {
       const db = clerkDb("user1");
-      await assertSucceeds(db.collection("groups").doc("group1").set({ name: "Test Group" }));
+      await assertSucceeds(db.collection("groups").doc("group1").set({ name: "Test Group", allowedUsers: ["user1"] }));
     });
 
     it("Guest user cannot create a group", async () => {
       const db = guestDb("guest1", "group1");
-      await assertFails(db.collection("groups").doc("group2").set({ name: "Test Group" }));
+      await assertFails(db.collection("groups").doc("group2").set({ name: "Test Group", allowedUsers: ["guest1"] }));
     });
 
     it("Guest user can read their assigned group", async () => {
@@ -72,7 +72,7 @@ describe("Firestore Security Rules", () => {
       
       // Setup initial document bypassing rules
       await testEnv.withSecurityRulesDisabled(async (context) => {
-        await context.firestore().collection("groups").doc("group3").set({ name: "Group 3", currentBalances: {} });
+        await context.firestore().collection("groups").doc("group3").set({ name: "Group 3", currentBalances: {}, allowedUsers: ["user1"] });
       });
 
       // Try to update restricted field
@@ -85,10 +85,11 @@ describe("Firestore Security Rules", () => {
 
   describe("Subcollections (Expenses & Settlements)", () => {
     beforeEach(async () => {
-      // Create groups to test against
+      // Setup test group
       await testEnv.withSecurityRulesDisabled(async (context) => {
-        await context.firestore().collection("groups").doc("group1").set({ name: "Group 1" });
-        await context.firestore().collection("groups").doc("group2").set({ name: "Group 2" });
+        const db = context.firestore();
+        await db.collection("groups").doc("group1").set({ name: "Group 1", allowedUsers: ["user1"] });
+        await db.collection("groups").doc("group2").set({ name: "Group 2", allowedUsers: ["user2"] });
       });
     });
 

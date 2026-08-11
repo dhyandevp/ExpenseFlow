@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { Eye, EyeOff } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function PINVerification({ pin, setPin, isError, onSubmit }) {
@@ -81,9 +81,7 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
             value={pin[index] || ""}
             onChange={(e) => handleChange(e, index)}
             onKeyDown={(e) => handleKeyDown(e, index)}
-            className={`w-12 h-14 text-center text-2xl font-bold bg-surface border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary transition-colors ${
-              isError ? "border-accent text-accent" : "border-border text-text-dark"
-            }`}
+            className="w-12 h-14 text-center text-2xl font-bold bg-white border border-[#C2CBC9] text-text-dark rounded-lg focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors"
           />
         ))}
       </motion.div>
@@ -95,11 +93,11 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
       >
         {showPin ? (
           <>
-            <EyeSlashIcon className="w-4 h-4" /> <span>Hide PIN</span>
+            <EyeOff className="w-4 h-4" /> <span>Hide PIN</span>
           </>
         ) : (
           <>
-            <EyeIcon className="w-4 h-4" /> <span>Show PIN</span>
+            <Eye className="w-4 h-4" /> <span>Show PIN</span>
           </>
         )}
       </button>

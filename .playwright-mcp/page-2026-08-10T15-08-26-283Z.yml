@@ -1,0 +1,14 @@
+- generic [ref=f34e3]:
+  - heading "Terms of Service" [level=1] [ref=f34e4]
+  - generic [ref=f34e5]:
+    - paragraph [ref=f34e6]: "Last Updated: August 2026"
+    - heading "1. Acceptance of Terms" [level=4] [ref=f34e7]
+    - paragraph [ref=f34e8]: By accessing or using ExpenseFlow, you agree to be bound by these Terms of Service.
+    - heading "2. Service Description" [level=4] [ref=f34e9]
+    - paragraph [ref=f34e10]: ExpenseFlow is a tool to help groups manage shared expenses and calculate fairness scores.
+    - heading "3. User Data" [level=4] [ref=f34e11]
+    - paragraph [ref=f34e12]: You agree to provide accurate information. You are responsible for maintaining the security of your group codes and PINs.
+    - heading "4. Limitation of Liability" [level=4] [ref=f34e13]
+    - paragraph [ref=f34e14]: ExpenseFlow is provided "as is" without warranty of any kind. We are not liable for financial discrepancies or loss of data.
+    - heading "5. Modifications" [level=4] [ref=f34e15]
+    - paragraph [ref=f34e16]: We reserve the right to modify these terms at any time. Continued use implies acceptance.

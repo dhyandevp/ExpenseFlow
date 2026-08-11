@@ -1,0 +1,1 @@
+- generic [active] [ref=f27e1]: "User-agent: * Allow: / Disallow: /api/ Disallow: /dashboard/ Disallow: /group/ Sitemap: https://expenseflow.site/sitemap.xml"

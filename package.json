@@ -12,13 +12,15 @@
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
+    "@playwright/test": "^1.62.1",
     "netlify-cli": "^27.1.1",
     "vitest": "^4.1.10"
   },
   "dependencies": {
     "@clerk/clerk-sdk-node": "^4.13.23",
+    "cloudinary": "^2.10.0",
+    "dotenv": "^17.4.2",
     "firebase-admin": "^14.2.0",
-    "pdfkit": "^0.19.1",
     "svix": "^1.99.1"
   }
 }

@@ -1,0 +1,65 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e3]:
+    - navigation [ref=f1e4]:
+      - generic [ref=f1e5]:
+        - img [ref=f1e85]: 💸
+        - generic [ref=f1e7]: ExpenseFlow
+      - generic [ref=f1e8]:
+        - button [ref=f1e86] [cursor=pointer]: Sign In / Sign Up
+        - button [ref=f1e87] [cursor=pointer]: Join with Code
+    - generic [ref=f1e13]:
+      - generic [ref=f1e14]:
+        - generic [ref=f1e15]: Fair sharing, clear minds.
+        - heading [level=1] [ref=f1e88]: Stop arguing about who paid what.
+        - paragraph [ref=f1e19]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+      - generic [ref=f1e20]:
+        - button [ref=f1e89] [cursor=pointer]: Sign In to Create
+        - button [ref=f1e90] [cursor=pointer]: Join with Code & PIN
+    - generic [ref=f1e30]:
+      - heading [level=2] [ref=f1e91]: Why ExpenseFlow?
+      - generic [ref=f1e32]:
+        - generic [ref=f1e33]:
+          - heading [level=3] [ref=f1e92]: Long-term fairness
+          - paragraph [ref=f1e39]: Track who pays what over months, not just per bill. See the big picture.
+        - generic [ref=f1e40]:
+          - heading [level=3] [ref=f1e93]: Category insights
+          - paragraph [ref=f1e45]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+        - generic [ref=f1e46]:
+          - heading [level=3] [ref=f1e94]: Scenario planning
+          - paragraph [ref=f1e51]: Simulate future expenses before they happen. Plan ahead with confidence.
+    - contentinfo [ref=f1e52]:
+      - generic [ref=f1e53]:
+        - generic [ref=f1e54]:
+          - generic [ref=f1e55]:
+            - generic [ref=f1e56]: ⚖️
+            - generic [ref=f1e57]: ExpenseFlow — Fair sharing, clear minds.
+          - paragraph [ref=f1e58]: Made for roommates, couples, and close friends.
+        - generic [ref=f1e59]:
+          - link [ref=f1e95] [cursor=pointer]:
+            - /url: /terms
+            - text: Terms of Service
+          - link [ref=f1e96] [cursor=pointer]:
+            - /url: /privacy
+            - text: Privacy Policy
+          - link [ref=f1e97] [cursor=pointer]:
+            - /url: /contact
+            - text: Contact
+    - button [ref=f1e98] [cursor=pointer]
+    - navigation [ref=f1e69]:
+      - generic [ref=f1e70]:
+        - button [ref=f1e99] [cursor=pointer]:
+          - generic [ref=f1e75]: Home
+        - button [ref=f1e100] [cursor=pointer]:
+          - generic [ref=f1e79]: Features
+        - button [ref=f1e101] [cursor=pointer]:
+          - generic [ref=f1e84]: Sign In
+  - generic:
+    - generic:
+      - generic:
+        - dialog:
+          - generic [ref=f1e104]:
+            - button [ref=f1e105] [cursor=pointer]
+            - heading "Sign In" [level=2] [ref=f1e109]
+            - generic [ref=f1e110]:
+              - textbox "Phone Number" [active] [ref=f1e111]
+              - button "Send OTP" [ref=f1e112] [cursor=pointer]

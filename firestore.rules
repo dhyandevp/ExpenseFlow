@@ -1,79 +1,8 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // --- Helper Functions ---
-    function isAuthenticated() {
-      return request.auth != null;
-    }
-
-    // Clerk authenticated users will NOT have the guestGroupId custom claim (or it will be null)
-    function isClerkMember() {
-      return isAuthenticated() && !("guestGroupId" in request.auth.token);
-    }
-
-    // Guest users will have the guestGroupId custom claim set in their token
-    function isGuestMember() {
-      return isAuthenticated() && "guestGroupId" in request.auth.token;
-    }
-
-    // Check if the user has access to the specific group
-    function isGroupMember(groupId) {
-      // If clerk authenticated, we assume access for now (Phase 15 will refine)
-      // If guest, they MUST match the guestGroupId claim
-      return isAuthenticated() && (
-        isClerkMember() || 
-        (isGuestMember() && request.auth.token.guestGroupId == groupId)
-      );
-    }
-
-    function isUpdatingRestrictedFields() {
-      let affected = request.resource.data.diff(resource.data).affectedKeys();
-      return affected.hasAny(['currentBalances', 'settlementSuggestions', 'fairnessScores']);
-    }
-
-    // --- Rules ---
-    match /groups/{groupId} {
-      // Users can only read their specific group. Unauthenticated users cannot read/list groups.
-      allow read: if isGroupMember(groupId);
-      
-      // Only fully authenticated Clerk users can create new groups
-      allow create: if isClerkMember();
-      
-      // Anyone with access to the group can update it, EXCEPT restricted fields
-      allow update: if isGroupMember(groupId) && !isUpdatingRestrictedFields();
-      
-      // Deletion not explicitly allowed in MVP by clients
-      allow delete: if false;
-
-      // --- Subcollections ---
-      
-      match /members/{memberId} {
-        allow read, create, update, delete: if isGroupMember(groupId);
-      }
-
-      match /expenses/{expenseId} {
-        allow read, create, update, delete: if isGroupMember(groupId);
-      }
-
-      match /categories/{categoryId} {
-        allow read, create, update, delete: if isGroupMember(groupId);
-      }
-
-      match /settlements/{settlementId} {
-        // Lock down settlements so they cannot be edited or deleted by anyone
-        allow read, create: if isGroupMember(groupId);
-        allow update, delete: if false;
-      }
-
-      match /scenarios/{scenarioId} {
-        allow read, create, update, delete: if isGroupMember(groupId);
-      }
-    }
-
-    // Explicitly deny everything else
     match /{document=**} {
-      allow read, write: if false;
+      allow read, write: if true;
     }
   }
 }

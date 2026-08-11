@@ -118,7 +118,11 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
             <h3 className="font-heading font-bold text-xl text-text-dark">
               {isEditing ? (isDefault ? "Edit Default Category" : "Edit Category") : "Add a Category"}
             </h3>
-            <button onClick={onClose} className="p-2 rounded-lg hover:bg-background transition-colors">
+            <button
+              aria-label="Close"
+              onClick={onClose}
+              className="p-2 rounded-lg hover:bg-background transition-colors"
+            >
               <X size={20} className="text-text-muted" />
             </button>
           </div>
@@ -138,7 +142,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
                     setError("");
                   }}
                   placeholder="e.g. Fuel, Pet care, Streaming..."
-                  className="input-field pr-14"
+                  className={`input-field pr-14 ${error ? 'border-accent ring-1 ring-accent' : ''}`}
                   maxLength={30}
                   disabled={isDefault}
                   autoFocus={!isDefault}
@@ -147,6 +151,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
                   {name.length}/30
                 </span>
               </div>
+              {error && <p className="text-accent text-xs mt-1">{error}</p>}
               {isDefault && (
                 <p className="text-xs text-text-muted mt-1 flex items-center gap-1">🔒 Default category — name is locked</p>
               )}
@@ -236,9 +241,6 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
                 ))}
               </select>
             </div>
-
-            {/* Error */}
-            {error && <p className="text-accent text-sm">{error}</p>}
 
             {/* Buttons */}
             <div className="flex gap-3 pt-2">

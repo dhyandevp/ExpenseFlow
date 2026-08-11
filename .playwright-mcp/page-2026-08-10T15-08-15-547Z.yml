@@ -1,0 +1,11 @@
+- generic [ref=f33e3]:
+  - heading "Contact Us" [level=1] [ref=f33e4]
+  - generic [ref=f33e5]:
+    - generic [ref=f33e6]:
+      - heading "Development Specialist" [level=4] [ref=f33e7]
+      - paragraph [ref=f33e8]: Built with precision for managing group finances effortlessly.
+    - generic [ref=f33e9]:
+      - link "dhyandevp@proton.me" [ref=f33e10] [cursor=pointer]:
+        - /url: mailto:dhyandevp@proton.me
+      - link "Developer Links" [ref=f33e14] [cursor=pointer]:
+        - /url: https://linktr.ee/DhyandevRTX

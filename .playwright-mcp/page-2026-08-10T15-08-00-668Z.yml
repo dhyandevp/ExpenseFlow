@@ -1,0 +1,56 @@
+- generic [ref=f32e3]:
+  - navigation [ref=f32e4]:
+    - generic [ref=f32e5]:
+      - img "ExpenseFlow logo" [ref=f32e6]: 💸
+      - generic [ref=f32e7]: ExpenseFlow
+    - generic [ref=f32e8]:
+      - button "Sign In / Sign Up" [ref=f32e9] [cursor=pointer]
+      - button "Join with Code" [ref=f32e10] [cursor=pointer]
+  - generic [ref=f32e12]:
+    - generic [ref=f32e13]:
+      - generic [ref=f32e14]:
+        - generic [ref=f32e15]: Fair sharing, clear minds.
+        - heading "Stop arguing about who paid what." [level=1] [ref=f32e18]
+        - paragraph [ref=f32e19]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+      - generic [ref=f32e20]:
+        - button "Sign In to Create" [ref=f32e21] [cursor=pointer]
+        - button "Join with Code & PIN" [ref=f32e24] [cursor=pointer]
+    - generic [ref=f32e33]:
+      - generic [ref=f32e34]:
+        - generic [ref=f32e35]: Alex
+        - generic [ref=f32e36]: +₹3,400
+      - generic [ref=f32e37]:
+        - generic [ref=f32e38]: Jamie
+        - generic [ref=f32e39]: "-₹2,100"
+      - generic [ref=f32e40]:
+        - generic [ref=f32e41]: Sam
+        - generic [ref=f32e42]: +₹700
+      - generic [ref=f32e43]:
+        - generic [ref=f32e44]: Taylor
+        - generic [ref=f32e45]: "-₹2,000"
+  - generic [ref=f32e48]:
+    - heading "Why ExpenseFlow?" [level=2] [ref=f32e49]
+    - generic [ref=f32e50]:
+      - generic [ref=f32e51]:
+        - heading "Long-term fairness" [level=3] [ref=f32e56]
+        - paragraph [ref=f32e57]: Track who pays what over months, not just per bill. See the big picture.
+      - generic [ref=f32e58]:
+        - heading "Category insights" [level=3] [ref=f32e62]
+        - paragraph [ref=f32e63]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+      - generic [ref=f32e64]:
+        - heading "Scenario planning" [level=3] [ref=f32e68]
+        - paragraph [ref=f32e69]: Simulate future expenses before they happen. Plan ahead with confidence.
+  - contentinfo [ref=f32e70]:
+    - generic [ref=f32e71]:
+      - generic [ref=f32e72]:
+        - generic [ref=f32e73]:
+          - generic [ref=f32e74]: ⚖️
+          - generic [ref=f32e75]: ExpenseFlow — Fair sharing, clear minds.
+        - paragraph [ref=f32e76]: Made for roommates, couples, and close friends.
+      - generic [ref=f32e77]:
+        - link "Terms of Service" [ref=f32e78] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=f32e79] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact" [ref=f32e80] [cursor=pointer]:
+          - /url: /contact

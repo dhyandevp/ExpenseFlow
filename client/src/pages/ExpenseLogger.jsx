@@ -50,6 +50,7 @@ function ExpenseLogger() {
   const [expenses, setExpenses] = useState([]);
   const [balances, setBalances] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [filterCategory, setFilterCategory] = useState("");
@@ -74,18 +75,23 @@ function ExpenseLogger() {
   const loadData = useCallback(async () => {
     if (!currentGroup) return;
     setLoading(true);
+    setError(null);
     try {
-      const [expRes, balRes] = await Promise.all([
-        getExpenses(currentGroup.id, {
+      const [expRes, balRes] = await Promise.race([
+        Promise.all([
+          getExpenses(currentGroup.id, {
           category: filterCategory || undefined,
           member_id: filterMember || undefined,
         }),
-        getBalances(currentGroup.id),
+          getBalances(currentGroup.id),
+        ]),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
       ]);
       setExpenses(expRes.data);
       setBalances(balRes.data);
     } catch (err) {
       console.error("Failed to load expenses:", err);
+      setError(err.message || "Failed to load expenses.");
     } finally {
       setLoading(false);
     }
@@ -97,8 +103,16 @@ function ExpenseLogger() {
 
   const handleAddExpense = async (data) => {
     try {
-      await createExpense(currentGroup.id, data);
       setShowForm(false);
+      // Optimistic state update for instant feedback
+      const newExpense = {
+        id: "temp_" + Date.now(),
+        ...data,
+        createdAt: new Date().toISOString()
+      };
+      setExpenses(prev => [newExpense, ...prev]);
+      
+      await createExpense(currentGroup.id, data);
       loadData();
     } catch (err) {
       console.error("Failed to add expense:", err);
@@ -225,7 +239,12 @@ function ExpenseLogger() {
       </div>
 
       {/* Expense List */}
-      {loading ? (
+      {error ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <p className="text-accent">{error}</p>
+          <button onClick={loadData} className="btn-primary">Retry</button>
+        </div>
+      ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="card p-4">

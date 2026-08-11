@@ -69,7 +69,11 @@ export default function AppLayout({ children }) {
       <aside className="hidden md:flex flex-col w-64 bg-surface border-r border-border min-h-screen p-4 sticky top-0">
         <div className="px-3 py-4 mb-2">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">⚖️</span>
+            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+              <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+              <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+            </svg>
             <div className="flex-1 min-w-0">
               <h2 className="font-heading font-bold text-lg text-text-dark leading-tight truncate">
                 {currentGroup.name}
@@ -107,7 +111,11 @@ export default function AppLayout({ children }) {
                       onClick={() => handleSwitchGroup(g)}
                       className="w-full flex items-center gap-2 px-3 py-2.5 text-sm text-text-dark hover:bg-highlight/30 transition-colors text-left"
                     >
-                      <span className="text-xs">⚖️</span>
+                      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+                        <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+                        <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+                      </svg>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate text-xs">{g.name}</p>
                         <p className="text-[10px] text-text-muted font-mono">#{g.code}</p>
@@ -162,7 +170,11 @@ export default function AppLayout({ children }) {
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 left-0 right-0 z-30 glass-header px-4 py-3 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-xl">⚖️</span>
+          <svg width="20" height="20" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+            <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+            <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+          </svg>
           <div>
             <h2 className="font-heading font-bold text-sm text-text-dark leading-tight">
               {currentGroup.name}
@@ -229,7 +241,11 @@ export default function AppLayout({ children }) {
                       }}
                       className="w-full flex items-center gap-2 px-3 py-2 text-sm text-text-dark hover:bg-highlight/30 transition-colors text-left rounded-xl"
                     >
-                      <span className="text-xs">⚖️</span>
+                      <svg width="16" height="16" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
+                        <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
+                        <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
+                      </svg>
                       <span className="truncate text-xs">{g.name}</span>
                       <span className="text-[10px] text-text-muted font-mono">#{g.code}</span>
                     </button>
@@ -253,7 +269,7 @@ export default function AppLayout({ children }) {
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="flex-1 md:pt-0 pt-[60px] pb-[72px] md:pb-0 min-h-screen overflow-hidden relative z-10">
+      <main className="flex-1 md:pt-0 pt-[60px] pb-[100px] md:pb-0 min-h-screen overflow-hidden relative z-10">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -269,13 +285,15 @@ export default function AppLayout({ children }) {
       </main>
 
       {/* Mobile FAB */}
-      <Link
-        to={`/group/${code}`}
-        className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center"
-        aria-label="Add Expense"
-      >
-        <PlusCircle size={28} />
-      </Link>
+      {location.pathname !== `/group/${code}` && (
+        <Link
+          to={`/group/${code}`}
+          className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center"
+          aria-label="Add Expense"
+        >
+          <PlusCircle size={28} />
+        </Link>
+      )}
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">

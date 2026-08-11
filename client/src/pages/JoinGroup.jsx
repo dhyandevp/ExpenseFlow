@@ -21,11 +21,17 @@ function JoinGroup() {
     try {
       setLoading(true);
       setError("");
-      const res = await getGroupByCode(code.toUpperCase(), pinValue || undefined);
+      const res = await Promise.race([
+        getGroupByCode(code.toUpperCase(), pinValue || undefined),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
+      ]);
       setCurrentGroup(res.data);
       navigate(`/group/${code.toUpperCase()}`, { replace: true });
     } catch (err) {
-      if (err.message.includes("PIN")) {
+      if (err.message === "Request timed out") {
+        setError("Request timed out. Please try again.");
+        setLoading(false);
+      } else if (err.message.includes("PIN")) {
         setNeedsPin(true);
         setLoading(false);
       } else {
@@ -53,18 +59,19 @@ function JoinGroup() {
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
         className="text-center max-w-sm w-full"
       >
         <h1 className="sr-only">Join Group</h1>
         {error ? (
-          <div>
+          <div className="card p-8" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
             <div className="text-4xl mb-3">😕</div>
             <p className="text-accent font-medium">{error}</p>
           </div>
         ) : needsPin ? (
-          <div>
+          <div className="card p-8" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
             <div className="text-4xl mb-3">🔒</div>
             <h2 className="font-heading font-bold text-xl text-text-dark mb-2">
               PIN Required
@@ -94,9 +101,15 @@ function JoinGroup() {
                 Join Group
               </button>
             </form>
+            <button
+              onClick={() => navigate("/")}
+              className="mt-4 text-xs text-text-muted hover:text-primary transition-colors"
+            >
+              ← Back to Home
+            </button>
           </div>
         ) : (
-          <div>
+          <div className="card p-8" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
             <Loader2 size={32} className="animate-spin text-primary mx-auto mb-3" />
             <p className="text-text-muted">Joining group <span className="font-mono font-bold text-primary">{code}</span>...</p>
           </div>

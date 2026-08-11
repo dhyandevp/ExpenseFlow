@@ -106,21 +106,6 @@
            focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-20 focus:border-primary;
   }
 
-  .badge-positive {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-success text-surface text-xs font-medium;
-  }
-
-  .badge-negative {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-border text-text-dark text-xs font-medium;
-  }
-
-  .badge-neutral {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-highlight text-text-dark text-xs font-medium;
-  }
-
-  .badge-alert {
-    @apply inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent text-text-dark text-xs font-medium;
-  }
 
   .skeleton {
     @apply animate-pulse bg-border bg-opacity-50 rounded-lg;

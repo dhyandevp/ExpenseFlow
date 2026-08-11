@@ -1,0 +1,48 @@
+- generic [ref=e3]:
+  - navigation [ref=e4]:
+    - generic [ref=e5]:
+      - img "ExpenseFlow logo" [ref=e6]: 💸
+      - generic [ref=e7]: ExpenseFlow
+    - generic [ref=e8]:
+      - button "Sign In / Sign Up" [ref=e9] [cursor=pointer]
+      - button "Join with Code" [ref=e10] [cursor=pointer]
+  - generic [ref=e13]:
+    - generic [ref=e14]:
+      - generic [ref=e15]: Fair sharing, clear minds.
+      - heading "Stop arguing about who paid what." [level=1] [ref=e18]
+      - paragraph [ref=e19]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+    - generic [ref=e20]:
+      - button "Sign In to Create" [ref=e21] [cursor=pointer]
+      - button "Join with Code & PIN" [ref=e24] [cursor=pointer]
+  - generic [ref=e30]:
+    - heading "Why ExpenseFlow?" [level=2] [ref=e31]
+    - generic [ref=e32]:
+      - generic [ref=e33]:
+        - heading "Long-term fairness" [level=3] [ref=e38]
+        - paragraph [ref=e39]: Track who pays what over months, not just per bill. See the big picture.
+      - generic [ref=e40]:
+        - heading "Category insights" [level=3] [ref=e44]
+        - paragraph [ref=e45]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+      - generic [ref=e46]:
+        - heading "Scenario planning" [level=3] [ref=e50]
+        - paragraph [ref=e51]: Simulate future expenses before they happen. Plan ahead with confidence.
+  - contentinfo [ref=e52]:
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]: ⚖️
+          - generic [ref=e57]: ExpenseFlow — Fair sharing, clear minds.
+        - paragraph [ref=e58]: Made for roommates, couples, and close friends.
+      - generic [ref=e59]:
+        - link "Terms of Service" [ref=e60] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=e61] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact" [ref=e62] [cursor=pointer]:
+          - /url: /contact
+  - button "Join with Code" [ref=e63] [cursor=pointer]
+  - navigation [ref=e69]:
+    - generic [ref=e70]:
+      - button "Home" [ref=e71] [cursor=pointer]
+      - button "Features" [ref=e76] [cursor=pointer]
+      - button "Sign In" [ref=e80] [cursor=pointer]

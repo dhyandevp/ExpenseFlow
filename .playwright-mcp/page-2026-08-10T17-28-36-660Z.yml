@@ -1,0 +1,42 @@
+- generic [ref=f1e113]:
+  - generic [ref=f1e114]:
+    - generic [ref=f1e115]:
+      - generic [ref=f1e116]: ⚖️
+      - generic [ref=f1e117]:
+        - heading "Test Group" [level=2] [ref=f1e118]
+        - paragraph [ref=f1e119]: "#TEST01"
+    - generic [ref=f1e120]:
+      - generic [ref=f1e121]: Guest
+      - button [ref=f1e122] [cursor=pointer]
+  - main [ref=f1e124]:
+    - generic [ref=f1e162]:
+      - generic [ref=f1e164]:
+        - heading "Test Group" [level=1] [ref=f1e165]
+        - paragraph [ref=f1e166]: "#TEST01"
+      - button [ref=f1e167] [cursor=pointer]
+      - generic [ref=f1e170]:
+        - heading "Settlement History" [level=3] [ref=f1e171]
+        - button "Record" [ref=f1e178] [cursor=pointer]
+      - generic [ref=f1e181]:
+        - combobox [ref=f1e182]:
+          - option "All Categories" [selected]
+          - option "Rent"
+          - option "Utilities"
+          - option "Groceries"
+          - option "Repairs"
+          - option "Outings"
+          - option "Other"
+        - combobox [ref=f1e183]:
+          - option "All Members" [selected]
+  - link "Add Expense" [active] [ref=f1e133] [cursor=pointer]:
+    - /url: /group/TEST01
+  - navigation [ref=f1e136]:
+    - generic [ref=f1e137]:
+      - link "Home" [ref=f1e138] [cursor=pointer]:
+        - /url: /group/TEST01/dashboard
+      - link "Add" [ref=f1e145] [cursor=pointer]:
+        - /url: /group/TEST01
+      - link "Groups" [ref=f1e149] [cursor=pointer]:
+        - /url: /group/TEST01/settings
+      - link "Reports" [ref=f1e156] [cursor=pointer]:
+        - /url: /group/TEST01/report

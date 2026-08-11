@@ -1,0 +1,14 @@
+- generic [ref=f35e3]:
+  - heading "Privacy Policy" [level=1] [ref=f35e4]
+  - generic [ref=f35e5]:
+    - paragraph [ref=f35e6]: "Last Updated: August 2026"
+    - heading "1. Information We Collect" [level=4] [ref=f35e7]
+    - paragraph [ref=f35e8]: We collect information you provide directly, such as group names, member names, and expense details. Authentication information may be collected via Firebase.
+    - heading "2. How We Use Your Information" [level=4] [ref=f35e9]
+    - paragraph [ref=f35e10]: "Data is used exclusively to provide the ExpenseFlow service: tracking expenses, calculating balances, and generating fairness reports."
+    - heading "3. Data Storage" [level=4] [ref=f35e11]
+    - paragraph [ref=f35e12]: Your data is stored securely in Firebase Firestore. We do not sell your personal data to third parties.
+    - heading "4. Analytics" [level=4] [ref=f35e13]
+    - paragraph [ref=f35e14]: We may use anonymous usage data to improve our service.
+    - heading "5. Contact Us" [level=4] [ref=f35e15]
+    - paragraph [ref=f35e16]: If you have any questions about this Privacy Policy, please contact us.

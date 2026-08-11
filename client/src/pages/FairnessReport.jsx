@@ -1,5 +1,5 @@
 import SEO from "../components/SEO";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { motion } from "framer-motion";
 import {
   FileText,
@@ -24,7 +24,6 @@ import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { csvSafe } from "../../../shared/balanceMath";
-//import { getCategoryColor } from "../../../shared/fairness.js";
 // getCategoryColor not currently used in this component
 
 const periodOptions = [
@@ -69,16 +68,26 @@ function FairnessReport() {
   const [period, setPeriod] = useState("all");
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [actionError, setActionError] = useState(null);
   const reportRef = useRef(null);
 
-  useEffect(() => {
+  const loadData = useCallback(() => {
     if (!currentGroup) return;
     setLoading(true);
-    getReport(currentGroup.id, getDateRange(period))
+    setError(null);
+    Promise.race([
+      getReport(currentGroup.id, getDateRange(period)),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
+    ])
       .then((res) => setReport(res.data))
-      .catch(console.error)
+      .catch((err) => setError(err.message || "Failed to load report."))
       .finally(() => setLoading(false));
   }, [currentGroup, period]);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   if (!currentGroup) return null;
 
@@ -111,11 +120,13 @@ function FairnessReport() {
       document.body.removeChild(link);
     } catch (err) {
       console.error("Export CSV failed", err);
+      setActionError("Failed to export CSV.");
     }
   };
 
   const handleExportPDF = async () => {
-    const { default: jsPDF } = await import("jspdf");
+    try {
+      const { default: jsPDF } = await import("jspdf");
     const html2canvas = (await import("html2canvas")).default;
 
     const element = reportRef.current;
@@ -131,8 +142,12 @@ function FairnessReport() {
       unit: "px",
       format: [canvas.width / 2, canvas.height / 2],
     });
-    pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
-    pdf.save(`ExpenseFlow-${currentGroup.name}-Report.pdf`);
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.save(`ExpenseFlow-${currentGroup.name}-Report.pdf`);
+    } catch (err) {
+      console.error("PDF export failed", err);
+      setActionError("Failed to export PDF.");
+    }
   };
 
   const handleShare = async () => {
@@ -186,7 +201,17 @@ function FairnessReport() {
         </div>
       </div>
 
-      {loading ? (
+      {actionError && (
+        <div className="mb-4 p-3 bg-[#E8E300]/10 text-[#E8E300] border border-[#E8E300]/20 rounded-xl">
+          {actionError}
+        </div>
+      )}
+      {error ? (
+        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+          <p className="text-accent">{error}</p>
+          <button onClick={loadData} className="btn-primary">Retry</button>
+        </div>
+      ) : loading ? (
         <div className="space-y-4">
           <div className="skeleton h-24 rounded-xl" />
           <div className="skeleton h-64 rounded-xl" />
@@ -293,7 +318,6 @@ function FairnessReport() {
             </div>
           )}
 
-          {/* Fairness Score Trend placeholder */}
           <div className="card">
             <h3 className="font-heading font-semibold text-text-dark mb-3 flex items-center gap-2">
               <TrendingUp size={18} className="text-primary" />

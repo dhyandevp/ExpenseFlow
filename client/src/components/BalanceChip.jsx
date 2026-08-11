@@ -17,7 +17,7 @@ export default function BalanceChip({ member, netBalance, currency = "₹", onCl
         isPositive
           ? "bg-success text-surface"
           : isNegative
-          ? "bg-border text-text-dark"
+          ? "bg-border text-text-muted"
           : "bg-highlight text-text-dark"
       }`}
     >
