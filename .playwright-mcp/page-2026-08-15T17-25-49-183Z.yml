@@ -1,0 +1,66 @@
+- generic [ref=f1e1]:
+  - generic [ref=f1e5]:
+    - navigation [ref=f1e6]:
+      - generic [ref=f1e7]: ExpenseFlow
+      - generic [ref=f1e13]:
+        - button [ref=f1e14] [cursor=pointer]: Sign In
+        - button [ref=f1e15] [cursor=pointer]: Join with Code
+    - generic [ref=f1e18]:
+      - generic [ref=f1e19]:
+        - generic [ref=f1e20]: Fair sharing, clear minds.
+        - heading [level=1] [ref=f1e23]: Stop arguing about who paid what.
+        - paragraph [ref=f1e24]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+      - generic [ref=f1e25]:
+        - button [ref=f1e26] [cursor=pointer]: Sign In to Create
+        - button [ref=f1e29] [cursor=pointer]: Join with Code & PIN
+    - generic [ref=f1e35]:
+      - heading [level=2] [ref=f1e36]: Why ExpenseFlow?
+      - generic [ref=f1e37]:
+        - generic [ref=f1e38]:
+          - heading [level=3] [ref=f1e43]: Long-term fairness
+          - paragraph [ref=f1e44]: Track who pays what over months, not just per bill. See the big picture.
+        - generic [ref=f1e45]:
+          - heading [level=3] [ref=f1e49]: Category insights
+          - paragraph [ref=f1e50]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+        - generic [ref=f1e51]:
+          - heading [level=3] [ref=f1e55]: Scenario planning
+          - paragraph [ref=f1e56]: Simulate future expenses before they happen. Plan ahead with confidence.
+    - contentinfo [ref=f1e57]:
+      - generic [ref=f1e58]:
+        - generic [ref=f1e59]:
+          - generic [ref=f1e60]: ExpenseFlow — Fair sharing, clear minds.
+          - paragraph [ref=f1e66]: Made for roommates, couples, and close friends.
+        - generic [ref=f1e67]:
+          - link [ref=f1e68] [cursor=pointer]:
+            - /url: /terms
+            - text: Terms of Service
+          - link [ref=f1e69] [cursor=pointer]:
+            - /url: /privacy
+            - text: Privacy Policy
+          - link [ref=f1e70] [cursor=pointer]:
+            - /url: /contact
+            - text: Contact
+  - generic:
+    - generic:
+      - generic:
+        - dialog "Join as Guest":
+          - generic [ref=f1e73]:
+            - button "Close" [ref=f1e74] [cursor=pointer]
+            - heading "Join as Guest" [level=2] [ref=f1e78]
+            - paragraph [ref=f1e79]: Enter the group code and 6-digit PIN provided by your group admin.
+            - generic [ref=f1e80]:
+              - generic [ref=f1e81]:
+                - generic [ref=f1e82]: Group Code
+                - textbox "e.g. A1B2C3" [ref=f1e83]
+              - generic [ref=f1e84]:
+                - generic [ref=f1e85]: Group PIN
+                - generic [ref=f1e86]:
+                  - generic [ref=f1e88]:
+                    - textbox "Digit 1" [active] [ref=f1e89]
+                    - textbox "Digit 2" [ref=f1e90]
+                    - textbox "Digit 3" [ref=f1e91]
+                    - textbox "Digit 4" [ref=f1e92]
+                    - textbox "Digit 5" [ref=f1e93]
+                    - textbox "Digit 6" [ref=f1e94]
+                  - button "Show PIN" [ref=f1e95] [cursor=pointer]
+              - button "Join Group" [disabled] [ref=f1e100]

@@ -26,11 +26,7 @@ import {
 } from "recharts";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 
-function getGroupCategories(group) {
-  return group?.categories?.length > 0
-    ? group.categories.map((c) => c.name)
-    : ["Rent", "Utilities", "Groceries", "Repairs", "Outings", "Other"];
-}
+import { getGroupCategories } from "../utils/groupHelpers";
 
 const prebuiltExamples = [
   {
@@ -270,8 +266,8 @@ function ScenarioPlanner() {
                     className="input-field text-sm"
                   >
                     {getGroupCategories(currentGroup).map((c) => (
-                      <option key={c} value={c}>
-                        {c}
+                      <option key={c.name} value={c.name}>
+                        {c.name}
                       </option>
                     ))}
                   </select>

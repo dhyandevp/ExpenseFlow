@@ -122,18 +122,10 @@ export const removeMember = async (groupId, memberId) => {
 };
 
 export const getMembers = async (groupId) => {
-  if (groupId === "test03") {
-    return [
-      { id: 1, name: "Alice", emoji: "👩" },
-      { id: 2, name: "Bob", emoji: "👨" }
-    ];
-  }
   const q = query(collection(db, "groups", groupId, "members"));
   const snap = await getDocs(q);
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 };
-
-const localExpenses = [];
 
 export const createExpense = async (groupId, data) => {
   const expenseData = {
@@ -143,27 +135,15 @@ export const createExpense = async (groupId, data) => {
     createdAt: data.createdAt || new Date().toISOString(),
     splits: data.splits || null
   };
-  
-  if (groupId === "test03") {
-    const newExp = { id: "mock_" + Date.now(), ...expenseData };
-    localExpenses.push(newExp);
-    return { success: true, data: newExp };
-  }
 
   const docRef = await addDoc(collection(db, "groups", groupId, "expenses"), expenseData);
   return { success: true, data: { id: docRef.id, ...expenseData } };
 };
 
 export const getExpenses = async (groupId, filters = {}) => {
-  let expenses = [];
-  
-  if (groupId === "test03") {
-    expenses = [...localExpenses].reverse(); // Mock desc order
-  } else {
-    const q = query(collection(db, "groups", groupId, "expenses"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-    expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  }
+  const q = query(collection(db, "groups", groupId, "expenses"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+  let expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   if (filters.startDate) {
     expenses = expenses.filter(e => e.createdAt >= filters.startDate);
@@ -266,27 +246,39 @@ export const getReport = async (groupId, period = {}) => {
   const { data: expenses } = await getExpenses(groupId, period);
   const settlementsSnap = await getDocs(query(collection(db, "groups", groupId, "settlements")));
   
-  // Ponytail: Just send raw data, let FairnessReport component format it
   const result = calculateCategoryBreakdown(members, expenses);
   const bal = calculateBalances(members, expenses, settlementsSnap.docs.map(d => d.data()));
-  
+  const fairness = calculateFairnessScore(members, expenses);
+
+  // Build narrative summary
+  const topPayer = bal.balances.reduce((max, b) => b.total_paid > (max?.total_paid || 0) ? b : max, null);
+  const narrative = bal.total_expenses > 0
+    ? `${group.name} has tracked ${formatReportCurrency(bal.total_expenses)} in total expenses across ${Object.keys(result.breakdown).length} categories. ${topPayer ? `${topPayer.name} has contributed the most (${formatReportCurrency(topPayer.total_paid)}).` : ''} Group fairness score: ${fairness.group_score}/100.`
+    : `No expenses recorded yet for ${group.name}.`;
+
   return { success: true, data: {
     group, members,
     total_expenses: bal.total_expenses,
     member_summary: bal.balances,
     category_list: Object.keys(result.breakdown),
-    settlement_plan: bal.settlement_suggestions
+    category_grid: result.breakdown,
+    settlement_plan: bal.settlement_suggestions,
+    narrative,
   }};
 };
 
+function formatReportCurrency(amount) {
+  return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+}
+
 // ── Categories ──────────────────────────────────────────────────────────
 export const getCategories = async (groupId) => {
-  const snap = await getDocs(query(collection(db, "groups", groupId, "categories"), orderBy("sort_order")));
-  if (snap.empty) {
-    return { success: true, data: [
-      { id: "1", name: "Rent", emoji: "🏠", color: "#4A90E2" },
-      { id: "2", name: "Groceries", emoji: "🛒", color: "#F5A623" }
-    ]};
+  let snap;
+  try {
+    snap = await getDocs(query(collection(db, "groups", groupId, "categories"), orderBy("sort_order")));
+  } catch {
+    // sort_order index may not exist — fall back to unordered query
+    snap = await getDocs(query(collection(db, "groups", groupId, "categories")));
   }
   return { success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
 };
@@ -308,7 +300,6 @@ export const deleteCategory = async (groupId, catId) => {
 
 // ── Settlements ─────────────────────────────────────────────────────────
 export const getSettlements = async (groupId) => {
-  if (groupId === "test03") return { success: true, data: [] };
   const snap = await getDocs(query(collection(db, "groups", groupId, "settlements"), orderBy("date", "desc")));
   return { success: true, data: snap.docs.map(d => ({ id: d.id, ...d.data() })) };
 };

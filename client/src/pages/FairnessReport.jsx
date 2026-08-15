@@ -9,16 +9,6 @@ import {
   TrendingUp,
   AlertCircle,
 } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  Legend,
-} from "recharts";
 import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
@@ -102,12 +92,12 @@ function FairnessReport() {
       const members = await getMembers(currentGroup.id);
       const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]));
 
-      let csv = "Date,Category,Description,Amount,Paid By\\n";
+      let csv = "Date,Category,Description,Amount,Paid By\n";
       for (const e of expenseData) {
         const safeDesc = csvSafe(e.description);
         const safeCat = csvSafe(e.category);
         const safeName = csvSafe(memberMap[e.paidBy] || e.paidBy);
-        csv += `${e.createdAt},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\\n`;
+        csv += `${e.createdAt},${safeCat},"${safeDesc.replace(/"/g, '""')}",${e.amount},${safeName}\n`;
       }
 
       const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -124,30 +114,8 @@ function FairnessReport() {
     }
   };
 
-  const handleExportPDF = async () => {
-    try {
-      const { default: jsPDF } = await import("jspdf");
-    const html2canvas = (await import("html2canvas")).default;
-
-    const element = reportRef.current;
-    if (!element) return;
-
-    const canvas = await html2canvas(element, {
-      backgroundColor: "#F9F7F4",
-      scale: 2,
-    });
-    const imgData = canvas.toDataURL("image/png");
-    const pdf = new jsPDF({
-      orientation: "portrait",
-      unit: "px",
-      format: [canvas.width / 2, canvas.height / 2],
-    });
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
-      pdf.save(`ExpenseFlow-${currentGroup.name}-Report.pdf`);
-    } catch (err) {
-      console.error("PDF export failed", err);
-      setActionError("Failed to export PDF.");
-    }
+  const handleExportPDF = () => {
+    window.print();
   };
 
   const handleShare = async () => {
@@ -283,10 +251,11 @@ function FairnessReport() {
                         </div>
                       </td>
                       {categories.map((cat) => {
-                        const amount = report.category_grid[cat]?.members?.[
+                        const memberEntry = report.category_grid[cat]?.members?.[
                           report.members.find((m) => m.name === member.name)
                             ?.id
-                        ] || 0;
+                        ];
+                        const amount = memberEntry?.amount || 0;
                         return (
                           <td key={cat} className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono text-xs border-b border-border/10 md:border-none">
                             <span className="md:hidden font-sans text-text-muted">{cat}</span>

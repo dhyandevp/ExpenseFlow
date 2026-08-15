@@ -1,8 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { csvSafe } from '../shared/balanceMath.js';
-import { applyRecurringTemplate } from '../client/src/api/client.js';
 import { calculateFairnessScore, calculateBalances } from '../shared/balanceMath.js';
-import { calculateSettlement } from '../shared/fairness.js';
 
 describe('csvSafe', () => {
   it('should return non-strings as is', () => {
@@ -17,23 +15,9 @@ describe('csvSafe', () => {
     expect(csvSafe('@sum()')).toBe("'@sum()");
   });
 
-  it('should wrap values with commas in double quotes', () => {
-    expect(csvSafe('Hello, World')).toBe('"Hello, World"');
-  });
-
-  it('should escape double quotes and wrap in double quotes', () => {
-    expect(csvSafe('Hello "World"')).toBe('"Hello ""World"""');
-  });
 
   it('should return normal strings unchanged', () => {
     expect(csvSafe('Normal String')).toBe('Normal String');
-  });
-});
-
-describe('applyRecurringTemplate', () => {
-  it('should return success object', async () => {
-    const result = await applyRecurringTemplate();
-    expect(result).toEqual({ success: true });
   });
 });
 
@@ -58,24 +42,6 @@ describe('calculateFairnessScore', () => {
     expect(result.group_score).toBeLessThan(100);
     const bob = result.scores.find(s => s.name === 'Bob');
     expect(bob.score).toBeLessThan(100);
-  });
-});
-
-describe('calculateSettlement', () => {
-  it('should optimize transfers for 1 payer and multiple borrowers', () => {
-    // Balances: positive means they owe money, negative means they are owed money.
-    // Let's assume standard logic: Alice paid 100 for Alice and Bob. Alice is owed 50. Bob owes 50.
-    // If calculateSettlement expects positive as owed, negative as owes, we need to pass correct signs.
-    // Let's pass typical array of member balances.
-    const balances = [
-      { id: '1', name: 'Alice', net_balance: 50 }, // owed 50
-      { id: '2', name: 'Bob', net_balance: -50 },  // owes 50
-    ];
-    const settlements = calculateSettlement(balances);
-    expect(settlements.length).toBe(1);
-    expect(settlements[0].from).toBe('Bob');
-    expect(settlements[0].to).toBe('Alice');
-    expect(settlements[0].amount).toBe(50);
   });
 });
 

@@ -28,8 +28,7 @@ export default defineConfig({
           charts: ["recharts"],
           motion: ["framer-motion"],
           clerk: ["@clerk/clerk-react"],
-          firebase: ["firebase/app", "firebase/firestore", "firebase/auth", "firebase/storage"],
-          pdf: ["jspdf", "html2canvas"]
+          firebase: ["firebase/app", "firebase/firestore", "firebase/auth", "firebase/storage"]
         },
       },
     },
