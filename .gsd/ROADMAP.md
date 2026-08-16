@@ -112,7 +112,7 @@
 **Objective**: Replace Firebase Storage with Cloudinary for all receipt image uploads. At the end, receipts upload directly to Cloudinary with automatic WebP compression, and the Firestore expense document stores a permanent Cloudinary URL.
 
 **Tasks** (ordered):
-1. Set up Cloudinary upload preset: `expenseflow_receipts`, unsigned, folder `receipts/`, allowed formats jpg/png/webp, max 5 MB, incoming transformations (format: webp, quality: auto, width: 1600 crop: limit) (Prompt 8)
+1. Set up Cloudinary upload preset: `your_upload_preset_here`, unsigned, folder receipts/, allowed formats jpg/png/webp, max 5 MB, incoming transformations (format: webp, quality: auto, width: 1600 crop: limit) (Prompt 8)
 2. Add `VITE_CLOUDINARY_CLOUD_NAME` and `VITE_CLOUDINARY_UPLOAD_PRESET` to `client/.env` and Netlify environment variables (Prompt 8)
 3. `npm uninstall browser-image-compression` in client (Prompt 8)
 4. Remove `firebase/storage` import from `firebase.js` (Prompt 8)
