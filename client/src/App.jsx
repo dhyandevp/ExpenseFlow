@@ -1,6 +1,6 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
-import { ClerkProvider } from "@clerk/clerk-react";
+import { ClerkProvider, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { HelmetProvider } from "react-helmet-async";
 import NotFound from "./pages/NotFound";
@@ -127,6 +127,7 @@ export default function App() {
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
                 <Route path="/setup" element={<ProtectedRoute><GroupSetup /></ProtectedRoute>} />
                 <Route path="/join/:code" element={<JoinGroup />} />
             <Route
