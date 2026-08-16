@@ -6,6 +6,18 @@ import { app } from "../firebase"; // Assuming firebase app is initialized in fi
 const AuthContext = createContext();
 const auth = getAuth(app);
 
+// Safe frontend logger
+const frontLogger = {
+  log: (event, data = {}) => {
+    if (import.meta.env.DEV || event.includes('failed') || event.includes('error')) {
+      console.log(`[AuthFlow] ${event}`, data);
+    }
+  },
+  error: (event, data = {}) => {
+    console.error(`[AuthFlow] ${event}`, data);
+  }
+};
+
 export function AuthProvider({ children }) {
   const { user: clerkUser, isLoaded: isClerkLoaded } = useUser();
   const { session } = useSession();
@@ -22,8 +34,11 @@ export function AuthProvider({ children }) {
       if (!isClerkLoaded) return;
 
       if (clerkUser && session) {
+        frontLogger.log('clerk_session_available', { clerkUserId: clerkUser.id });
         try {
           const sessionToken = await session.getToken();
+          frontLogger.log('jwt_bridge_request_started');
+          
           const res = await fetch("/api/auth/jwt-bridge", {
             method: "POST",
             headers: {
@@ -32,15 +47,28 @@ export function AuthProvider({ children }) {
             },
           });
           
-          if (!res.ok) throw new Error("Failed to bridge JWT");
+          if (!res.ok) {
+            let errorData = {};
+            try { errorData = await res.json(); } catch(e) {}
+            frontLogger.error('jwt_bridge_request_failed', { 
+              status: res.status, 
+              requestId: errorData.requestId || res.headers.get('x-request-id') 
+            });
+            throw new Error(`Failed to bridge JWT (Status: ${res.status})`);
+          }
           
-          const { firebaseToken } = await res.json();
-          await signInWithCustomToken(auth, firebaseToken);
+          const responseData = await res.json();
+          frontLogger.log('jwt_bridge_request_success', { requestId: responseData.requestId });
+          
+          frontLogger.log('firebase_sign_in_started');
+          await signInWithCustomToken(auth, responseData.firebaseToken);
+          frontLogger.log('firebase_sign_in_success');
         } catch (err) {
-          if (import.meta.env.DEV) console.error("Clerk->Firebase Auth Bridge failed", err);
+          frontLogger.error("firebase_auth_bridge_failed", { message: err.message });
         }
       } else if (!clerkUser && authMode === 'clerk') {
         // Clerk signed out, so sign out of Firebase
+        frontLogger.log('clerk_signed_out');
         await firebaseSignOut(auth);
       }
     }
@@ -66,7 +94,7 @@ export function AuthProvider({ children }) {
             setGroupAccess(null);
           }
         } catch (err) {
-          if (import.meta.env.DEV) console.error("Failed to parse token claims", err);
+          frontLogger.error("failed_to_parse_token_claims", { message: err.message });
           setAuthMode(null);
           setGroupAccess(null);
         }
@@ -81,10 +109,12 @@ export function AuthProvider({ children }) {
   }, [clerkUser]);
 
   const signOut = async () => {
+    frontLogger.log('sign_out_started');
     if (authMode === "clerk") {
       await clerk.signOut();
     }
     await firebaseSignOut(auth);
+    frontLogger.log('sign_out_success');
   };
 
   const isLoaded = isClerkLoaded && isFirebaseLoaded;
