@@ -1,7 +1,8 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useUser, useSession, useClerk } from "@clerk/clerk-react";
 import { getAuth, signInWithCustomToken, onIdTokenChanged, signOut as firebaseSignOut } from "firebase/auth";
-import { app } from "../firebase"; // Assuming firebase app is initialized in firebase.js
+import { app } from "../firebase";
+import { getUserProfile } from "../api/client";
 
 const AuthContext = createContext();
 const auth = getAuth(app);
@@ -27,6 +28,8 @@ export function AuthProvider({ children }) {
   const [authMode, setAuthMode] = useState(null); // 'clerk', 'guest', or null
   const [groupAccess, setGroupAccess] = useState(null); // 'all' or specific groupId
   const [isFirebaseLoaded, setIsFirebaseLoaded] = useState(false);
+  const [userProfile, setUserProfile] = useState(null);
+  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
 
   // Sync Clerk Session to Firebase Custom Token
   useEffect(() => {
@@ -86,21 +89,33 @@ export function AuthProvider({ children }) {
           if (tokenResult.claims.guestGroupId) {
             setAuthMode("guest");
             setGroupAccess(tokenResult.claims.guestGroupId);
+            setUserProfile(null);
+            setIsProfileLoaded(true);
           } else if (clerkUser) {
             setAuthMode("clerk");
             setGroupAccess("all");
+            // Load user profile
+            const profileRes = await getUserProfile(user.uid);
+            setUserProfile(profileRes.data);
+            setIsProfileLoaded(true);
           } else {
             setAuthMode(null);
             setGroupAccess(null);
+            setUserProfile(null);
+            setIsProfileLoaded(true);
           }
         } catch (err) {
           frontLogger.error("failed_to_parse_token_claims", { message: err.message });
           setAuthMode(null);
           setGroupAccess(null);
+          setUserProfile(null);
+          setIsProfileLoaded(true);
         }
       } else {
         setAuthMode(null);
         setGroupAccess(null);
+        setUserProfile(null);
+        setIsProfileLoaded(true);
       }
       setIsFirebaseLoaded(true);
     });
@@ -119,6 +134,13 @@ export function AuthProvider({ children }) {
 
   const isLoaded = isClerkLoaded && isFirebaseLoaded;
 
+  const refreshProfile = async () => {
+    if (firebaseUser && authMode === 'clerk') {
+      const profileRes = await getUserProfile(firebaseUser.uid);
+      setUserProfile(profileRes.data);
+    }
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -127,6 +149,9 @@ export function AuthProvider({ children }) {
         groupAccess,
         signOut,
         isLoaded,
+        userProfile,
+        isProfileLoaded,
+        refreshProfile,
       }}
     >
       {children}

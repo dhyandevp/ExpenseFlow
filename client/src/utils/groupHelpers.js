@@ -1,10 +1,10 @@
 export const DEFAULT_CATEGORIES = [
-  { name: "Rent", emoji: "🏠" },
-  { name: "Utilities", emoji: "⚡" },
-  { name: "Groceries", emoji: "🛒" },
-  { name: "Repairs", emoji: "🔧" },
-  { name: "Outings", emoji: "🎉" },
-  { name: "Other", emoji: "📦" },
+  { name: "Rent", iconName: "House" },
+  { name: "Utilities", iconName: "Lightbulb" },
+  { name: "Groceries", iconName: "ShoppingCart" },
+  { name: "Repairs", iconName: "Wrench" },
+  { name: "Outings", iconName: "PartyPopper" },
+  { name: "Other", iconName: "Package" },
 ];
 
 export function getGroupCategories(group) {

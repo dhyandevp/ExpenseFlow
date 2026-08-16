@@ -20,6 +20,9 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const ScenarioPlanner = lazy(() => import("./pages/ScenarioPlanner"));
 const FairnessReport = lazy(() => import("./pages/FairnessReport"));
 const Settings = lazy(() => import("./pages/Settings"));
+const GroupsHome = lazy(() => import("./pages/GroupsHome"));
+const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
+const Profile = lazy(() => import("./pages/Profile"));
 
 export const GroupContext = createContext();
 
@@ -91,10 +94,24 @@ function PageLoader() {
   );
 }
 
-function ProtectedRoute({ children }) {
-  const { user, isLoaded } = useAuth();
-  if (!isLoaded) return <PageLoader />;
+function ProtectedRoute({ children, requireProfile = true }) {
+  const { user, isLoaded, isProfileLoaded, userProfile, authMode } = useAuth();
+  
+  if (!isLoaded || (authMode === 'clerk' && !isProfileLoaded)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-primary">
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-4" />
+        <p className="font-medium text-sm">Loading your account...</p>
+      </div>
+    );
+  }
+  
   if (!user) return <Navigate to="/" replace />;
+  
+  if (requireProfile && authMode === 'clerk' && !userProfile) {
+    return <Navigate to="/profile-setup" replace />;
+  }
+  
   return children;
 }
 
@@ -128,66 +145,49 @@ export default function App() {
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/contact" element={<Contact />} />
                 <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
+                <Route path="/home" element={<ProtectedRoute><GroupsHome /></ProtectedRoute>} />
+                <Route path="/profile-setup" element={<ProtectedRoute requireProfile={false}><ProfileSetup /></ProtectedRoute>} />
+                <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                 <Route path="/setup" element={<ProtectedRoute><GroupSetup /></ProtectedRoute>} />
                 <Route path="/join/:code" element={<JoinGroup />} />
             <Route
               path="/group/:code"
               element={
-                currentGroup ? (
-                  <AppLayout>
-                    <ExpenseLogger />
-                  </AppLayout>
-                ) : (
-                  <Navigate to="/" replace />
-                )
+                <AppLayout>
+                  <ExpenseLogger />
+                </AppLayout>
               }
             />
             <Route
               path="/group/:code/dashboard"
               element={
-                currentGroup ? (
-                  <AppLayout>
-                    <Dashboard />
-                  </AppLayout>
-                ) : (
-                  <Navigate to="/" replace />
-                )
+                <AppLayout>
+                  <Dashboard />
+                </AppLayout>
               }
             />
             <Route
               path="/group/:code/scenarios"
               element={
-                currentGroup ? (
-                  <AppLayout>
-                    <ScenarioPlanner />
-                  </AppLayout>
-                ) : (
-                  <Navigate to="/" replace />
-                )
+                <AppLayout>
+                  <ScenarioPlanner />
+                </AppLayout>
               }
             />
             <Route
               path="/group/:code/report"
               element={
-                currentGroup ? (
-                  <AppLayout>
-                    <FairnessReport />
-                  </AppLayout>
-                ) : (
-                  <Navigate to="/" replace />
-                )
+                <AppLayout>
+                  <FairnessReport />
+                </AppLayout>
               }
             />
             <Route
               path="/group/:code/settings"
               element={
-                currentGroup ? (
-                  <AppLayout>
-                    <Settings />
-                  </AppLayout>
-                ) : (
-                  <Navigate to="/" replace />
-                )
+                <AppLayout>
+                  <Settings />
+                </AppLayout>
               }
             />
             <Route path="*" element={<NotFound />} />

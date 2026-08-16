@@ -36,18 +36,12 @@ function Landing() {
   // If already authenticated, redirect
   useEffect(() => {
     if (isLoaded && user) {
-      const stored = localStorage.getItem("expenseflow_group");
-      if (stored) {
-        try {
-          const group = JSON.parse(stored);
-          navigate(`/group/${group.code}/dashboard`);
-          return;
-        } catch(e) {}
-      }
       if (authMode === "clerk") {
-        navigate("/setup"); // Or a group selection dashboard
+        navigate("/home"); 
       } else if (authMode === "guest") {
-        navigate("/setup"); // They can't access setup, but we'll secure it in App.jsx
+        // Guests usually jump straight to the group they just joined, 
+        // but if they hit root, they can just see their home or whatever recent groups they have.
+        navigate("/home"); 
       }
     }
   }, [user, isLoaded, authMode, navigate]);

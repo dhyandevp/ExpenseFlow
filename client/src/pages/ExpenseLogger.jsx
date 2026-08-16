@@ -11,6 +11,7 @@ import {
   Wrench,
   PartyPopper,
   Package,
+  ReceiptText,
 } from "lucide-react";
 import { useGroup } from "../App";
 import { getExpenses, createExpense, deleteExpense } from "../api/client";
@@ -22,6 +23,8 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ReceiptIndicator, ReceiptLightbox } from "../components/ReceiptUpload";
 import SettlementHistory from "../components/SettlementHistory";
 import { springScale } from "../utils/motion";
+import Avatar from "../components/Avatar";
+import { CategoryIcon } from "../utils/categoryIcons";
 
 const categoryIcons = {
   Rent: Home,
@@ -129,7 +132,6 @@ function ExpenseLogger() {
     }
   };
 
-  if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
 
@@ -215,7 +217,7 @@ function ExpenseLogger() {
           {(currentGroup.categories || []).length > 0
             ? currentGroup.categories.map((cat) => (
                 <option key={cat.name} value={cat.name}>
-                  {cat.emoji || "📦"} {cat.name}
+                  {cat.name}
                 </option>
               ))
             : ["Rent", "Utilities", "Groceries", "Repairs", "Outings", "Other"].map((cat) => (
@@ -232,7 +234,7 @@ function ExpenseLogger() {
           <option value="">All Members</option>
           {members.map((m) => (
             <option key={m.id} value={m.id}>
-              {m.emoji} {m.name}
+              {m.name}
             </option>
           ))}
         </select>
@@ -259,7 +261,7 @@ function ExpenseLogger() {
           animate={{ opacity: 1 }}
           className="text-center py-16"
         >
-          <div className="text-5xl mb-4">🧾</div>
+          <div className="flex justify-center mb-4"><ReceiptText size={48} className="text-text-muted" /></div>
           <h3 className="font-heading font-semibold text-lg text-text-muted mb-2">
             No expenses yet
           </h3>
@@ -286,17 +288,6 @@ function ExpenseLogger() {
                 if (groupCat?.color) return groupCat.color;
                 return categoryColors[cat] || "#767F7D";
               };
-              const getExpenseCatEmoji = (cat) => {
-                const groupCat = currentGroup.categories?.find((c) => c.name === cat);
-                if (groupCat?.emoji) return groupCat.emoji;
-                const emojiMap = { Rent: "🏠", Utilities: "⚡", Groceries: "🛒", Repairs: "🔧", Outings: "🎉", Other: "📦" };
-                return emojiMap[cat] || "📦";
-              };
-              const getCatIcon = (cat) => {
-                const iconMap = { Rent: Home, Utilities: Zap, Groceries: ShoppingCart, Repairs: Wrench, Outings: PartyPopper, Other: Package };
-                const Icon = iconMap[cat] || Package;
-                return <Icon size={18} style={{ color: catColor }} />;
-              };
               const catColor = getExpenseCatColor(expense.category);
               const payer = members.find((m) => m.id === expense.paidBy);
 
@@ -318,10 +309,10 @@ function ExpenseLogger() {
                   >
                   {/* Category icon */}
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
-                    style={{ backgroundColor: catColor + "15" }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-primary"
+                    style={{ backgroundColor: catColor + "15", color: catColor }}
                   >
-                    <span className="text-lg">{getExpenseCatEmoji(expense.category)}</span>
+                    <CategoryIcon category={{name: expense.category}} size={20} />
                   </div>
 
                   {/* Details */}
@@ -331,8 +322,8 @@ function ExpenseLogger() {
                         <p className="font-medium text-text-dark text-sm">
                           {expense.description || expense.category}
                         </p>
-                        <p className="text-xs text-text-muted mt-0.5">
-                          {expense.payer_emoji} {expense.payer_name} ·{" "}
+                        <p className="text-xs text-text-muted mt-0.5 flex items-center gap-1">
+                          <Avatar member={payer || {name: expense.payer_name}} size={12} /> {expense.payer_name} ·{" "}
                           {new Date(expense.createdAt).toLocaleDateString(
                             "en-IN",
                             { day: "numeric", month: "short" }
@@ -355,7 +346,7 @@ function ExpenseLogger() {
                             color: split.color || "#767F7D",
                           }}
                         >
-                          {split.emoji || ""} {formatINR(split.share_amount)}
+                          <Avatar member={members.find(m => m.id === split.member_id) || {name: split.member_name}} size={10} /> {formatINR(split.share_amount)}
                         </span>
                       ))}
                     </div>

@@ -2,7 +2,7 @@ import SEO from "../components/SEO";
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Loader2, KeyRound } from "lucide-react";
+import { Loader2, KeyRound, CircleAlert, Lock } from "lucide-react";
 import { useGroup } from "../App";
 import { getGroupByCode } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
@@ -26,7 +26,7 @@ function JoinGroup() {
         new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
       ]);
       setCurrentGroup(res.data);
-      navigate(`/group/${code.toUpperCase()}`, { replace: true });
+      navigate(`/group/${code.toUpperCase()}/dashboard`, { replace: true });
     } catch (err) {
       if (err.message === "Request timed out") {
         setError("Request timed out. Please try again.");
@@ -46,8 +46,9 @@ function JoinGroup() {
       navigate("/", { replace: true });
       return;
     }
-    setNeedsPin(true);
-    setLoading(false);
+    // Attempt to fetch without PIN first. 
+    // If PIN is required, the API will throw and we'll prompt for it.
+    fetchGroup();
   }, [code, navigate]);
 
   const handlePinSubmit = (e) => {
@@ -67,12 +68,12 @@ function JoinGroup() {
         <h1 className="sr-only">Join Group</h1>
         {error ? (
           <div className="card p-8" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
-            <div className="text-4xl mb-3">😕</div>
+            <div className="flex justify-center mb-3"><CircleAlert size={36} className="text-accent" /></div>
             <p className="text-accent font-medium">{error}</p>
           </div>
         ) : needsPin ? (
           <div className="card p-8" style={{ border: '1px solid rgba(255,255,255,0.7)' }}>
-            <div className="text-4xl mb-3">🔒</div>
+            <div className="flex justify-center mb-3"><Lock size={36} className="text-primary" /></div>
             <h2 className="font-heading font-bold text-xl text-text-dark mb-2">
               PIN Required
             </h2>

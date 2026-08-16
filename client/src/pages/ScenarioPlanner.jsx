@@ -150,7 +150,6 @@ function ScenarioPlanner() {
     setActions(mappedActions);
   };
 
-  if (!currentGroup) return null;
 
   const chartData =
     simulation?.projectedBalances.map((b) => ({
@@ -228,7 +227,7 @@ function ScenarioPlanner() {
                     <option value="">Select...</option>
                     {members.map((m) => (
                       <option key={m.id} value={m.id}>
-                        {m.emoji} {m.name}
+                        {m.name}
                       </option>
                     ))}
                   </select>

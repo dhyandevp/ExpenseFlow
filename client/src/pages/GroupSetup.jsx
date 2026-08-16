@@ -4,24 +4,25 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, springScale } from "../utils/motion";
 import {
-  ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock
+  ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock, PartyPopper, Mail
 } from "lucide-react";
 import { createGroup } from "../api/client";
 import { useGroup } from "../App";
 import AddCategoryModal from "../components/AddCategoryModal";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
+import { CategoryIcon } from "../utils/categoryIcons";
+import Avatar from "../components/Avatar";
 
-const EMOJIS = ["😊", "🦊", "🐱", "🐼", "🐸", "🐙", "🦄", "🌈"];
 const COLORS = ["#105D5E", "#009A6E", "#B3EDA9", "#E8E300", "#767F7D", "#C2CBC9", "#293E33", "#FFFFFF"];
 
 const DEFAULT_CATEGORIES = [
-  { name: "Rent", emoji: "🏠", color: "#105D5E", split_model: "equal", is_default: true },
-  { name: "Utilities", emoji: "⚡", color: "#E8E300", split_model: "equal", is_default: true },
-  { name: "Groceries", emoji: "🛒", color: "#009A6E", split_model: "equal", is_default: true },
-  { name: "Repairs", emoji: "🔧", color: "#767F7D", split_model: "equal", is_default: true },
-  { name: "Outings", emoji: "🎉", color: "#B3EDA9", split_model: "pay_as_you_go", is_default: true },
-  { name: "Other", emoji: "📦", color: "#C2CBC9", split_model: "equal", is_default: true },
+  { name: "Rent", iconName: "House", color: "#105D5E", split_model: "equal", is_default: true },
+  { name: "Utilities", iconName: "Lightbulb", color: "#E8E300", split_model: "equal", is_default: true },
+  { name: "Groceries", iconName: "ShoppingCart", color: "#009A6E", split_model: "equal", is_default: true },
+  { name: "Repairs", iconName: "Wrench", color: "#767F7D", split_model: "equal", is_default: true },
+  { name: "Outings", iconName: "PartyPopper", color: "#B3EDA9", split_model: "pay_as_you_go", is_default: true },
+  { name: "Other", iconName: "Package", color: "#C2CBC9", split_model: "equal", is_default: true },
 ];
 
 import { MODEL_OPTIONS } from "../utils/groupHelpers";
@@ -48,8 +49,8 @@ function GroupSetup() {
   const [step, setStep] = useState(1);
   const [groupName, setGroupName] = useState("");
   const [members, setMembers] = useState([
-    { name: "", color: COLORS[0], emoji: EMOJIS[0] },
-    { name: "", color: COLORS[1], emoji: EMOJIS[1] },
+    { name: "", color: COLORS[0] },
+    { name: "", color: COLORS[1] },
   ]);
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES.map((c, i) => ({ ...c, sort_order: i })));
   const [settlementThreshold, setSettlementThreshold] = useState(500);
@@ -65,7 +66,7 @@ function GroupSetup() {
   const addMember = () => {
     if (members.length >= 8) return;
     const idx = members.length;
-    setMembers([...members, { name: "", color: COLORS[idx % COLORS.length], emoji: EMOJIS[idx % EMOJIS.length] }]);
+    setMembers([...members, { name: "", color: COLORS[idx % COLORS.length] }]);
   };
 
   const removeMember = (idx) => {
@@ -112,7 +113,7 @@ function GroupSetup() {
   };
 
   const goToGroup = () => {
-    if (createdGroup) navigate(`/group/${createdGroup.code}`);
+    if (createdGroup) navigate(`/group/${createdGroup.code}/dashboard`);
   };
 
   // Category management
@@ -170,7 +171,7 @@ function GroupSetup() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="card max-w-md w-full text-center p-8">
-          <div className="text-5xl mb-4">🎉</div>
+          <div className="flex justify-center mb-4 text-primary"><PartyPopper size={48} /></div>
           <h2 className="font-heading font-bold text-2xl text-text-dark mb-2">Group Created!</h2>
           <p className="text-text-muted mb-6">Share this code with your group members so they can join.</p>
           <div onClick={copyCode} className="cursor-pointer inline-flex items-center gap-3 bg-highlight/30 border-2 border-dashed border-primary/30 rounded-xl px-6 py-4 mb-6 hover:border-primary/60 transition-all">
@@ -191,7 +192,7 @@ function GroupSetup() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-4">
         <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="card max-w-md w-full text-center p-8">
-          <div className="text-5xl mb-4">✉️</div>
+          <div className="flex justify-center mb-4 text-primary"><Mail size={48} /></div>
           <h2 className="font-heading font-bold text-2xl text-text-dark mb-2">Verify your email</h2>
           <p className="text-text-muted mb-6">You must verify your email address before you can create a group.</p>
           <Link to="/" className="btn-primary w-full inline-block text-center">Go back</Link>
@@ -241,11 +242,7 @@ function GroupSetup() {
               <div className="space-y-3 mb-8">
                 {members.map((member, idx) => (
                   <motion.div key={idx} initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="flex items-center gap-3">
-                    <button onClick={() => { const ne = EMOJIS[(EMOJIS.indexOf(member.emoji) + 1) % EMOJIS.length]; updateMember(idx, "emoji", ne); }}
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-lg hover:ring-2 ring-primary/30 transition-all"
-                      style={{ backgroundColor: member.color + "20" }}>
-                      {member.emoji}
-                    </button>
+                    <Avatar member={member} size={40} className="shrink-0" />
                     <input type="text" value={member.name} onChange={(e) => updateMember(idx, "name", e.target.value)} placeholder={`Member ${idx + 1}`} className="input-field flex-1" />
                     <div className="flex gap-1">
                       {COLORS.slice(0, 4).map((c) => (
@@ -278,7 +275,7 @@ function GroupSetup() {
               <div className="space-y-2 mb-6">
                 {categories.length === 0 && (
                   <div className="text-center py-8 card">
-                    <p className="text-text-muted text-sm">These are your starter categories. Add your own to make it feel like home 🏡</p>
+                    <p className="text-text-muted text-sm">These are your starter categories. Add your own to make it feel like home.</p>
                   </div>
                 )}
 
@@ -302,8 +299,10 @@ function GroupSetup() {
                         <GripVertical size={16} />
                       </button>
 
-                      {/* Emoji */}
-                      <span className="text-lg w-8 text-center">{cat.emoji}</span>
+                      {/* Icon */}
+                      <span className="flex items-center justify-center w-8 text-primary">
+                        <CategoryIcon category={cat} size={20} />
+                      </span>
 
                       {/* Name + badge */}
                       <div className="flex-1 min-w-0">
@@ -395,7 +394,7 @@ function GroupSetup() {
                   {members.filter((m) => m.name.trim()).map((m, i) => (
                     <div key={i} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm"
                       style={{ backgroundColor: m.color + "15", color: m.color }}>
-                      <span>{m.emoji}</span>{m.name}
+                      <Avatar member={m} size={16} />{m.name}
                     </div>
                   ))}
                 </div>
@@ -407,7 +406,7 @@ function GroupSetup() {
                   {categories.map((cat) => (
                     <div key={cat.name} className="flex items-center justify-between text-sm py-1">
                       <span className="flex items-center gap-2">
-                        <span>{cat.emoji}</span>
+                        <CategoryIcon category={cat} size={16} className="text-primary" />
                         <span className="text-text-dark">{cat.name}</span>
                         {cat.is_default && <span className="text-[10px] text-text-muted">(Default)</span>}
                       </span>

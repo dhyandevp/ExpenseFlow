@@ -7,6 +7,24 @@ import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore }
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
+// ── Users ─────────────────────────────────────────────────────────────────
+export const getUserProfile = async (userId) => {
+  const docSnap = await getDoc(doc(db, "users", userId));
+  if (!docSnap.exists()) return { success: true, data: null };
+  return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
+};
+
+export const createUserProfile = async (userId, data) => {
+  const userRef = doc(db, "users", userId);
+  await setDoc(userRef, { ...data, createdAt: new Date().toISOString() });
+  return { success: true, data: { id: userId, ...data } };
+};
+
+export const updateUserProfile = async (userId, data) => {
+  await updateDoc(doc(db, "users", userId), { ...data, updatedAt: new Date().toISOString() });
+  return { success: true };
+};
+
 // ── Groups ──────────────────────────────────────────────────────────────
 export const createGroup = async (groupData) => {
   const { pin, members, fairness_models, ...restData } = groupData;

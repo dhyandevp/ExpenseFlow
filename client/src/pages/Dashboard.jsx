@@ -30,6 +30,8 @@ import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import SettlementHistory from "../components/SettlementHistory";
+import Avatar from "../components/Avatar";
+import { CategoryIcon } from "../utils/categoryIcons";
 
 const timeFilters = [
   { label: "All Time", value: "all" },
@@ -104,7 +106,6 @@ function Dashboard() {
 
 
 
-  if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
 
@@ -288,20 +289,10 @@ function Dashboard() {
                 className="flex items-center gap-3 p-3 rounded-xl bg-highlight/20"
               >
                 <div
-                  className="w-8 h-8 rounded-lg flex items-center justify-center text-xs"
+                  className="w-8 h-8 rounded-lg flex items-center justify-center text-primary"
                   style={{ backgroundColor: getCategoryColor(insight.category) + "20" }}
                 >
-                  {insight.category === "Rent"
-                    ? "🏠"
-                    : insight.category === "Groceries"
-                    ? "🛒"
-                    : insight.category === "Utilities"
-                    ? "⚡"
-                    : insight.category === "Repairs"
-                    ? "🔧"
-                    : insight.category === "Outings"
-                    ? "🎉"
-                    : "📦"}
+                  <CategoryIcon category={{name: insight.category}} size={16} />
                 </div>
                 <p className="text-sm text-text-dark">{insight.text}</p>
               </motion.div>
@@ -339,12 +330,7 @@ function Dashboard() {
               >
                 <div className="flex items-center justify-between mb-2">
                   <div className="flex items-center gap-2">
-                    <div
-                      className="w-8 h-8 rounded-full flex items-center justify-center text-sm"
-                      style={{ backgroundColor: b.color + "20" }}
-                    >
-                      {b.emoji}
-                    </div>
+                    <Avatar member={b} size={32} />
                     <span className="font-medium text-text-dark">{b.name}</span>
                   </div>
                   <span
@@ -433,12 +419,7 @@ function Dashboard() {
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-3 p-3 rounded-xl bg-highlight/20"
               >
-                <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center"
-                  style={{ backgroundColor: s.color + "20" }}
-                >
-                  {s.emoji}
-                </div>
+                <Avatar member={s} size={40} className="shrink-0" />
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-text-dark text-sm">

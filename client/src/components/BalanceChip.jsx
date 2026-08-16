@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { formatCompact } from "../utils/formatCurrency";
+import Avatar from "./Avatar";
 
 export default function BalanceChip({ member, netBalance, currency = "₹", onClick }) {
   const isPositive = netBalance > 0;
@@ -21,12 +22,7 @@ export default function BalanceChip({ member, netBalance, currency = "₹", onCl
           : "bg-highlight text-text-dark"
       }`}
     >
-      <div
-        className="w-6 h-6 rounded-full flex items-center justify-center text-xs"
-        style={{ backgroundColor: member.color + "30" }}
-      >
-        {member.emoji}
-      </div>
+      <Avatar member={member} size={24} />
       <span className="whitespace-nowrap">{member.name}</span>
       <span className="font-mono font-semibold">
         {isPositive ? "+" : ""}

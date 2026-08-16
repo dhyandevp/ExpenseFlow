@@ -11,11 +11,13 @@ import {
   X,
   ChevronDown,
   Users,
+  Home,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGroup } from "../App";
 import { useAuth } from "../hooks/useAuth";
 import Logo from "./Logo";
+import AccountMenu from "./AccountMenu";
 
 const navItems = [
   { path: "", icon: PlusCircle, label: "Expenses" },
@@ -43,6 +45,7 @@ export default function AppLayout({ children }) {
 
   const handleLeave = () => {
     setCurrentGroup(null);
+    navigate("/home");
   };
 
   const handleSwitchGroup = (group) => {
@@ -50,7 +53,25 @@ export default function AppLayout({ children }) {
     navigate(`/join/${group.code}`);
   };
 
-  if (!currentGroup) return null;
+  if (!currentGroup) {
+    return (
+      <div className="min-h-screen bg-[#F0F2F5] flex flex-col items-center justify-center p-6">
+        <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-xl border border-black/5">
+          <div className="w-16 h-16 bg-[#105D5E]/10 text-[#105D5E] rounded-full flex items-center justify-center mx-auto mb-6">
+            <Users size={32} />
+          </div>
+          <h2 className="text-xl font-bold text-[#293E33] mb-3">No Group Selected</h2>
+          <p className="text-[#767F7D] mb-8">Please select a group from your home screen or join a new one.</p>
+          <button 
+            onClick={() => navigate('/home')}
+            className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all"
+          >
+            Go to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Filter out current group from recent groups
   const otherGroups = (recentGroups || []).filter(
@@ -116,7 +137,7 @@ export default function AppLayout({ children }) {
                     </button>
                   ))}
                   <Link
-                    to="/"
+                    to="/home"
                     onClick={() => setGroupSwitcherOpen(false)}
                     className="w-full flex items-center gap-2 px-3 py-2.5 text-xs text-primary hover:bg-highlight/30 transition-colors border-t border-border"
                   >
@@ -151,13 +172,9 @@ export default function AppLayout({ children }) {
           })}
         </nav>
 
-        <button
-          onClick={handleLeave}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-muted hover:bg-accent/10 hover:text-accent transition-all duration-200"
-        >
-          <LogOut size={20} />
-          Leave Group
-        </button>
+        <div className="pt-2 border-t border-border mt-auto">
+          <AccountMenu />
+        </div>
       </aside>
 
       {/* Mobile Header */}
@@ -171,12 +188,8 @@ export default function AppLayout({ children }) {
             <p className="text-[10px] text-text-muted font-mono">#{currentGroup.code}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          {authMode === "clerk" ? (
-            <span className="text-[10px] bg-success/20 text-success px-2 py-1 rounded-full font-medium">Signed In</span>
-          ) : (
-            <span className="text-[10px] bg-border text-text-muted px-2 py-1 rounded-full font-medium">Guest</span>
-          )}
+        <div className="flex items-center gap-1">
+          <AccountMenu />
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="p-1.5 rounded-lg hover:bg-background transition-colors"
@@ -241,12 +254,12 @@ export default function AppLayout({ children }) {
               <button
                 onClick={() => {
                   setMobileMenuOpen(false);
-                  handleLeave();
+                  navigate('/home');
                 }}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-muted hover:bg-accent/10 hover:text-accent transition-all"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-muted hover:bg-highlight hover:text-text-dark transition-all"
               >
-                <LogOut size={20} />
-                Leave Group
+                <Home size={20} />
+                Global Home
               </button>
             </div>
           </motion.div>

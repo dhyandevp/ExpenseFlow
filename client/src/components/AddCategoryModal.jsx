@@ -1,20 +1,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Lock } from "lucide-react";
 
-const EMOJI_GROUPS = [
-  { label: "🏡 Home & Living", emojis: ["🏠", "🏢", "🛋️", "🛏️", "🧹", "🔑", "💡", "🔌"] },
-  { label: "🚗 Transport", emojis: ["🚗", "🚌", "🚇", "⛽", "🅿️", "🚲", "🛵", "✈️"] },
-  { label: "🍕 Food & Drinks", emojis: ["🍕", "🍔", "🥗", "🛒", "☕", "🍺", "🧃", "🥡"] },
-  { label: "🎮 Entertainment", emojis: ["🎮", "🎬", "🎵", "📺", "🎯", "🎪", "🎨", "📚"] },
-  { label: "💊 Health", emojis: ["💊", "🏥", "💉", "🩺", "🧘", "💪", "🧴", "🩹"] },
-  { label: "📚 Education", emojis: ["📚", "✏️", "🎓", "📖", "💻", "📝", "🏫", "📐"] },
-  { label: "✈️ Travel", emojis: ["✈️", "🏨", "🗺️", "🧳", "🏖️", "⛺", "🚢", "🏔️"] },
-  { label: "🐾 Pets", emojis: ["🐾", "🐕", "🐈", "🦜", "🐰", "🦴", "🥩", "🏥"] },
-  { label: "💡 Utilities", emojis: ["💡", "📱", "🌐", "📡", "🔋", "💻", "📺", "🎛️"] },
-  { label: "💰 Finance", emojis: ["💰", "💳", "🏦", "📊", "🧾", "📈", "💸", "🔒"] },
-  { label: "🎁 Gifts", emojis: ["🎁", "🎂", "🎉", "🎊", "💐", "🕯️", "🧧", "🏆"] },
-];
+import { CategoryIcon, ICON_GROUPS, availableIcons } from "../utils/categoryIcons";
 
 const COLOR_OPTIONS = ["#105D5E", "#009A6E", "#B3EDA9", "#293E33", "#767F7D", "#C2CBC9", "#E8E300", "#FFFFFF"];
 
@@ -28,10 +16,9 @@ const SPLIT_OPTIONS = [
 
 export default function AddCategoryModal({ isOpen, onClose, onSave, existingNames = [], initialData = null }) {
   const [name, setName] = useState("");
-  const [emoji, setEmoji] = useState("📦");
+  const [iconName, setIconName] = useState("Package");
   const [color, setColor] = useState("#767F7D");
   const [splitModel, setSplitModel] = useState("equal");
-  const [customEmoji, setCustomEmoji] = useState("");
   const [error, setError] = useState("");
   const isEditing = !!initialData;
   const isDefault = initialData?.is_default;
@@ -49,17 +36,20 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
   useEffect(() => {
     if (initialData) {
       setName(initialData.name || "");
-      setEmoji(initialData.emoji || "📦");
+      // For backward compatibility, map existing emojis or use iconName if it exists
+      let initialIcon = "Package";
+      if (initialData.iconName) {
+        initialIcon = initialData.iconName;
+      }
+      setIconName(initialIcon);
       setColor(initialData.color || "#767F7D");
       setSplitModel(initialData.split_model || "equal");
-      setCustomEmoji("");
       setError("");
     } else {
       setName("");
-      setEmoji("📦");
+      setIconName("Package");
       setColor("#767F7D");
       setSplitModel("equal");
-      setCustomEmoji("");
       setError("");
     }
   }, [initialData, isOpen]);
@@ -81,21 +71,17 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
       return;
     }
 
-    const finalEmoji = customEmoji.trim() || emoji;
     onSave({
       name: trimmedName,
-      emoji: finalEmoji,
+      iconName,
       color,
       split_model: splitModel,
     });
   };
 
-  const handleEmojiPick = (e) => {
-    setEmoji(e);
-    setCustomEmoji("");
-  };
-
   if (!isOpen) return null;
+
+  const SelectedIcon = availableIcons[iconName] || availableIcons["Package"];
 
   return (
     <AnimatePresence>
@@ -153,59 +139,48 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
               </div>
               {error && <p className="text-accent text-xs mt-1">{error}</p>}
               {isDefault && (
-                <p className="text-xs text-text-muted mt-1 flex items-center gap-1">🔒 Default category — name is locked</p>
+                <p className="text-xs text-text-muted mt-1 flex items-center gap-1"><Lock size={12}/> Default category — name is locked</p>
               )}
             </div>
 
-            {/* Emoji Picker */}
+            {/* Icon Picker */}
             <div>
               <label className="block text-sm font-medium text-text-dark mb-2">
-                Pick an Emoji Icon
+                Pick an Icon
               </label>
               <div className="max-h-48 overflow-y-auto space-y-2 scrollbar-thin">
-                {EMOJI_GROUPS.map((group) => (
+                {ICON_GROUPS.map((group) => (
                   <div key={group.label}>
                     <p className="text-xs text-text-muted font-medium mb-1">{group.label}</p>
                     <div className="flex flex-wrap gap-1">
-                      {group.emojis.map((e) => (
+                      {group.icons.map(({name, Icon}) => (
                         <button
-                          key={e}
+                          key={name}
                           type="button"
-                          onClick={() => handleEmojiPick(e)}
-                          className={`w-9 h-9 rounded-lg flex items-center justify-center text-lg transition-all ${
-                            emoji === e && !customEmoji
-                              ? "bg-primary/10 ring-2 ring-primary"
-                              : "hover:bg-background"
+                          aria-label={name}
+                          onClick={() => setIconName(name)}
+                          className={`w-9 h-9 rounded-lg flex items-center justify-center transition-all ${
+                            iconName === name
+                              ? "bg-primary/10 ring-2 ring-primary text-primary"
+                              : "text-text-muted hover:bg-background hover:text-text-dark"
                           }`}
                         >
-                          {e}
+                          <Icon size={18} />
                         </button>
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
-              <div className="mt-2">
-                <label className="text-xs text-text-muted font-medium">Or type any emoji</label>
-                <input
-                  type="text"
-                  value={customEmoji}
-                  onChange={(e) => {
-                    setCustomEmoji(e.target.value);
-                    if (e.target.value) setEmoji("");
-                  }}
-                  placeholder="e.g. 🌟"
-                  className="input-field mt-1 text-lg text-center w-20"
-                  maxLength={10}
-                />
-              </div>
+              
               <div className="mt-2 flex items-center gap-2">
                 <span className="text-sm text-text-muted">Selected:</span>
-                <span className="text-2xl">{customEmoji || emoji}</span>
+                <span className="flex items-center justify-center p-2 bg-background rounded"><SelectedIcon size={20} /></span>
               </div>
             </div>
 
             {/* Color Tag */}
+
             <div>
               <label className="block text-sm font-medium text-text-dark mb-2">
                 Color Tag{" "}

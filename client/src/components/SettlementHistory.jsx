@@ -5,6 +5,7 @@ import { useGroup } from "../App";
 import { getSettlements, recordSettlement, deleteSettlement } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { staggerContainer, hoverScale } from "../utils/motion";
+import Avatar from "./Avatar";
 export default function SettlementHistory() {
   const { currentGroup } = useGroup();
   const [settlements, setSettlements] = useState([]);
@@ -67,7 +68,6 @@ export default function SettlementHistory() {
     }
   };
 
-  if (!currentGroup) return null;
 
   return (
     <div className="card">
@@ -108,7 +108,7 @@ export default function SettlementHistory() {
                 >
                   <option value="">Who paid...</option>
                   {members.map((m) => (
-                    <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>
+                    <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
               </div>
@@ -124,7 +124,7 @@ export default function SettlementHistory() {
                 >
                   <option value="">Paid to...</option>
                   {members.filter((m) => String(m.id) !== form.from_member).map((m) => (
-                    <option key={m.id} value={m.id}>{m.emoji} {m.name}</option>
+                    <option key={m.id} value={m.id}>{m.name}</option>
                   ))}
                 </select>
               </div>
@@ -180,12 +180,12 @@ export default function SettlementHistory() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2 text-sm min-w-0">
                   <span className="flex items-center gap-1">
-                    <span>{s.from_emoji}</span>
+                    <Avatar member={members.find(m => m.id === s.from_member) || {name: s.from_name}} size={14} />
                     <span className="font-medium text-text-dark">{s.from_name}</span>
                   </span>
                   <span className="text-text-muted text-[10px]">→</span>
                   <span className="flex items-center gap-1">
-                    <span>{s.to_emoji}</span>
+                    <Avatar member={members.find(m => m.id === s.to_member) || {name: s.to_name}} size={14} />
                     <span className="font-medium text-text-dark">{s.to_name}</span>
                   </span>
                 </div>

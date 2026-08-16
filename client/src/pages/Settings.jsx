@@ -21,6 +21,8 @@ import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
 
 import { getGroupCategories, MODEL_OPTIONS as modelOptions } from "../utils/groupHelpers";
+import Avatar from "../components/Avatar";
+import { CategoryIcon } from "../utils/categoryIcons";
 
 function SettingsPage() {
   useDocumentTitle("Group Settings");
@@ -52,7 +54,6 @@ function SettingsPage() {
     }
   }, [currentGroup]);
 
-  if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
   const fairnessModels = currentGroup.fairness_models || [];
@@ -323,12 +324,7 @@ function SettingsPage() {
               className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
             >
               <div className="flex items-center gap-3">
-                <div
-                  className="w-9 h-9 rounded-full flex items-center justify-center text-sm"
-                  style={{ backgroundColor: m.color + "20" }}
-                >
-                  {m.emoji}
-                </div>
+                <Avatar member={m} size={36} />
                 <div>
                   <p className="font-medium text-text-dark text-sm">{m.name}</p>
                   <p className="text-xs text-text-muted">ID: {m.id}</p>
@@ -361,7 +357,7 @@ function SettingsPage() {
                 className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
               >
                 <div className="flex items-center gap-2">
-                  <span className="text-lg">{cat.emoji || "📦"}</span>
+                  <CategoryIcon category={cat} size={20} className="text-primary" />
                   <span className="text-sm font-medium text-text-dark">{cat.name}</span>
                   {cat.is_default && <span className="text-[10px] text-text-muted">(Default)</span>}
                 </div>

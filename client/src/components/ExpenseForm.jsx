@@ -6,6 +6,8 @@ import { useGroup } from "../App";
 import ReceiptUpload from "./ReceiptUpload";
 
 import { getGroupCategories } from "../utils/groupHelpers";
+import { CategoryIcon } from "../utils/categoryIcons";
+import Avatar from "./Avatar";
 
 export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) {
   const { currentGroup } = useGroup();
@@ -170,7 +172,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                   <option value="">Select a member...</option>
                   {members.map((m) => (
                     <option key={m.id} value={m.id}>
-                      {m.emoji} {m.name}
+                      {m.name}
                     </option>
                   ))}
                 </select>
@@ -188,13 +190,14 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                       key={cat.name}
                       type="button"
                       onClick={() => setForm((f) => ({ ...f, category: cat.name }))}
-                      className={`px-3 py-2 rounded-xl text-sm font-medium transition-all ${
+                      className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl text-sm font-medium transition-all ${
                         form.category === cat.name
-                          ? "bg-primary text-background"
+                          ? "bg-primary text-background ring-2 ring-primary ring-offset-2"
                           : "bg-highlight/30 text-text-muted hover:bg-highlight"
                       }`}
                     >
-                      {cat.emoji || "📦"} {cat.name}
+                      <CategoryIcon category={cat} size={20} />
+                      <span className="truncate w-full text-center">{cat.name}</span>
                     </button>
                   ))}
                 </div>
@@ -274,13 +277,13 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                         key={m.id}
                         type="button"
                         onClick={() => toggleMember(m.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-sm transition-all ${
+                        className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-sm transition-all ${
                           isSelected
                             ? "bg-primary/10 text-primary ring-1 ring-primary/20"
                             : "bg-highlight/30 text-text-muted hover:bg-highlight"
                         }`}
                       >
-                        <span>{m.emoji}</span>
+                        <Avatar member={m} size={16} />
                         {m.name}
                       </button>
                     );

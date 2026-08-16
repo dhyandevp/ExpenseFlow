@@ -8,12 +8,14 @@ import {
   Calendar,
   TrendingUp,
   AlertCircle,
+  ChartColumn,
 } from "lucide-react";
 import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { csvSafe } from "../../../shared/balanceMath";
+import Avatar from "../components/Avatar";
 // getCategoryColor not currently used in this component
 
 const periodOptions = [
@@ -79,7 +81,6 @@ function FairnessReport() {
     loadData();
   }, [loadData]);
 
-  if (!currentGroup) return null;
 
   const handleExportCSV = async () => {
     try {
@@ -187,7 +188,7 @@ function FairnessReport() {
         </div>
       ) : !report ? (
         <div className="text-center py-16">
-          <div className="text-5xl mb-4">📊</div>
+          <div className="flex justify-center mb-4"><ChartColumn size={48} className="text-text-muted" /></div>
           <h3 className="font-heading font-semibold text-lg text-text-muted mb-2">
             No data to report
           </h3>
@@ -244,7 +245,7 @@ function FairnessReport() {
                     <tr key={member.name} className="block md:table-row mb-4 md:mb-0 border-b border-border/50 md:border-b-0 pb-2 md:pb-0">
                       <td className="py-2 px-3 block md:table-cell bg-highlight/10 md:bg-transparent mb-1 md:mb-0 rounded md:rounded-none">
                         <div className="flex items-center gap-2">
-                          <span>{member.emoji}</span>
+                          <Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={20} />
                           <span className="font-medium text-text-dark">
                             {member.name}
                           </span>
@@ -301,8 +302,10 @@ function FairnessReport() {
                 const isFair = diff < 10;
 
                 return (
-                  <div key={member.name} className="p-3 rounded-xl bg-highlight/20 text-center">
-                    <div className="text-lg mb-1">{member.emoji}</div>
+                  <div key={member.name} className="p-3 rounded-xl bg-highlight/20 text-center flex flex-col items-center">
+                    <div className="mb-2">
+                      <Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={40} />
+                    </div>
                     <p className="font-medium text-text-dark text-sm">
                       {member.name}
                     </p>
