@@ -1,9 +1,9 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
-import { verifyToken } from '@clerk/clerk-sdk-node';
-import crypto from 'node:crypto';
-
+import clerk from '@clerk/clerk-sdk-node';
+const { verifyToken } = clerk;
+import crypto from 'crypto';
 // Initialize Firebase Admin
 function initFirebase() {
   if (getApps().length === 0) {
