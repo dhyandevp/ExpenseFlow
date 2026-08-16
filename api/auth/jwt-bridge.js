@@ -96,11 +96,11 @@ export default async function handler(req, res) {
     // Mode B: Guest Access (code + pinHash)
     if (req.method === 'POST') {
       const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
-      const { code, pinHash } = body;
+      const { code, pin } = body;
 
-      if (!code || !pinHash) {
+      if (!code || !pin) {
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
-        return res.status(400).json({ error: 'Code and pinHash are required for guest access' });
+        return res.status(400).json({ error: 'Code and pin are required for guest access' });
       }
 
       // Check Rate Limits
@@ -152,7 +152,8 @@ export default async function handler(req, res) {
       const groupId = groupDoc.id;
 
       // Verify PIN
-      const isValid = safeCompare(pinHash, groupData.pinHash);
+      const computedPinHash = crypto.createHash('sha256').update(pin).digest('hex');
+      const isValid = safeCompare(computedPinHash, groupData.pinHash);
 
       if (!isValid) {
         consecutiveFailures += 1;
