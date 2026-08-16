@@ -25,6 +25,22 @@ export const updateUserProfile = async (userId, data) => {
   return { success: true };
 };
 
+// ── Validation ────────────────────────────────────────────────────────────
+export const assertFirestoreSafeData = (data, path = "root") => {
+  if (data === undefined) {
+    throw new Error(`Invalid Firestore field: ${path} is undefined.`);
+  }
+  if (data === null || typeof data !== "object") return;
+  if (data instanceof Date) return;
+  if (Array.isArray(data)) {
+    data.forEach((item, index) => assertFirestoreSafeData(item, `${path}[${index}]`));
+  } else {
+    for (const key of Object.keys(data)) {
+      assertFirestoreSafeData(data[key], `${path}.${key}`);
+    }
+  }
+};
+
 // ── Groups ──────────────────────────────────────────────────────────────
 export const createGroup = async (groupData) => {
   const { pin, members, fairness_models, ...restData } = groupData;
@@ -42,6 +58,8 @@ export const createGroup = async (groupData) => {
     currentBalances: {},
     createdAt: new Date().toISOString()
   };
+  
+  assertFirestoreSafeData(newGroupData, `groups/${groupRef.id}`);
   batch.set(groupRef, newGroupData);
 
   const returnedMembers = [];
@@ -51,9 +69,9 @@ export const createGroup = async (groupData) => {
       const memberObj = {
         id: i + 1,
         name: member.name,
-        color: member.color,
-        emoji: member.emoji
+        color: member.color
       };
+      assertFirestoreSafeData(memberObj, `groups/${groupRef.id}/members[${i}]`);
       batch.set(memberRef, memberObj);
       returnedMembers.push(memberObj);
     });
@@ -61,14 +79,15 @@ export const createGroup = async (groupData) => {
 
   const returnedCategories = [];
   if (fairness_models && fairness_models.length > 0) {
-    fairness_models.forEach(model => {
+    fairness_models.forEach((model, i) => {
       const catRef = doc(collection(db, `groups/${groupRef.id}/categories`));
       const catObj = {
         name: model.category,
         split_model: model.model_type,
-        emoji: model.emoji || "📦",
+        iconName: model.iconName || "Package",
         is_default: !!model.is_default
       };
+      assertFirestoreSafeData(catObj, `groups/${groupRef.id}/categories[${i}]`);
       batch.set(catRef, catObj);
       returnedCategories.push(catObj);
     });

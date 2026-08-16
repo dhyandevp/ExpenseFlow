@@ -57,3 +57,47 @@
 - `useDocumentTitle.js` (1482 bytes): SEO utility.
 - `useReceiptUpload.js` (3111 bytes): Cloudinary logic.
 *(Also `useGroup` and `useRecentGroups` defined directly in `App.jsx`)*
+
+## 5. Data Layer (Firestore Queries)
+*Source: `client/src/api/client.js`*
+
+The application encapsulates all Firestore interactions within the `client.js` API module. No direct Firestore queries were found inside React components, indicating a clean separation of concerns.
+
+### Collections & Queries
+- **`users`**: Profiles are queried by `getDoc(doc(db, "users", userId))`.
+- **`groups`**: Queried by `code` using `where("code", "==", code)`.
+- **`groups/{id}/members`**: Subcollection for group members.
+- **`groups/{id}/categories`**: Subcollection for group expense categories. Sorted by `sort_order` if available.
+- **`groups/{id}/expenses`**: Subcollection for expenses. Sorted by `createdAt desc`. Supports filtering by date range, category, and member ID.
+- **`groups/{id}/scenarios`**: Subcollection for saving hypothetical scenario parameters.
+- **`groups/{id}/settlements`**: Subcollection for recorded debt settlements. Sorted by `date desc`.
+
+### State Management
+State relies on standard React state and contexts (`useAuth` and `GroupContext`). The API layer fetches data statelessly, and the UI triggers refetches rather than relying on real-time `onSnapshot` listeners.
+
+## 6. Styling & Design Tokens
+*Source: `client/src/index.css`*
+
+### Tokens (CSS Variables)
+- `background`: #EBFADB
+- `foreground`: #293E33
+- `surface`: #FFFFFF
+- `primary`: #105D5E (Hover: #0D4A4B)
+- `success`: #009A6E
+- `highlight`: #B3EDA9
+- `muted`: #C2CBC9 (Text: #767F7D)
+- `accent`: #E8E300
+- `border`: #C2CBC9
+- `radius`: 0.75rem
+
+### Common Utility Classes
+- `.card`, `.card-hover`: Core container styles.
+- `.btn-primary`, `.btn-secondary`, `.btn-ghost`: Standardized buttons with hover/active states.
+- `.input-field`: Standardized form inputs.
+- `.skeleton`: Loading placeholder.
+- `.glass`, `.glass-nav`, `.glass-header`: Liquid glass effects with `backdrop-filter`.
+
+*Observation: Design tokens are centralized correctly. We will audit components to ensure these are used consistently without hardcoded overrides.*
+
+
+

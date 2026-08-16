@@ -95,12 +95,13 @@ function GroupSetup() {
         name: groupName.trim(),
         members: validMembers,
         settlement_threshold: settlementThreshold,
-        fairness_models: categories.map((c) => ({ category: c.name, model_type: c.split_model })),
+        fairness_models: categories.map((c) => ({ category: c.name, model_type: c.split_model, iconName: c.iconName, is_default: c.is_default })),
       });
       setCreatedGroup({ ...res.data, code: res.data.code });
       setCurrentGroup(res.data);
     } catch (err) {
-      setErrors({ global: err.message || "Failed to create group." });
+      console.error(err);
+      setErrors({ global: "Couldn't create the group. Please try again." });
     } finally { setCreating(false); }
   };
 
@@ -424,7 +425,7 @@ function GroupSetup() {
               <div className="flex gap-3">
                 <motion.button {...springScale} onClick={() => setStep(2)} className="btn-secondary flex-1">Back</motion.button>
                 <motion.button {...springScale} onClick={handleCreate} disabled={creating} className="btn-primary flex-1">
-                  {creating ? <><Loader2 size={18} className="animate-spin" /> Creating...</> : <><Shuffle size={18} /> Create Group</>}
+                  {creating ? <><Loader2 size={18} className="animate-spin" /> Creating...</> : <><Shuffle size={18} /> {errors.global ? "Retry" : "Create Group"}</>}
                 </motion.button>
               </div>
             </motion.div>
