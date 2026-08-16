@@ -1,2 +1,0 @@
-import crypto from 'node:crypto';
-export default function handler(req, res) { res.status(200).json({ ok: 3 }) }

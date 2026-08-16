@@ -13,10 +13,27 @@ const fs = require('fs');
   });
 
   try {
-    await page.goto('https://expenseflow.site/login', { waitUntil: 'load' });
+    // We will run this against http://localhost:5173
+    await page.goto('http://localhost:5173/group-setup', { waitUntil: 'load' });
     
-    // Simulate login for testing - since it's production, we might need a test token or bypass.
-    // Wait, it's easier to just read the code and find the undefined field.
+    // Fill group name
+    await page.getByPlaceholder(/Enter group name/i).fill('Test Playwright Group');
+    
+    // Add member
+    await page.getByText(/Add Member/i).click();
+    await page.locator('input[placeholder="Name"]').nth(2).fill('Charlie');
+    
+    // Continue
+    await page.getByText(/Continue/i).click();
+    
+    // Continue again
+    await page.getByText(/Continue/i).click();
+    
+    // Create group
+    await page.getByText(/Create Group/i).click();
+    
+    await page.waitForTimeout(3000);
+    
   } catch (e) {
     console.error(e);
   } finally {

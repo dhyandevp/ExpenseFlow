@@ -99,5 +99,17 @@ State relies on standard React state and contexts (`useAuth` and `GroupContext`)
 
 *Observation: Design tokens are centralized correctly. We will audit components to ensure these are used consistently without hardcoded overrides.*
 
+## 7. Dead Code & Junk Identification
+*Completed in Phase 1.3*
+
+### Deleted Debug Scripts & Files
+- Dozens of `fix_*.mjs`, `test_*.mjs`, `qa-*.cjs` files at the root level were removed.
+- Debug screenshots (`blank_screen.png`, `test_error.png`, etc.) removed.
+- Unused test stubs in `api/` (`test1.js` through `test4.js`) removed.
+
+### Dependency Check
+- `depcheck` identified `dotenv` and `jsonwebtoken` as potentially unused in the frontend (likely used in backend serverless functions, so they should be retained in the root `package.json` for now).
+- `npm run build` completed successfully in the `client` directory (7.9s) with no missing runtime dependencies or unresolved imports. No fatal console errors were found during compilation.
+
 
 
