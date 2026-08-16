@@ -5,13 +5,11 @@ import { motion } from "framer-motion";
 import { Plus, UserPlus, ArrowRight, UsersRound, Loader2, LogOut, User } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useRecentGroups } from "../App";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import { getGroupById } from "../api/client";
 import GuestJoinModal from "../components/auth/GuestJoinModal";
 import AccountMenu from "../components/AccountMenu";
 
 export function GroupsHome() {
-  useDocumentTitle("Home");
   const { user, isLoaded, authMode, signOut } = useAuth();
   const { recentGroups } = useRecentGroups();
   const navigate = useNavigate();

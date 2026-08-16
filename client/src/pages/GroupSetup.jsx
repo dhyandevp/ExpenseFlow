@@ -9,7 +9,6 @@ import {
 import { createGroup } from "../api/client";
 import { useGroup } from "../App";
 import AddCategoryModal from "../components/AddCategoryModal";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
 import { CategoryIcon } from "../utils/categoryIcons";
 import Avatar from "../components/Avatar";

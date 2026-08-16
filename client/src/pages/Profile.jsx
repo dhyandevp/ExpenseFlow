@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { ArrowLeft, Loader2, LogOut, Check, Save } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { updateUserProfile } from "../api/client";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 
 export function Profile() {
-  useDocumentTitle("Account");
   const { user, userProfile, refreshProfile, signOut, authMode } = useAuth();
   const navigate = useNavigate();
 

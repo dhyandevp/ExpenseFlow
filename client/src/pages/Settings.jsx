@@ -19,7 +19,6 @@ import {
 } from "lucide-react";
 import { useGroup } from "../App";
 import { updateGroup, removeMember, regenerateCode, setGroupPin, deleteGroup } from "../api/client";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
 import { useSession } from "@clerk/clerk-react";
 
@@ -78,7 +77,6 @@ const Dialog = ({ isOpen, onClose, title, children }) => {
 };
 
 function SettingsPage() {
-  useDocumentTitle("Group Settings");
   const { currentGroup, setCurrentGroup } = useGroup();
   const navigate = useNavigate();
   const { authMode, signOut } = useAuth();

@@ -27,7 +27,6 @@ import {
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import SettlementHistory from "../components/SettlementHistory";
 import Avatar from "../components/Avatar";
 import { CategoryIcon } from "../utils/categoryIcons";
@@ -66,7 +65,6 @@ function getDateRange(filter) {
 }
 
 function Dashboard() {
-  useDocumentTitle("Dashboard");
   const { currentGroup } = useGroup();
   const [timeFilter, setTimeFilter] = useState("all");
 

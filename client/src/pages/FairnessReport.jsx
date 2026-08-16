@@ -13,7 +13,6 @@ import {
 import { useGroup } from "../App";
 import { getReport } from "../api/client";
 import { formatINR as formatCurrency } from "../utils/formatCurrency";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import { csvSafe } from "../../../shared/balanceMath";
 import Avatar from "../components/Avatar";
 // getCategoryColor not currently used in this component
@@ -55,7 +54,6 @@ function getDateRange(filter) {
 }
 
 function FairnessReport() {
-  useDocumentTitle("Fairness Report");
   const { currentGroup } = useGroup();
   const [period, setPeriod] = useState("all");
   const [report, setReport] = useState(null);

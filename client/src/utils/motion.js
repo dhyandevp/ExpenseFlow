@@ -30,13 +30,6 @@ export const sheetSlide = {
   transition: { type: "spring", damping: 25, stiffness: 300 }
 };
 
-export const listItem = {
-  initial: { opacity: 0, x: -10 },
-  animate: { opacity: 1, x: 0 },
-  exit: { opacity: 0, x: -100 },
-  transition: { duration: 0.2 }
-};
-
 export const hoverScale = {
   whileHover: { scale: 1.01, y: -2, backgroundColor: "var(--highlight)", transition: { duration: 0.2 } },
   transition: { type: "spring", stiffness: 400, damping: 17 }

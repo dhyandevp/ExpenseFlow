@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { createUserProfile } from "../api/client";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 
 export function ProfileSetup() {
-  useDocumentTitle("Profile Setup");
   const { user, authMode, refreshProfile, userProfile } = useAuth();
   const navigate = useNavigate();
 

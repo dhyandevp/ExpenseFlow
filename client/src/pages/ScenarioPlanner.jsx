@@ -24,7 +24,6 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 
 import { getGroupCategories } from "../utils/groupHelpers";
 
@@ -50,7 +49,6 @@ const prebuiltExamples = [
 ];
 
 function ScenarioPlanner() {
-  useDocumentTitle("Scenario Planner");
   const { currentGroup } = useGroup();
   const members = currentGroup?.members || [];
 

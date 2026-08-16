@@ -11,6 +11,11 @@ dist/
 firestore-debug.log
 *.log
 
+# Test output
+test-results/
+
+# Generated reports
+lighthouse-report.*
+
 # Local Vercel folder
 .vercel
-lighthouse-report.json

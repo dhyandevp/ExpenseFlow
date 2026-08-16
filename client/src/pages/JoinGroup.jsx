@@ -5,10 +5,8 @@ import { motion } from "framer-motion";
 import { Loader2, KeyRound, CircleAlert, Lock } from "lucide-react";
 import { useGroup } from "../App";
 import { getGroupByCode } from "../api/client";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 
 function JoinGroup() {
-  useDocumentTitle("Join Group");
   const { code } = useParams();
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();

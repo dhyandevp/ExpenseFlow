@@ -33,38 +33,6 @@ function safeCompare(a, b) {
   return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-// Generate Firebase Custom Token without requiring firebase-admin/auth which causes Vercel bundle issues
-function createFirebaseCustomToken(uid, claims = {}, requestId) {
-  logger.info('firebase_custom_token_started', { requestId, uid });
-  try {
-    const sa = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8'));
-    const header = { alg: 'RS256', typ: 'JWT' };
-    const iat = Math.floor(Date.now() / 1000);
-    const payload = {
-      iss: sa.client_email,
-      sub: sa.client_email,
-      aud: 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit',
-      iat: iat,
-      exp: iat + 3600,
-      uid: uid,
-      claims: claims
-    };
-
-    const b64url = str => Buffer.from(str).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-    const encodedHeader = b64url(JSON.stringify(header));
-    const encodedPayload = b64url(JSON.stringify(payload));
-
-    const sign = crypto.createSign('RSA-SHA256');
-    sign.update(encodedHeader + '.' + encodedPayload);
-    const signature = sign.sign(sa.private_key, 'base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
-
-    logger.info('firebase_custom_token_success', { requestId, uid });
-    return encodedHeader + '.' + encodedPayload + '.' + signature;
-  } catch (err) {
-    logger.error('firebase_custom_token_failed', { requestId, error: err });
-    throw err;
-  }
-}
 
 export default async function handler(req, res) {
   const startTime = Date.now();
@@ -106,8 +74,8 @@ export default async function handler(req, res) {
         const clerkUserId = payload.sub;
         logger.info('clerk_verification_success', { requestId, clerkUserId });
 
-        // Generate Firebase Custom Token manually
-        const firebaseToken = createFirebaseCustomToken(clerkUserId, { mode: 'clerk' }, requestId);
+        const { getAuth } = await import('firebase-admin/auth');
+        const firebaseToken = await getAuth().createCustomToken(clerkUserId, { mode: 'clerk' });
         
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
         logger.info('request_completed', { requestId, status: 200, route, method: req.method, durationMs: Date.now() - startTime });
@@ -216,12 +184,13 @@ export default async function handler(req, res) {
       // Success! Reset failures
       await rateLimitRef.set({ attempts, consecutiveFailures: 0, blockUntil: 0 });
 
-      // Create Custom Token for Guest manually
+      // Create Custom Token for Guest
       const guestUid = 'guest_' + crypto.randomUUID().replace(/-/g, '');
-      const firebaseToken = createFirebaseCustomToken(guestUid, { 
+      const { getAuth } = await import('firebase-admin/auth');
+      const firebaseToken = await getAuth().createCustomToken(guestUid, { 
         guestGroupId: groupId, 
         mode: 'guest' 
-      }, requestId);
+      });
 
       logger.info('guest_auth_success', { requestId, groupId, guestUid });
       Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));

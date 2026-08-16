@@ -27,21 +27,6 @@ export function getBalanceColor(netBalance) {
 }
 
 /**
- * Get category icon name for lucide-react
- */
-export function getCategoryIcon(category) {
-  const icons = {
-    Rent: "Home",
-    Utilities: "Zap",
-    Groceries: "ShoppingCart",
-    Repairs: "Wrench",
-    Outings: "PartyPopper",
-    Other: "Package",
-  };
-  return icons[category] || "Package";
-}
-
-/**
  * Get category color from Aurora Forest palette
  */
 export function getCategoryColor(category) {

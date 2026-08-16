@@ -126,7 +126,7 @@ async function handler(req, res) {
         firstName: first_name || '',
         lastName: last_name || '',
         createdAt: new Date().toISOString(),
-      });
+      }, { merge: true });
 
       logger.info('webhook_processed', { requestId, type: eventType, userId: id, action: 'user_created_in_firestore' });
       logger.info('request_completed', { requestId, status: 200, route, method: req.method, durationMs: Date.now() - startTime });

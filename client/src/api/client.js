@@ -35,20 +35,21 @@ export const updateUserProfile = async (userId, data) => {
   return { success: true };
 };
 
-// ── Validation ────────────────────────────────────────────────────────────
-export const assertFirestoreSafeData = (data, path = "root") => {
-  if (data === undefined) {
-    throw new Error(`Invalid Firestore field: ${path} is undefined.`);
-  }
-  if (data === null || typeof data !== "object") return;
-  if (data instanceof Date) return;
+// ── Validation & Sanitization ─────────────────────────────────────────────
+export const cleanFirestoreData = (data) => {
+  if (data === undefined) return null;
+  if (data === null || typeof data !== "object") return data;
+  if (data instanceof Date) return data;
   if (Array.isArray(data)) {
-    data.forEach((item, index) => assertFirestoreSafeData(item, `${path}[${index}]`));
-  } else {
-    for (const key of Object.keys(data)) {
-      assertFirestoreSafeData(data[key], `${path}.${key}`);
+    return data.map(item => cleanFirestoreData(item)).filter(item => item !== undefined);
+  }
+  const clean = {};
+  for (const [key, value] of Object.entries(data)) {
+    if (value !== undefined) {
+      clean[key] = cleanFirestoreData(value);
     }
   }
+  return clean;
 };
 
 // ── Groups ──────────────────────────────────────────────────────────────
@@ -59,7 +60,7 @@ export const createGroup = async (groupData) => {
   
   const code = groupData.code || Math.random().toString(36).substring(2, 8).toUpperCase();
   
-  const newGroupData = {
+  const newGroupData = cleanFirestoreData({
     name: groupData.name || "Untitled Group",
     code: code,
     pinHash: pin || groupData.pinHash || null,
@@ -67,21 +68,19 @@ export const createGroup = async (groupData) => {
     settlementThreshold: groupData.settlement_threshold || 500,
     currentBalances: {},
     createdAt: new Date().toISOString()
-  };
+  });
   
-  assertFirestoreSafeData(newGroupData, `groups/${groupRef.id}`);
   batch.set(groupRef, newGroupData);
 
   const returnedMembers = [];
   if (members && members.length > 0) {
     members.forEach((member, i) => {
       const memberRef = doc(collection(db, `groups/${groupRef.id}/members`));
-      const memberObj = {
+      const memberObj = cleanFirestoreData({
         id: i + 1,
         name: member.name,
         color: member.color
-      };
-      assertFirestoreSafeData(memberObj, `groups/${groupRef.id}/members[${i}]`);
+      });
       batch.set(memberRef, memberObj);
       returnedMembers.push(memberObj);
     });
@@ -91,13 +90,12 @@ export const createGroup = async (groupData) => {
   if (fairness_models && fairness_models.length > 0) {
     fairness_models.forEach((model, i) => {
       const catRef = doc(collection(db, `groups/${groupRef.id}/categories`));
-      const catObj = {
+      const catObj = cleanFirestoreData({
         name: model.category,
         split_model: model.model_type,
         iconName: model.iconName || "Package",
         is_default: !!model.is_default
-      };
-      assertFirestoreSafeData(catObj, `groups/${groupRef.id}/categories[${i}]`);
+      });
       batch.set(catRef, catObj);
       returnedCategories.push(catObj);
     });
@@ -223,11 +221,6 @@ export const getExpenses = async (groupId, filters = {}) => {
   return { success: true, data: expenses };
 };
 
-export const updateExpense = async (groupId, id, data) => {
-  await updateDoc(doc(db, "groups", groupId, "expenses", id), data);
-  return { success: true };
-};
-
 export const deleteExpense = async (groupId, id) => {
   await deleteDoc(doc(db, "groups", groupId, "expenses", id));
   return { success: true };
@@ -351,16 +344,6 @@ export const getCategories = async (groupId) => {
 export const createCategory = async (groupId, data) => {
   const docRef = await addDoc(collection(db, "groups", groupId, "categories"), { ...data });
   return { success: true, data: { id: docRef.id, ...data } };
-};
-
-export const updateCategory = async (groupId, catId, data) => {
-  await updateDoc(doc(db, "groups", groupId, "categories", catId), data);
-  return { success: true };
-};
-
-export const deleteCategory = async (groupId, catId) => {
-  await deleteDoc(doc(db, "groups", groupId, "categories", catId));
-  return { success: true };
 };
 
 // ── Settlements ─────────────────────────────────────────────────────────

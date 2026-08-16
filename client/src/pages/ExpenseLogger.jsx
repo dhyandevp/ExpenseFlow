@@ -19,7 +19,6 @@ import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import ExpenseForm from "../components/ExpenseForm";
 import BalanceChip from "../components/BalanceChip";
 import { getBalances } from "../api/client";
-import useDocumentTitle from "../hooks/useDocumentTitle";
 import { ReceiptIndicator, ReceiptLightbox } from "../components/ReceiptUpload";
 import SettlementHistory from "../components/SettlementHistory";
 import { springScale } from "../utils/motion";
@@ -45,7 +44,6 @@ const categoryColors = {
 };
 
 function ExpenseLogger() {
-  useDocumentTitle("Log Expenses");
   const { currentGroup, setCurrentGroup } = useGroup();
   const location = useLocation();
   const navigate = useNavigate();

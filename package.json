@@ -8,7 +8,7 @@
     "build": "cd client && bun install && bun run build",
     "install:all": "cd client && bun install",
     "test:rules": "npx --yes firebase-tools emulators:exec 'vitest run tests/firestore.rules.test.js'",
-    "test:unit": "vitest run tests/unit.test.js"
+    "test:unit": "vitest run client/src/utils/__tests__/"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
@@ -18,10 +18,8 @@
   "dependencies": {
     "@clerk/backend": "^3.16.6",
     "cloudinary": "^2.10.0",
-    "dotenv": "^17.4.2",
     "firebase-admin": "^14.2.0",
     "jsonwebtoken": "^9.0.3",
-    "svix": "^1.99.1",
-    "yarn": "^1.22.22"
+    "svix": "^1.99.1"
   }
 }

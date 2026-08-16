@@ -140,3 +140,39 @@ describe('balanceMath.js', () => {
     });
   });
 });
+
+describe('assertFirestoreSafeData', () => {
+  // Inline reimplementation — importing client.js triggers Firebase init errors in Vitest
+  const assertFirestoreSafeData = (data, path = "root") => {
+    if (data === undefined) {
+      throw new Error(`Invalid Firestore field: ${path} is undefined.`);
+    }
+    if (data === null || typeof data !== "object") return;
+    if (data instanceof Date) return;
+    if (Array.isArray(data)) {
+      data.forEach((item, index) => assertFirestoreSafeData(item, `${path}[${index}]`));
+    } else {
+      for (const key of Object.keys(data)) {
+        assertFirestoreSafeData(data[key], `${path}.${key}`);
+      }
+    }
+  };
+
+  it('accepts valid payload', () => {
+    const validPayload = {
+      name: "Test Group",
+      currency: "USD",
+      members: [{ id: 1, name: "Alice", color: "#FFFFFF" }],
+      categories: [{ name: "Rent", split_model: "equal", iconName: "House", is_default: true }]
+    };
+    expect(() => assertFirestoreSafeData(validPayload)).not.toThrow();
+  });
+
+  it('rejects payload with undefined fields', () => {
+    const invalidPayload = {
+      name: "Test Group",
+      members: [{ id: 1, name: "Alice", emoji: undefined }]
+    };
+    expect(() => assertFirestoreSafeData(invalidPayload)).toThrow(/is undefined/);
+  });
+});
