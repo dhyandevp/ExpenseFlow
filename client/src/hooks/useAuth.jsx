@@ -196,6 +196,7 @@ export function AuthProvider({ children }) {
     <AuthContext.Provider
       value={{
         user: clerkUser || firebaseUser,
+        firebaseUser,
         authMode,
         groupAccess,
         signOut,

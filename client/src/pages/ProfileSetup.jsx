@@ -7,7 +7,7 @@ import { useAuth } from "../hooks/useAuth";
 import { createUserProfile } from "../api/client";
 
 export function ProfileSetup() {
-  const { user, authMode, refreshProfile, userProfile } = useAuth();
+  const { user, firebaseUser, authMode, refreshProfile, userProfile } = useAuth();
   const navigate = useNavigate();
 
 // Removed explicit navigation, handled by ProtectedRoute
@@ -30,17 +30,32 @@ export function ProfileSetup() {
       return;
     }
     
+    if (!firebaseUser) {
+      setError("Authentication is not ready yet. Please wait a moment and try again.");
+      console.error("[ProfileSetup] firebaseUser is null during save");
+      return;
+    }
+
     setError("");
     setIsSaving(true);
     
     try {
-      console.log("[ProfileSetup] profile_save_started", { userIdPresent: !!user?.id });
-      
-      await createUserProfile(user.id, {
-        displayName: displayName.trim(),
-        email: user.primaryEmailAddress?.emailAddress || null,
-        photoURL: user.imageUrl || null,
+      console.log("[ProfileSetup] profile_save_started", { 
+        userIdPresent: !!user?.id, 
+        firebaseUid: firebaseUser.uid 
       });
+      
+      const profilePayload = {
+        displayName: displayName.trim(),
+      };
+      if (user.primaryEmailAddress?.emailAddress) {
+        profilePayload.email = user.primaryEmailAddress.emailAddress;
+      }
+      if (user.imageUrl) {
+        profilePayload.photoURL = user.imageUrl;
+      }
+
+      await createUserProfile(user.id, profilePayload);
       
       console.log("[ProfileSetup] profile_save_success", { userId: user.id });
       await refreshProfile();

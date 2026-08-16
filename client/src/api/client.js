@@ -7,34 +7,6 @@ import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore }
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
-// ── Users ─────────────────────────────────────────────────────────────────
-export const getUserProfile = async (userId) => {
-  const docSnap = await getDoc(doc(db, "users", userId));
-  if (!docSnap.exists()) return { success: true, data: null };
-  return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
-};
-
-export const createUserProfile = async (userId, data) => {
-  const userRef = doc(db, "users", userId);
-  
-  // Clean undefined values
-  const safeData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
-
-  await setDoc(userRef, { 
-    ...safeData, 
-    updatedAt: new Date().toISOString(),
-    onboardingCompleted: true 
-  }, { merge: true });
-  
-  return { success: true, data: { id: userId, ...safeData, onboardingCompleted: true } };
-};
-
-export const updateUserProfile = async (userId, data) => {
-  const safeData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
-  await updateDoc(doc(db, "users", userId), { ...safeData, updatedAt: new Date().toISOString() });
-  return { success: true };
-};
-
 // ── Validation & Sanitization ─────────────────────────────────────────────
 export const cleanFirestoreData = (data) => {
   if (data === undefined) return null;
@@ -50,6 +22,37 @@ export const cleanFirestoreData = (data) => {
     }
   }
   return clean;
+};
+
+// ── Users ─────────────────────────────────────────────────────────────────
+export const getUserProfile = async (userId) => {
+  const docSnap = await getDoc(doc(db, "users", userId));
+  if (!docSnap.exists()) return { success: true, data: null };
+  return { success: true, data: { id: docSnap.id, ...docSnap.data() } };
+};
+
+export const createUserProfile = async (userId, data) => {
+  const userRef = doc(db, "users", userId);
+  
+  // Clean undefined values recursively
+  const safeData = cleanFirestoreData(data) || {};
+
+  const payload = cleanFirestoreData({ 
+    ...safeData, 
+    updatedAt: new Date().toISOString(),
+    onboardingCompleted: true 
+  });
+
+  await setDoc(userRef, payload, { merge: true });
+  
+  return { success: true, data: { id: userId, ...payload } };
+};
+
+export const updateUserProfile = async (userId, data) => {
+  const safeData = cleanFirestoreData(data) || {};
+  const payload = cleanFirestoreData({ ...safeData, updatedAt: new Date().toISOString() });
+  await updateDoc(doc(db, "users", userId), payload);
+  return { success: true };
 };
 
 // ── Groups ──────────────────────────────────────────────────────────────
