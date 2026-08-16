@@ -27,7 +27,7 @@
 | vite & @vitejs/plugin-react | ^5.4.0 / ^4.3.1 | Build tool and dev server |
 | vitest & @vitest/ui | ^4.1.10 | Unit testing framework |
 | @playwright/test | ^1.62.1 | E2E and visual testing framework |
-| netlify-cli | ^27.1.1 | Local dev environment for serverless functions |
+| vercel (CLI) | latest | Local dev environment for serverless functions |
 | @firebase/rules-unit-testing | ^5.0.1 | Testing Firestore security rules |
 | eslint | - | Code linting (via Vite scripts) |
 | autoprefixer & postcss | ^10.4.20 / ^8.4.41 | CSS processors for Tailwind |
@@ -35,7 +35,7 @@
 ## Infrastructure
 | Service | Provider | Purpose |
 |---------|----------|---------|
-| Hosting | Netlify | Hosting the static client assets and serverless functions |
+| Hosting | Vercel | Hosting the static client assets and serverless functions |
 | Database | Google (Firebase) | Firestore database for application data |
 | Authentication | Clerk | Auth provider for seamless identity management |
 | Storage | Cloudinary | Blob storage for uploaded receipts/images |

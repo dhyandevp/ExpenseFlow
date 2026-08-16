@@ -2,6 +2,13 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
 import { Webhook } from 'svix';
 
+// Disable Vercel's automatic body parsing — Svix needs the raw body
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 // Initialize Firebase Admin
 function initFirebase() {
   if (getApps().length === 0) {
@@ -22,38 +29,40 @@ function initFirebase() {
   }
 }
 
-export const handler = async (event, context) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+// Read raw body from request stream
+function getRawBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    req.on('data', (chunk) => chunks.push(chunk));
+    req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+    req.on('error', reject);
+  });
+}
+
+async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   const WEBHOOK_SECRET = process.env.CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
     console.error('Missing CLERK_WEBHOOK_SECRET');
-    return {
-      statusCode: 500,
-      body: JSON.stringify({ error: 'Webhook secret not configured' }),
-    };
+    return res.status(500).json({ error: 'Webhook secret not configured' });
   }
 
   // Get the headers
-  const svix_id = event.headers['svix-id'];
-  const svix_timestamp = event.headers['svix-timestamp'];
-  const svix_signature = event.headers['svix-signature'];
+  const svix_id = req.headers['svix-id'];
+  const svix_timestamp = req.headers['svix-timestamp'];
+  const svix_signature = req.headers['svix-signature'];
 
   // If there are no headers, error out
   if (!svix_id || !svix_timestamp || !svix_signature) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Missing svix headers' }),
-    };
+    return res.status(400).json({ error: 'Missing svix headers' });
   }
 
-  const payload = event.body;
+  // Read raw body for signature verification
+  const payload = await getRawBody(req);
 
   // Create a new Svix instance with your secret.
   const wh = new Webhook(WEBHOOK_SECRET);
@@ -69,10 +78,7 @@ export const handler = async (event, context) => {
     });
   } catch (err) {
     console.error('Error verifying webhook:', err.message);
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ error: 'Error verifying webhook' }),
-    };
+    return res.status(400).json({ error: 'Error verifying webhook' });
   }
 
   // Handle the webhook
@@ -101,21 +107,17 @@ export const handler = async (event, context) => {
         createdAt: new Date().toISOString(),
       });
 
-      return {
-        statusCode: 200,
-        body: JSON.stringify({ message: 'User created in Firestore' }),
-      };
+      return res.status(200).json({ message: 'User created in Firestore' });
     } catch (dbError) {
       console.error('Error saving user to Firestore:', dbError);
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: 'Error saving user to database' }),
-      };
+      return res.status(500).json({ error: 'Error saving user to database' });
     }
   }
 
-  return {
-    statusCode: 200,
-    body: JSON.stringify({ message: 'Webhook received but event type not handled' }),
-  };
-};
+  return res.status(200).json({ message: 'Webhook received but event type not handled' });
+}
+
+export default handler;
+
+// Named export for test compatibility
+export { handler };

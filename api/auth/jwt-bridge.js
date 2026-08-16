@@ -31,15 +31,11 @@ function safeCompare(a, b) {
   return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-export const handler = async (event, context) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 204,
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
-    };
+async function handler(req, res) {
+  if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    return res.status(204).end();
   }
 
   const corsHeaders = {
@@ -50,10 +46,10 @@ export const handler = async (event, context) => {
     initFirebase();
     const db = getFirestore();
     const auth = getAuth();
-    const ip = event.headers['x-forwarded-for'] || event.headers['client-ip'] || 'unknown-ip';
+    const ip = req.headers['x-forwarded-for'] || req.headers['client-ip'] || 'unknown-ip';
 
     // Mode A: Authenticated user (Clerk)
-    const authHeader = event.headers.authorization;
+    const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
       try {
@@ -65,31 +61,22 @@ export const handler = async (event, context) => {
         // Generate Firebase Custom Token
         const firebaseToken = await auth.createCustomToken(clerkUserId, { mode: 'clerk' });
         
-        return {
-          statusCode: 200,
-          headers: corsHeaders,
-          body: JSON.stringify({ firebaseToken }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(200).json({ firebaseToken });
       } catch (error) {
-        return {
-          statusCode: 401,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Invalid Clerk token' }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(401).json({ error: 'Invalid Clerk token' });
       }
     }
 
     // Mode B: Guest Access (code + pinHash)
-    if (event.httpMethod === 'POST') {
-      const body = JSON.parse(event.body || '{}');
+    if (req.method === 'POST') {
+      const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
       const { code, pinHash } = body;
 
       if (!code || !pinHash) {
-        return {
-          statusCode: 400,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Code and pinHash are required for guest access' }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(400).json({ error: 'Code and pinHash are required for guest access' });
       }
 
       // Check Rate Limits
@@ -109,14 +96,11 @@ export const handler = async (event, context) => {
 
         // Check if IP is blocked
         if (now < blockUntil) {
-          return {
-            statusCode: 429,
-            headers: corsHeaders,
-            body: JSON.stringify({ 
-              error: 'Too many attempts. Please try again later.',
-              blockUntil
-            }),
-          };
+          Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+          return res.status(429).json({ 
+            error: 'Too many attempts. Please try again later.',
+            blockUntil
+          });
         }
 
         // Clean up attempts older than 15 minutes
@@ -124,11 +108,8 @@ export const handler = async (event, context) => {
       }
 
       if (attempts.length >= 10) {
-        return {
-          statusCode: 429,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Rate limit exceeded (10 attempts / 15 mins)' }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(429).json({ error: 'Rate limit exceeded (10 attempts / 15 mins)' });
       }
 
       // Lookup Group
@@ -138,11 +119,8 @@ export const handler = async (event, context) => {
         // Record failure
         attempts.push(now);
         await rateLimitRef.set({ attempts, consecutiveFailures, blockUntil });
-        return {
-          statusCode: 404,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Group not found' }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(404).json({ error: 'Group not found' });
       }
 
       const groupDoc = groupsSnapshot.docs[0];
@@ -162,15 +140,12 @@ export const handler = async (event, context) => {
 
         await rateLimitRef.set({ attempts, consecutiveFailures, blockUntil });
 
-        return {
-          statusCode: 401,
-          headers: corsHeaders,
-          body: JSON.stringify({ 
-            error: 'Incorrect PIN',
-            remainingAttempts: Math.max(0, 3 - consecutiveFailures),
-            blockUntil
-          }),
-        };
+        Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+        return res.status(401).json({ 
+          error: 'Incorrect PIN',
+          remainingAttempts: Math.max(0, 3 - consecutiveFailures),
+          blockUntil
+        });
       }
 
       // Success! Reset failures
@@ -183,29 +158,24 @@ export const handler = async (event, context) => {
         mode: 'guest' 
       });
 
-      return {
-        statusCode: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ 
-          firebaseToken,
-          groupId,
-          expiresIn: 3600 // 1 hour token
-        }),
-      };
+      Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+      return res.status(200).json({ 
+        firebaseToken,
+        groupId,
+        expiresIn: 3600 // 1 hour token
+      });
     }
 
-    return {
-      statusCode: 405,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Method not allowed' }),
-    };
+    Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+    return res.status(405).json({ error: 'Method not allowed' });
 
   } catch (error) {
     console.error('Error in jwt-bridge:', error);
-    return {
-      statusCode: 500,
-      headers: corsHeaders,
-      body: JSON.stringify({ error: 'Internal server error' }),
-    };
+    return res.status(500).json({ error: 'Internal server error' });
   }
-};
+}
+
+export default handler;
+
+// Named export for test compatibility
+export { handler };

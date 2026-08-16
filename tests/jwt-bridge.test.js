@@ -46,7 +46,29 @@ vi.mock('@clerk/clerk-sdk-node', () => ({
 }));
 
 import { verifyToken } from '@clerk/clerk-sdk-node';
-import { handler } from '../netlify/functions/jwt-bridge.js';
+import { handler as vercelHandler } from '../api/auth/jwt-bridge.js';
+
+// Adapter: convert Netlify-style event to Vercel (req, res) and return Netlify-style response
+function handler(event) {
+  return new Promise((resolve) => {
+    const req = {
+      method: event.httpMethod,
+      headers: event.headers || {},
+      body: event.body ? JSON.parse(event.body) : undefined,
+    };
+    const _headers = {};
+    const res = {
+      setHeader(k, v) { _headers[k] = v; },
+      status(code) {
+        return {
+          json(data) { resolve({ statusCode: code, headers: _headers, body: JSON.stringify(data) }); },
+          end() { resolve({ statusCode: code, headers: _headers, body: '' }); },
+        };
+      },
+    };
+    vercelHandler(req, res);
+  });
+}
 
 describe('jwt-bridge function', () => {
   beforeEach(() => {

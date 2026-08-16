@@ -33,7 +33,39 @@ vi.mock('svix', () => {
   };
 });
 
-import { handler } from '../netlify/functions/clerk-webhook.js';
+import { handler as vercelHandler } from '../api/clerk-webhook.js';
+
+// Adapter: convert Netlify-style event to Vercel (req, res) and return Netlify-style response
+function handler(event) {
+  return new Promise((resolve) => {
+    // Simulate a readable stream for the raw body
+    const { Readable } = require('stream');
+    const bodyStr = event.body || '';
+    const stream = new Readable({
+      read() {
+        this.push(bodyStr);
+        this.push(null);
+      }
+    });
+
+    const req = Object.assign(stream, {
+      method: event.httpMethod,
+      headers: event.headers || {},
+    });
+
+    const _headers = {};
+    const res = {
+      setHeader(k, v) { _headers[k] = v; },
+      status(code) {
+        return {
+          json(data) { resolve({ statusCode: code, headers: _headers, body: JSON.stringify(data) }); },
+          end() { resolve({ statusCode: code, headers: _headers, body: '' }); },
+        };
+      },
+    };
+    vercelHandler(req, res);
+  });
+}
 
 describe('clerk-webhook function', () => {
   beforeEach(() => {

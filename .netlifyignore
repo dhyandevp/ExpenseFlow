@@ -1,5 +1,0 @@
-# Ignore these directories in Netlify builds
-scripts/
-.gsd/
-node_modules/
-tests/

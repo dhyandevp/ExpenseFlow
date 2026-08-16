@@ -2,7 +2,7 @@
  * balanceMath.js
  * Pure functions for calculating balances, fairness scores, and category breakdowns.
  * 🐴 Ponytail Ultra: Moved from backend Express server to frontend to eliminate
- * the need for Netlify Functions and dynamic database triggers. 
+ * the need for serverless functions and dynamic database triggers. 
  */
 
 export function calculateBalances(members, expenses, settlements = []) {

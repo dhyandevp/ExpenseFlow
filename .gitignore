@@ -11,6 +11,6 @@ dist/
 firestore-debug.log
 *.log
 
-# Local Netlify folder
-.netlify
+# Local Vercel folder
+.vercel
 lighthouse-report.json
