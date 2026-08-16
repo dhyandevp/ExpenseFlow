@@ -147,10 +147,14 @@ export function AuthProvider({ children }) {
           setProfileStatus("error");
         }
       } else {
-        setAuthMode("none");
+        if (clerkUser) {
+          setAuthMode("clerk");
+        } else {
+          setAuthMode("none");
+          setProfileStatus("complete");
+        }
         setGroupAccess(null);
         setUserProfile(null);
-        setProfileStatus("complete");
       }
       setIsFirebaseLoaded(true);
     });

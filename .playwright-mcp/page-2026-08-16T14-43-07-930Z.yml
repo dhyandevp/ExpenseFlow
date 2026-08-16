@@ -1,0 +1,272 @@
+- generic [ref=e1]:
+  - generic [ref=e5]:
+    - banner [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]: ExpenseFlow
+        - navigation [ref=e14]:
+          - button [ref=e15] [cursor=pointer]: Features
+          - button [ref=e16] [cursor=pointer]: How it works
+          - button [ref=e17] [cursor=pointer]: FAQ
+        - generic [ref=e18]:
+          - button [ref=e19] [cursor=pointer]: Sign In
+          - button [ref=e20] [cursor=pointer]: Join with Code
+    - generic [ref=e22]:
+      - generic [ref=e23]:
+        - generic [ref=e24]:
+          - generic [ref=e25]: Fair sharing, clear minds.
+          - heading [level=1] [ref=e28]: Stop arguing about who paid what.
+          - paragraph [ref=e29]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+        - generic [ref=e30]:
+          - button [ref=e31] [cursor=pointer]: Sign In to Create
+          - button [ref=e34] [cursor=pointer]: Join with Code & PIN
+      - generic [ref=e42]:
+        - generic [ref=e43]:
+          - generic [ref=e44]:
+            - generic [ref=e45]: Group Balance
+            - generic [ref=e46]: ₹12,850
+          - generic [ref=e47]:
+            - generic [ref=e48]: Fairness Score
+            - generic [ref=e49]: 87/100
+        - generic [ref=e50]:
+          - generic [ref=e51]:
+            - generic [ref=e52]: A
+            - text: Alex
+          - generic [ref=e53]: +₹3,400
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - generic [ref=e56]: J
+            - text: Jamie
+          - generic [ref=e57]: "-₹2,100"
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]: S
+            - text: Sam
+          - generic [ref=e61]: +₹700
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - generic [ref=e64]: T
+            - text: Taylor
+          - generic [ref=e65]: "-₹2,000"
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - heading [level=2] [ref=e71]: More than just "who owes whom"
+        - paragraph [ref=e72]: Traditional expense splitting focuses on today's debt, which often leads to awkward conversations. ExpenseFlow helps you understand the bigger picture, offering calm financial visibility for real groups.
+      - generic [ref=e73]:
+        - generic [ref=e74]:
+          - heading [level=3] [ref=e81]: Built for real groups
+          - paragraph [ref=e82]: Designed for roommates, couples, families, and travel groups sharing ongoing expenses.
+        - generic [ref=e83]:
+          - heading [level=3] [ref=e87]: Calm visibility
+          - paragraph [ref=e88]: See exactly where money goes without confrontation. The goal is clarity, not arguments.
+        - generic [ref=e89]:
+          - heading [level=3] [ref=e94]: Long-term fairness
+          - paragraph [ref=e95]: Understand contribution patterns over months, making it easier to balance things out naturally.
+    - generic [ref=e97]:
+      - generic [ref=e98]:
+        - heading [level=2] [ref=e99]: How ExpenseFlow works
+        - paragraph [ref=e100]: Four simple steps to financial clarity for your shared expenses.
+      - generic [ref=e101]:
+        - generic [ref=e104]:
+          - generic [ref=e105]: "01"
+          - heading [level=3] [ref=e111]: Create or join a group
+          - paragraph [ref=e112]: Set up a group and securely invite members with a unique code and PIN.
+        - generic [ref=e115]:
+          - generic [ref=e116]: "02"
+          - heading [level=3] [ref=e121]: Track shared expenses
+          - paragraph [ref=e122]: Record who paid, how much, and securely attach receipts if needed.
+        - generic [ref=e125]:
+          - generic [ref=e126]: "03"
+          - heading [level=3] [ref=e131]: See balances & fairness
+          - paragraph [ref=e132]: View real-time balances and an overall fairness score for the group.
+        - generic [ref=e134]:
+          - generic [ref=e135]: "04"
+          - heading [level=3] [ref=e141]: Settle up with clarity
+          - paragraph [ref=e142]: Follow simplified settlement suggestions to clear debts efficiently.
+    - generic [ref=e143]:
+      - generic [ref=e144]:
+        - heading [level=2] [ref=e145]: Everything you need. Nothing you don't.
+        - paragraph [ref=e146]: ExpenseFlow provides the precise tools needed to manage shared finances without the bloat of traditional accounting software.
+      - generic [ref=e147]:
+        - generic [ref=e153]:
+          - heading [level=3] [ref=e154]: Shared expense tracking
+          - paragraph [ref=e155]: Record who paid, how much, what it was for, and how it should be split. Keep a transparent history accessible to all group members.
+        - generic [ref=e161]:
+          - heading [level=3] [ref=e162]: Flexible splitting
+          - paragraph [ref=e163]: Support for equal splits, custom amounts, custom percentages, and specific models like room-size or income-weighted splits.
+        - generic [ref=e168]:
+          - heading [level=3] [ref=e169]: Fairness insights
+          - paragraph [ref=e170]: ExpenseFlow looks beyond immediate balances, offering a 0-100 Fairness Score that helps you understand longer-term contribution patterns.
+        - generic [ref=e175]:
+          - heading [level=3] [ref=e176]: Automatic balance calculation
+          - paragraph [ref=e177]: Instantly see exactly who is ahead or behind. We handle the complex math of multiple payers and mixed splits automatically.
+        - generic [ref=e183]:
+          - heading [level=3] [ref=e184]: Settlement suggestions
+          - paragraph [ref=e185]: Simplifies complex webs of group debt into the minimum number of practical settlement transactions to square everyone up.
+        - generic [ref=e193]:
+          - heading [level=3] [ref=e194]: Scenario planning
+          - paragraph [ref=e195]: Simulate hypothetical future expenses (like an upcoming trip or large purchase) to see how they would affect balances before spending.
+        - generic [ref=e202]:
+          - heading [level=3] [ref=e203]: Receipt management
+          - paragraph [ref=e204]: Upload and view images of receipts alongside expenses to maintain a clear, indisputable record of shared purchases.
+        - generic [ref=e210]:
+          - heading [level=3] [ref=e211]: Reports and exports
+          - paragraph [ref=e212]: Generate comprehensive fairness reports and export your entire group ledger to CSV for external records or printing.
+    - generic [ref=e215]:
+      - generic [ref=e216]:
+        - heading [level=2] [ref=e217]: See the big picture instantly
+        - paragraph [ref=e218]: Your dashboard presents a clean, unified view of your group's financial health. No digging through menus to find out where you stand.
+        - list [ref=e219]:
+          - listitem [ref=e220]: Total spending summaries
+          - listitem [ref=e224]: Per-member balance views
+          - listitem [ref=e228]: Category breakdowns
+          - listitem [ref=e232]: One-click settlements
+      - generic [ref=e236]:
+        - generic [ref=e237]:
+          - generic [ref=e238]:
+            - generic [ref=e239]: Your group's financial picture
+            - generic [ref=e240]: Apartment 4B
+          - generic [ref=e241]:
+            - generic [ref=e242]: Total spending
+            - generic [ref=e243]: ₹24,800
+        - generic [ref=e244]:
+          - generic [ref=e245]:
+            - generic [ref=e246]: Fairness Score
+            - generic [ref=e247]: 87 / 100
+          - generic [ref=e248]:
+            - generic [ref=e249]: Your Balance
+            - generic [ref=e250]: +₹1,240
+        - generic [ref=e251]:
+          - generic [ref=e252]:
+            - generic [ref=e253]:
+              - generic [ref=e254]: A
+              - generic [ref=e255]: Alex
+            - generic [ref=e256]: +₹1,240
+          - generic [ref=e257]:
+            - generic [ref=e258]:
+              - generic [ref=e259]: T
+              - generic [ref=e260]: Taylor
+            - generic [ref=e261]: "-₹1,240"
+    - generic [ref=e263]:
+      - generic [ref=e264]:
+        - heading [level=2] [ref=e265]: Built for shared expenses
+        - paragraph [ref=e266]: Designed specifically for groups that share costs repeatedly.
+      - generic [ref=e267]:
+        - generic [ref=e268]:
+          - heading [level=3] [ref=e274]: Roommates
+          - paragraph [ref=e275]: Track rent, groceries, utilities, and household expenses fairly.
+        - generic [ref=e276]:
+          - heading [level=3] [ref=e280]: Couples
+          - paragraph [ref=e281]: Keep shared spending visible without turning every purchase into a discussion.
+        - generic [ref=e282]:
+          - heading [level=3] [ref=e286]: Trips
+          - paragraph [ref=e287]: Track shared travel costs and settle them easily at the end of the journey.
+        - generic [ref=e288]:
+          - heading [level=3] [ref=e293]: Shared households
+          - paragraph [ref=e294]: Understand long-term contribution across multiple categories and responsibilities.
+    - generic [ref=e295]:
+      - heading [level=2] [ref=e296]: Features at a Glance
+      - generic [ref=e297]:
+        - generic [ref=e298]: Expense tracking
+        - generic [ref=e303]: Custom splits
+        - generic [ref=e308]: Receipt uploads
+        - generic [ref=e314]: Balance calculation
+        - generic [ref=e318]: Fairness insights
+        - generic [ref=e322]: Settlement suggestions
+        - generic [ref=e327]: Scenario planning
+        - generic [ref=e334]: Reports & CSV export
+        - generic [ref=e339]: PIN-protected access
+    - generic [ref=e345]:
+      - heading [level=2] [ref=e347]: Frequently Asked Questions
+      - generic [ref=e348]:
+        - generic [ref=e349]:
+          - button [expanded] [ref=e350] [cursor=pointer]:
+            - generic [ref=e351]: What is ExpenseFlow?
+          - paragraph [ref=e355]: ExpenseFlow is a minimal, professional web application that helps groups track shared expenses, automatically calculate balances, and understand long-term fairness.
+        - button [ref=e357] [cursor=pointer]:
+          - generic [ref=e358]: Is ExpenseFlow only for roommates?
+        - button [ref=e362] [cursor=pointer]:
+          - generic [ref=e363]: Can I split an expense unevenly?
+        - button [ref=e367] [cursor=pointer]:
+          - generic [ref=e368]: Can I join a group without creating an account?
+        - button [ref=e372] [cursor=pointer]:
+          - generic [ref=e373]: How does fairness work?
+        - button [ref=e377] [cursor=pointer]:
+          - generic [ref=e378]: Does ExpenseFlow automatically calculate who owes whom?
+        - button [ref=e382] [cursor=pointer]:
+          - generic [ref=e383]: Can I upload receipts?
+        - button [ref=e387] [cursor=pointer]:
+          - generic [ref=e388]: Can I simulate future expenses?
+        - button [ref=e392] [cursor=pointer]:
+          - generic [ref=e393]: Can I export my data?
+        - button [ref=e397] [cursor=pointer]:
+          - generic [ref=e398]: Is my group's data private?
+        - button [ref=e402] [cursor=pointer]:
+          - generic [ref=e403]: Do I need to install an app?
+    - generic [ref=e406]:
+      - heading [level=2] [ref=e411]: Secure & Private
+      - paragraph [ref=e412]: "We use secure, standard authentication practices. Your group's financial data is strictly isolated—only invited members can view your ledger. We don't include unnecessary social features or public feeds, keeping your finances exactly where they belong: between you and your group."
+    - generic [ref=e416]:
+      - heading [level=2] [ref=e417]: Ready to make shared expenses simpler?
+      - paragraph [ref=e418]: Create a group, invite your people, and start tracking.
+      - generic [ref=e419]:
+        - button [ref=e420] [cursor=pointer]: Create a Group
+        - button [ref=e421] [cursor=pointer]: Join with Code
+    - contentinfo [ref=e422]:
+      - generic [ref=e423]:
+        - generic [ref=e424]:
+          - generic [ref=e425]:
+            - generic [ref=e426]: ExpenseFlow
+            - paragraph [ref=e432]: Fair sharing, clear minds. Designed to help groups track expenses and settle up without the awkwardness.
+          - generic [ref=e433]:
+            - heading [level=4] [ref=e434]: Product
+            - list [ref=e435]:
+              - listitem [ref=e436]:
+                - button [ref=e437] [cursor=pointer]: Features
+              - listitem [ref=e438]:
+                - button [ref=e439] [cursor=pointer]: How it works
+              - listitem [ref=e440]:
+                - button [ref=e441] [cursor=pointer]: FAQ
+          - generic [ref=e442]:
+            - heading [level=4] [ref=e443]: Account
+            - list [ref=e444]:
+              - listitem [ref=e445]:
+                - button [ref=e446] [cursor=pointer]: Sign In
+              - listitem [ref=e447]:
+                - button [ref=e448] [cursor=pointer]: Join with Code
+          - generic [ref=e449]:
+            - heading [level=4] [ref=e450]: Legal
+            - list [ref=e451]:
+              - listitem [ref=e452]:
+                - link [ref=e453] [cursor=pointer]:
+                  - /url: /terms
+                  - text: Terms of Service
+              - listitem [ref=e454]:
+                - link [ref=e455] [cursor=pointer]:
+                  - /url: /privacy
+                  - text: Privacy Policy
+              - listitem [ref=e456]:
+                - link [ref=e457] [cursor=pointer]:
+                  - /url: /contact
+                  - text: Contact Support
+        - generic [ref=e458]:
+          - paragraph [ref=e459]: © 2026 ExpenseFlow. All rights reserved.
+          - paragraph [ref=e460]: Made for roommates, couples, and close friends.
+  - generic:
+    - generic:
+      - generic:
+        - dialog [active]:
+          - generic [ref=e463]:
+            - button "Close" [ref=e464] [cursor=pointer]
+            - generic [ref=e468]: ExpenseFlow
+            - generic [ref=e474]:
+              - button "Sign In" [ref=e475] [cursor=pointer]
+              - button "Create Account" [ref=e479] [cursor=pointer]
+            - button "Continue with Google" [ref=e483] [cursor=pointer]
+            - generic [ref=e489]: or continue with email
+            - generic [ref=e493]:
+              - textbox "Email Address" [ref=e495]
+              - textbox "Password" [ref=e497]
+              - button "Sign In" [ref=e498] [cursor=pointer]
+            - paragraph [ref=e502]:
+              - text: Don't have an account?
+              - button "Sign Up" [ref=e503] [cursor=pointer]

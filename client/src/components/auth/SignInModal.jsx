@@ -13,6 +13,8 @@ export default function SignInModal({ isOpen, onClose }) {
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
+  const [pendingVerification, setPendingVerification] = useState(false);
+  const [code, setCode] = useState("");
 
   const isSignUp = activeTab === "signup";
 
@@ -20,6 +22,8 @@ export default function SignInModal({ isOpen, onClose }) {
     setActiveTab(tab);
     setError("");
     setFieldErrors({});
+    setPendingVerification(false);
+    setCode("");
   };
 
   const handleOAuth = async (strategy) => {
@@ -53,13 +57,14 @@ export default function SignInModal({ isOpen, onClose }) {
     try {
       if (isSignUp) {
         // Sign Up Flow
-        await signUp.create({ emailAddress: email, password });
+        const res = await signUp.create({ emailAddress: email, password });
         
-        if (signUp.status === "complete") {
-          await setSignUpActive({ session: signUp.createdSessionId });
+        if (res.status === "complete") {
+          await setSignUpActive({ session: res.createdSessionId });
           onClose();
         } else {
-          setError("Verification required. Please check your email.");
+          await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+          setPendingVerification(true);
         }
       } else {
         // Sign In Flow
@@ -87,6 +92,26 @@ export default function SignInModal({ isOpen, onClose }) {
     } catch (err) {
       console.error("SignIn Error:", err);
       setError(err?.message || err?.errors?.[0]?.message || "Authentication failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerify = async (e) => {
+    e.preventDefault();
+    if (!isSignUpLoaded) return;
+    setLoading(true);
+    setError("");
+    try {
+      const completeSignUp = await signUp.attemptEmailAddressVerification({ code });
+      if (completeSignUp.status === "complete") {
+        await setSignUpActive({ session: completeSignUp.createdSessionId });
+        onClose();
+      } else {
+        setError("Verification failed.");
+      }
+    } catch (err) {
+      setError(err?.message || err?.errors?.[0]?.message || "Verification failed");
     } finally {
       setLoading(false);
     }
@@ -167,45 +192,82 @@ export default function SignInModal({ isOpen, onClose }) {
           </div>
           
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <input 
-                type="email" 
-                placeholder="Email Address" 
-                value={email}
-                onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(err => ({ ...err, email: null })); }}
-                required
-                className={`w-full bg-white border ${fieldErrors.email ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
-              />
-              {fieldErrors.email && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.email}</p>}
-            </div>
-            <div>
-              <input 
-                type="password" 
-                placeholder="Password" 
-                value={password}
-                onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(err => ({ ...err, password: null })); }}
-                required
-                className={`w-full bg-white border ${fieldErrors.password ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
-              />
-              {fieldErrors.password && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.password}</p>}
-            </div>
-            
-            {error && (
-              <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
-                {error}
+          {pendingVerification ? (
+            <form onSubmit={handleVerify} className="space-y-4">
+              <p className="text-sm text-[#767F7D] text-center mb-4">
+                We sent a verification code to {email}.
               </p>
-            )}
+              <div>
+                <input 
+                  type="text" 
+                  placeholder="Verification Code" 
+                  value={code}
+                  onChange={e => setCode(e.target.value)}
+                  required
+                  className="w-full bg-white border border-[#C2CBC9] text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm text-center tracking-widest font-mono"
+                />
+              </div>
+              {error && (
+                <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
+                  {error}
+                </p>
+              )}
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#105D5E]/20"
+              >
+                {loading ? "Verifying..." : "Verify Account"}
+              </button>
+              <button 
+                type="button"
+                onClick={() => setPendingVerification(false)}
+                className="w-full text-[#767F7D] hover:text-[#293E33] text-sm mt-2 transition-colors"
+              >
+                Back to Sign Up
+              </button>
+            </form>
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <input 
+                  type="email" 
+                  placeholder="Email Address" 
+                  value={email}
+                  onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(err => ({ ...err, email: null })); }}
+                  required
+                  className={`w-full bg-white border ${fieldErrors.email ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
+                />
+                {fieldErrors.email && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.email}</p>}
+              </div>
+              <div>
+                <input 
+                  type="password" 
+                  placeholder="Password" 
+                  value={password}
+                  onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(err => ({ ...err, password: null })); }}
+                  required
+                  className={`w-full bg-white border ${fieldErrors.password ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
+                />
+                {fieldErrors.password && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.password}</p>}
+              </div>
+              
+              {error && (
+                <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
+                  {error}
+                </p>
+              )}
 
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#105D5E]/20"
-            >
-              {isSignUp ? <UserPlus size={18} /> : <LogIn size={18} />}
-              {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
-            </button>
-          </form>
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#105D5E]/20"
+              >
+                {isSignUp ? <UserPlus size={18} /> : <LogIn size={18} />}
+                {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
+              </button>
+            </form>
+          )}
 
           {/* Bottom toggle text */}
           <p className="text-center text-sm text-[#767F7D] mt-6">

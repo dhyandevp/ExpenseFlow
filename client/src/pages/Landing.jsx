@@ -90,7 +90,7 @@ function Landing() {
       } else if (authMode === "clerk") {
         if (profileStatus === "missing") {
           navigate("/profile-setup");
-        } else if (profileStatus === "complete") {
+        } else if (profileStatus === "complete" || profileStatus === "error") {
           navigate("/home");
         }
       }

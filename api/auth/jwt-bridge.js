@@ -34,6 +34,39 @@ function safeCompare(a, b) {
 }
 
 
+// Generate Firebase Custom Token without requiring firebase-admin/auth which causes Vercel bundle issues
+function createFirebaseCustomToken(uid, claims = {}, requestId) {
+  logger.info('firebase_custom_token_started', { requestId, uid });
+  try {
+    const sa = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8'));
+    const header = { alg: 'RS256', typ: 'JWT' };
+    const iat = Math.floor(Date.now() / 1000);
+    const payload = {
+      iss: sa.client_email,
+      sub: sa.client_email,
+      aud: 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit',
+      iat: iat,
+      exp: iat + 3600,
+      uid: uid,
+      claims: claims
+    };
+
+    const b64url = str => Buffer.from(str).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+    const encodedHeader = b64url(JSON.stringify(header));
+    const encodedPayload = b64url(JSON.stringify(payload));
+
+    const sign = crypto.createSign('RSA-SHA256');
+    sign.update(encodedHeader + '.' + encodedPayload);
+    const signature = sign.sign(sa.private_key, 'base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+    logger.info('firebase_custom_token_success', { requestId, uid });
+    return encodedHeader + '.' + encodedPayload + '.' + signature;
+  } catch (err) {
+    logger.error('firebase_custom_token_failed', { requestId, error: err });
+    throw err;
+  }
+}
+
 export default async function handler(req, res) {
   const startTime = Date.now();
   const requestId = req.headers['x-request-id'] || generateRequestId();
@@ -74,17 +107,16 @@ export default async function handler(req, res) {
         const clerkUserId = payload.sub;
         logger.info('clerk_verification_success', { requestId, clerkUserId });
 
-        const { getAuth } = await import('firebase-admin/auth');
-        const firebaseToken = await getAuth().createCustomToken(clerkUserId, { mode: 'clerk' });
+        const firebaseToken = createFirebaseCustomToken(clerkUserId, { mode: 'clerk' }, requestId);
         
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
         logger.info('request_completed', { requestId, status: 200, route, method: req.method, durationMs: Date.now() - startTime });
         return res.status(200).json({ firebaseToken, requestId });
       } catch (error) {
-        logger.error('clerk_verification_failed', { requestId, error });
+        logger.error('clerk_verification_failed', { requestId, error: error.message, stack: error.stack });
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
         logger.error('request_failed', { requestId, status: 401, route, method: req.method, durationMs: Date.now() - startTime });
-        return res.status(401).json({ error: 'Invalid Clerk token', requestId });
+        return res.status(401).json({ error: 'Invalid Clerk token or signing error: ' + error.message, requestId });
       }
     }
 
@@ -186,11 +218,10 @@ export default async function handler(req, res) {
 
       // Create Custom Token for Guest
       const guestUid = 'guest_' + crypto.randomUUID().replace(/-/g, '');
-      const { getAuth } = await import('firebase-admin/auth');
-      const firebaseToken = await getAuth().createCustomToken(guestUid, { 
+      const firebaseToken = createFirebaseCustomToken(guestUid, { 
         guestGroupId: groupId, 
         mode: 'guest' 
-      });
+      }, requestId);
 
       logger.info('guest_auth_success', { requestId, groupId, guestUid });
       Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
@@ -208,7 +239,7 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed', requestId });
 
   } catch (error) {
-    logger.error('request_failed', { requestId, error, status: 500, route, method: req.method, durationMs: Date.now() - startTime });
-    return res.status(500).json({ error: 'Internal server error', requestId });
+    logger.error('request_failed', { requestId, error: error.message, stack: error.stack, status: 500, route, method: req.method, durationMs: Date.now() - startTime });
+    return res.status(500).json({ error: 'Internal server error: ' + error.message, requestId });
   }
 }
