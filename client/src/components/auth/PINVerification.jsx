@@ -33,25 +33,32 @@ export default function PINVerification({ pin, setPin, isError, onSubmit }) {
     const value = e.target.value.replace(/[^0-9]/g, "");
     if (!value) return;
 
-    const newPin = pin.substring(0, index) + value + pin.substring(index + 1);
-    setPin(newPin);
+    setPin(prev => {
+      const currentPin = prev || "";
+      const newPin = currentPin.substring(0, index) + value + currentPin.substring(index + 1);
+      
+      // Auto-submit when complete
+      if (newPin.length === 6 && index === 5) {
+        // Use a small timeout to allow state to settle before submitting
+        setTimeout(() => onSubmit(newPin), 0);
+      }
+      return newPin;
+    });
 
     // Auto-advance
     if (index < 5 && value) {
       inputRefs.current[index + 1].focus();
-    }
-    
-    // Auto-submit when complete
-    if (newPin.length === 6 && index === 5) {
-      onSubmit(newPin);
     }
   };
 
   const handleKeyDown = (e, index) => {
     if (e.key === "Backspace") {
       e.preventDefault();
-      const newPin = pin.substring(0, index) + " " + pin.substring(index + 1);
-      setPin(newPin.trim());
+      setPin(prev => {
+        const currentPin = prev || "";
+        const newPin = currentPin.substring(0, index) + " " + currentPin.substring(index + 1);
+        return newPin.trim();
+      });
       if (index > 0) {
         inputRefs.current[index - 1].focus();
       }
