@@ -2,7 +2,7 @@ import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { verifyToken } from '@clerk/clerk-sdk-node';
-import crypto from 'crypto';
+import crypto from 'node:crypto';
 
 // Initialize Firebase Admin
 function initFirebase() {
@@ -176,6 +176,3 @@ async function handler(req, res) {
 }
 
 export default handler;
-
-// Named export for test compatibility
-export { handler };

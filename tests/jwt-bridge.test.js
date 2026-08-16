@@ -46,7 +46,7 @@ vi.mock('@clerk/clerk-sdk-node', () => ({
 }));
 
 import { verifyToken } from '@clerk/clerk-sdk-node';
-import { handler as vercelHandler } from '../api/auth/jwt-bridge.js';
+import vercelHandler from '../api/auth/jwt-bridge.js';
 
 // Adapter: convert Netlify-style event to Vercel (req, res) and return Netlify-style response
 function handler(event) {

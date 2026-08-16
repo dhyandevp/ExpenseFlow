@@ -118,6 +118,3 @@ async function handler(req, res) {
 }
 
 export default handler;
-
-// Named export for test compatibility
-export { handler };

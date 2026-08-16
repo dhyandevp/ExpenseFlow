@@ -33,7 +33,7 @@ vi.mock('svix', () => {
   };
 });
 
-import { handler as vercelHandler } from '../api/clerk-webhook.js';
+import vercelHandler from '../api/clerk-webhook.js';
 
 // Adapter: convert Netlify-style event to Vercel (req, res) and return Netlify-style response
 function handler(event) {
