@@ -1,6 +1,6 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
-// import { verifyToken } from '@clerk/clerk-sdk-node';
+import { verifyToken } from '@clerk/backend';
 import crypto from 'crypto';
 
 // Initialize Firebase Admin (Only needed for Firestore)
@@ -76,7 +76,6 @@ export default async function handler(req, res) {
     const authHeader = req.headers.authorization;
     if (authHeader && authHeader.startsWith('Bearer ')) {
       const token = authHeader.split(' ')[1];
-      /*
       try {
         const payload = await verifyToken(token, {
           secretKey: process.env.CLERK_SECRET_KEY,
@@ -92,9 +91,6 @@ export default async function handler(req, res) {
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
         return res.status(401).json({ error: 'Invalid Clerk token' });
       }
-      */
-      Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
-      return res.status(401).json({ error: 'Clerk verification temporarily disabled' });
     }
 
     // Mode B: Guest Access (code + pinHash)
