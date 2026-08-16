@@ -16,12 +16,22 @@ export const getUserProfile = async (userId) => {
 
 export const createUserProfile = async (userId, data) => {
   const userRef = doc(db, "users", userId);
-  await setDoc(userRef, { ...data, createdAt: new Date().toISOString() });
-  return { success: true, data: { id: userId, ...data } };
+  
+  // Clean undefined values
+  const safeData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+
+  await setDoc(userRef, { 
+    ...safeData, 
+    updatedAt: new Date().toISOString(),
+    onboardingCompleted: true 
+  }, { merge: true });
+  
+  return { success: true, data: { id: userId, ...safeData, onboardingCompleted: true } };
 };
 
 export const updateUserProfile = async (userId, data) => {
-  await updateDoc(doc(db, "users", userId), { ...data, updatedAt: new Date().toISOString() });
+  const safeData = Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined));
+  await updateDoc(doc(db, "users", userId), { ...safeData, updatedAt: new Date().toISOString() });
   return { success: true };
 };
 

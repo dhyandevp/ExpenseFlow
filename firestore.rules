@@ -64,9 +64,9 @@ service cloud.firestore {
       }
     }
 
-    // ── Users (server-side only via Admin SDK) ──────────────────────────
+    // ── Users ───────────────────────────────────────────────────────────
     match /users/{userId} {
-      allow read, write: if false;
+      allow read, write: if isAuthenticated() && request.auth.uid == userId;
     }
   }
 }

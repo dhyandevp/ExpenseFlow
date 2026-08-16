@@ -36,15 +36,23 @@ export function ProfileSetup() {
     setIsSaving(true);
     
     try {
+      console.log("[ProfileSetup] profile_save_started", { userIdPresent: !!user?.id });
+      
       await createUserProfile(user.id, {
         displayName: displayName.trim(),
-        email: user.primaryEmailAddress?.emailAddress || "",
-        photoURL: user.imageUrl || "",
+        email: user.primaryEmailAddress?.emailAddress || null,
+        photoURL: user.imageUrl || null,
       });
+      
+      console.log("[ProfileSetup] profile_save_success", { userId: user.id });
       await refreshProfile();
       // Navigate to home handled by useEffect above when userProfile updates
     } catch (err) {
-      console.error(err);
+      console.error("[ProfileSetup] profile_save_failed", { 
+        code: err.code,
+        message: err.message,
+        userIdPresent: !!user?.id
+      });
       setError("Couldn't save your profile. Please try again.");
       setIsSaving(false);
     }
