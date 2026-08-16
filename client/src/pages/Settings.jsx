@@ -16,7 +16,7 @@ import {
   Shield,
 } from "lucide-react";
 import { useGroup } from "../App";
-import { updateGroup, removeMember, regenerateCode, setGroupPin } from "../api/client";
+import { updateGroup, removeMember, regenerateCode, setGroupPin, deleteGroup } from "../api/client";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
 
@@ -94,7 +94,17 @@ function SettingsPage() {
       navigate("/");
     }
   };
-
+  const handleDeleteGroup = async () => {
+    if (confirm("Are you absolutely sure you want to delete this group? This action CANNOT be undone and all data will be lost.")) {
+      try {
+        await deleteGroup(currentGroup.id);
+        setCurrentGroup(null);
+        navigate("/");
+      } catch (err) {
+        alert("Failed to delete group: " + err.message);
+      }
+    }
+  };
 
 
   const handleRegenerateCode = async () => {
@@ -152,16 +162,17 @@ function SettingsPage() {
         <p className="text-sm text-text-muted">Manage your group</p>
       </div>
 
-      {/* Group Info */}
+      {/* 1. Group Profile */}
       <div className="card">
         <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
           <SettingsIcon size={18} className="text-primary" />
-          Group Settings
+          Group Profile
         </h2>
 
         <div className="space-y-4">
-          <div>              <label className="block text-sm font-medium text-text-dark mb-1">
-                Group Name
+          <div>
+            <label className="block text-sm font-medium text-text-dark mb-1">
+              Group Name
             </label>
             <input
               type="text"
@@ -170,60 +181,71 @@ function SettingsPage() {
               className="input-field"
             />
           </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-text-dark mb-1">
-                Currency Symbol
-              </label>
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="input-field"
-              >
-                <option value="₹">₹ (INR)</option>
-                <option value="$">$ (USD)</option>
-                <option value="€">€ (EUR)</option>
-                <option value="£">£ (GBP)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-text-dark mb-1">
-                Settlement Threshold
-              </label>
-              <input
-                type="number"
-                value={threshold}
-                onChange={(e) => setThreshold(parseInt(e.target.value) || 0)}
-                className="input-field"
-                min={0}
-                step={100}
-              />
-            </div>
-          </div>
-
-          <button
-            onClick={handleUpdateGroup}
-            disabled={saving}
-            className="btn-primary"
-          >
-            <Save size={16} />
-            {saving ? "Saving..." : "Save Changes"}
-          </button>
-
-          {message && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="text-sm text-success"
-            >
-              {message}
-            </motion.p>
-          )}
         </div>
       </div>
 
-      {/* Security: Code & PIN */}
+      {/* 2. Members */}
+      <div className="card">
+        <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
+          <Edit3 size={18} className="text-primary" />
+          Members
+        </h2>
+
+        <div className="space-y-2">
+          {members.map((m) => (
+            <div
+              key={m.id}
+              className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
+            >
+              <div className="flex items-center gap-3">
+                <Avatar member={m} size={36} />
+                <div>
+                  <p className="font-medium text-text-dark text-sm">{m.name}</p>
+                  <p className="text-xs text-text-muted">ID: {m.id}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => handleRemoveMember(m.id)}
+                className="p-2 rounded-lg text-text-muted hover:bg-accent/10 hover:text-accent transition-colors"
+                title="Remove member"
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* 3. Categories */}
+      <div className="card">
+        <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
+          Categories & Fairness
+        </h2>
+
+        <div className="space-y-3">
+          {getGroupCategories(currentGroup).map((cat) => {
+            const model = fairnessModels.find((fm) => fm.category === cat.name);
+            return (
+              <div
+                key={cat.name}
+                className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
+              >
+                <div className="flex items-center gap-2">
+                  <CategoryIcon category={cat} size={20} className="text-primary" />
+                  <span className="text-sm font-medium text-text-dark">{cat.name}</span>
+                  {cat.is_default && <span className="text-[10px] text-text-muted">(Default)</span>}
+                </div>
+                <span className="text-xs text-text-muted">
+                  {modelOptions.find((o) => o.value === model?.model_type)?.label ||
+                    cat.split_model ? modelOptions.find((o) => o.value === cat.split_model)?.label || cat.split_model : "Equal split"}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* 4. Access & Security */}
       <div className="card">
         <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
           <Shield size={18} className="text-primary" />
@@ -310,84 +332,96 @@ function SettingsPage() {
         </div>
       </div>
 
-      {/* Members */}
+      {/* 5. Preferences */}
       <div className="card">
         <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
-          <Edit3 size={18} className="text-primary" />
-          Members
+          <SettingsIcon size={18} className="text-primary" />
+          Preferences
         </h2>
 
-        <div className="space-y-2">
-          {members.map((m) => (
-            <div
-              key={m.id}
-              className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
-            >
-              <div className="flex items-center gap-3">
-                <Avatar member={m} size={36} />
-                <div>
-                  <p className="font-medium text-text-dark text-sm">{m.name}</p>
-                  <p className="text-xs text-text-muted">ID: {m.id}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => handleRemoveMember(m.id)}
-                className="p-2 rounded-lg text-text-muted hover:bg-accent/10 hover:text-accent transition-colors"
-                title="Remove member"
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-text-dark mb-1">
+                Currency Symbol
+              </label>
+              <select
+                value={currency}
+                onChange={(e) => setCurrency(e.target.value)}
+                className="input-field"
               >
-                <Trash2 size={16} />
-              </button>
+                <option value="₹">₹ (INR)</option>
+                <option value="$">$ (USD)</option>
+                <option value="€">€ (EUR)</option>
+                <option value="£">£ (GBP)</option>
+              </select>
             </div>
-          ))}
-        </div>
-      </div>
+            <div>
+              <label className="block text-sm font-medium text-text-dark mb-1">
+                Settlement Threshold
+              </label>
+              <input
+                type="number"
+                value={threshold}
+                onChange={(e) => setThreshold(parseInt(e.target.value) || 0)}
+                className="input-field"
+                min={0}
+                step={100}
+              />
+            </div>
+          </div>
 
-      {/* Categories */}
-      <div className="card">
-        <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
-          Categories & Fairness
-        </h2>
-
-        <div className="space-y-3">
-          {getGroupCategories(currentGroup).map((cat) => {
-            const model = fairnessModels.find((fm) => fm.category === cat.name);
-            return (
-              <div
-                key={cat.name}
-                className="flex items-center justify-between p-3 rounded-xl bg-highlight/20"
+          <div className="pt-2">
+            <button
+              onClick={handleUpdateGroup}
+              disabled={saving}
+              className="btn-primary"
+            >
+              <Save size={16} />
+              {saving ? "Saving..." : "Save All Settings"}
+            </button>
+            {message && (
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-sm text-success mt-2"
               >
-                <div className="flex items-center gap-2">
-                  <CategoryIcon category={cat} size={20} className="text-primary" />
-                  <span className="text-sm font-medium text-text-dark">{cat.name}</span>
-                  {cat.is_default && <span className="text-[10px] text-text-muted">(Default)</span>}
-                </div>
-                <span className="text-xs text-text-muted">
-                  {modelOptions.find((o) => o.value === model?.model_type)?.label ||
-                    cat.split_model ? modelOptions.find((o) => o.value === cat.split_model)?.label || cat.split_model : "Equal split"}
-                </span>
-              </div>
-            );
-          })}
+                {message}
+              </motion.p>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Danger Zone */}
-      <div className="card border border-accent/30">
-        <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2 text-accent">
+      {/* 6. Danger Zone */}
+      <div className="card border border-accent/40 bg-accent/5">
+        <h2 className="font-heading font-semibold text-accent mb-4 flex items-center gap-2">
           <AlertTriangle size={18} />
           Danger Zone
         </h2>
 
         <div className="space-y-3">
-          <button
-            onClick={handleLeave}
-            className="btn-secondary border-accent/30 text-accent hover:bg-accent/10 w-full"
-          >
-            <LogOut size={16} />
-            Leave Group
-          </button>
-
-
+          <p className="text-sm text-text-dark mb-2">
+            Proceed with caution. These actions cannot be easily undone.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              onClick={handleLeave}
+              className="btn-secondary border-accent/30 text-accent hover:bg-accent/10 w-full sm:w-auto"
+            >
+              <LogOut size={16} />
+              Leave Group
+            </button>
+            {authMode === "clerk" && (
+              <button
+                onClick={handleDeleteGroup}
+                className="btn-secondary border-accent text-accent hover:bg-accent hover:text-white transition-colors w-full sm:w-auto"
+              >
+                <Trash2 size={16} />
+                Delete Group
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </div>

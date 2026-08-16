@@ -31,7 +31,7 @@ service cloud.firestore {
       allow update: if canAccessGroup(groupId)
                     && !request.resource.data.diff(resource.data).affectedKeys()
                         .hasAny(['currentBalances']);
-      allow delete: if false;
+      allow delete: if isClerkUser();
 
       // Members
       match /members/{memberId} {

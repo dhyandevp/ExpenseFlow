@@ -134,6 +134,11 @@ export const updateGroup = async (id, data) => {
   return { success: true };
 };
 
+export const deleteGroup = async (id) => {
+  await deleteDoc(doc(db, "groups", id));
+  return { success: true };
+};
+
 export const regenerateCode = async (groupId) => {
   const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   await updateDoc(doc(db, "groups", groupId), { code: newCode });
