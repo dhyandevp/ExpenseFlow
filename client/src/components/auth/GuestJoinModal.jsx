@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import PINVerification from "./PINVerification";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { app } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [code, setCode] = useState(defaultCode);
@@ -11,6 +12,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   const handleSubmit = async (finalPin = pin) => {
     if (!code) {
@@ -55,7 +57,8 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       const auth = getAuth(app);
       await signInWithCustomToken(auth, data.firebaseToken);
       
-      onClose(); // Successfully joined, close modal. App.jsx router handles redirect.
+      onClose(); // Successfully joined, close modal.
+      navigate(`/group/${code.trim().toUpperCase()}/dashboard`);
       
     } catch (err) {
       console.error(err);
