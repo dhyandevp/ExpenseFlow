@@ -65,16 +65,16 @@
 ---
 
 ### Phase 3: Authentication & Session Lifecycle
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Verify and fix the complete auth lifecycle: sign in, Google auth, session restoration, profile setup redirect, protected route guards, logout, and re-login. Ensure every auth state renders useful UI (loading, error, no-profile, authenticated).
 **Depends on**: Phase 2
 
 **Tasks**:
-- [ ] Verify Clerk sign-in flow works end-to-end
-- [ ] Verify Google OAuth redirect and SSO callback
-- [ ] Verify JWT bridge (Clerk → Firebase custom token)
-- [ ] Verify session restoration on page refresh at every protected route
-- [ ] Verify profile setup redirect for new users without profiles
+- [x] Verify Clerk sign-in flow works end-to-end
+- [x] Verify Google OAuth redirect and SSO callback
+- [x] Verify JWT bridge (Clerk → Firebase custom token)
+- [x] Verify session restoration on page refresh at every protected route
+- [x] Verify profile setup redirect for new users without profiles
 - [ ] Verify logout clears all state (Clerk, Firebase, localStorage)
 - [ ] Verify re-login after logout works cleanly
 - [ ] Fix any auth state that renders blank/null

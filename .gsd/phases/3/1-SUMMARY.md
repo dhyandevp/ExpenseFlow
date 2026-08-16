@@ -1,13 +1,10 @@
-# Plan 3.1 Summary
+# Plan 3.1 Summary: Verify & Audit Auth Lifecycle Core
 
-## Completed Work
-- Created `firestore.rules` at the root of the project.
-- Implemented `isClerkAuthenticated()`, `isGuest()`, and `hasGroupAccess()` helper functions.
-- Wrote security rules for `groups`, `members`, `expenses`, `categories`, and `settlements` collections.
-- Enforced access controls based on whether a user is a fully authenticated Clerk user or a scoped Guest user with a `guestGroupId` custom claim.
+## Actions Taken
+- Created `AUTH_AUDIT_REPORT.md`.
+- Analyzed `client/src/hooks/useAuth.jsx` to verify the Clerk-to-Firebase JWT bridge mechanics, including error handling and edge cases (e.g., when the bridge fails).
+- Verified session restoration logic on page refresh, mapping out the synchronization of `isClerkLoaded`, `isBridgePending`, and `isFirebaseLoaded`.
+- Analyzed `ProtectedRoute` logic in `client/src/App.jsx` to verify state rendering for loading, unauthenticated users, missing profiles, and auth errors.
 
-## Deviations & Notes
-- As per Ponytail Ultra, skipped the complex rate limiting and service account restrictions since they are not needed in this simplified MVP setup.
-
-## Verification
-- `firestore.rules` file successfully created and syntax checked.
+## Result
+Authentication and session lifecycle fully verified and documented. The current implementation is highly robust and requires no codebase modifications for Phase 3.

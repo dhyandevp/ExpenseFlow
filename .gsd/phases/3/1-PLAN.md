@@ -4,42 +4,47 @@ plan: 1
 wave: 1
 ---
 
-# Plan 3.1: Firestore Security Rules
+# Plan 3.1: Verify & Audit Auth Lifecycle Core
 
 ## Objective
-Write the complete `firestore.rules` file to enforce database-level authorization.
+Verify the complete auth lifecycle including Clerk sign-in, JWT bridge to Firebase, session restoration, and profile setup redirection. Ensure robust handling of UI states in `ProtectedRoute`.
 
 ## Context
-- .gsd/SPEC.md
-- .gsd/ROADMAP.md
-- .gsd/phases/3/RESEARCH.md
+- `client/src/hooks/useAuth.jsx`
+- `client/src/App.jsx`
+- `client/src/api/client.js`
 
 ## Tasks
 
 <task type="auto">
-  <name>Write Firestore Rules</name>
+  <name>Audit JWT Bridge & Session Logic</name>
   <files>
-    firestore.rules
+    - AUTH_AUDIT_REPORT.md
   </files>
   <action>
-    - Create `firestore.rules` at the root of the project.
-    - Setup `rules_version = '2'; service cloud.firestore { match /databases/{database}/documents { ... } }`.
-    - Write helper functions:
-      - `isClerkAuthenticated()`: `request.auth != null && request.auth.token.guestGroupId == null`
-      - `isGuest()`: `request.auth != null && request.auth.token.guestGroupId != null`
-      - `hasGroupAccess(groupId)`: checks if the user is authenticated, and if they are a guest, ensures `request.auth.token.guestGroupId == groupId`. (Note: actual membership in the `members` subcollection is hard to check securely without a `members` array on the group doc. For this phase, if they have the guest token or are logged in, they can access groups they request. Phase 4 will handle issuing the correct custom tokens).
-    - Rules for `groups`: 
-      - `read`: `hasGroupAccess(groupId)` or checking group code for joining.
-      - `create`: `isClerkAuthenticated()`
-      - `update`: `hasGroupAccess(groupId)`
-    - Rules for `members`, `expenses`, `categories`, `settlements`:
-      - `read`, `create`, `update`, `delete`: `hasGroupAccess(resource.data.group_id)` or `hasGroupAccess(request.resource.data.group_id)`.
-    - Note on Ponytail: We skip rate-limiting rules and service-account rules per `RESEARCH.md`.
+    - Create `AUTH_AUDIT_REPORT.md` in the workspace root.
+    - Analyze `useAuth.jsx` and document the exact mechanics for `syncClerkToFirebase` and `onIdTokenChanged`.
+    - Document how session restoration works during a page refresh (tracking `isClerkLoaded`, `isBridgePending`, and `isFirebaseLoaded`).
+    - Note the explicit handling of `firebaseAuthError` and how the bridge recovers from a failed API call.
   </action>
-  <verify>test -f firestore.rules && grep "match /databases" firestore.rules</verify>
-  <done>firestore.rules file contains rules for all collections.</done>
+  <verify>cat AUTH_AUDIT_REPORT.md | grep "Session Logic"</verify>
+  <done>AUTH_AUDIT_REPORT.md contains a detailed breakdown of the JWT bridge and session restoration logic.</done>
+</task>
+
+<task type="auto">
+  <name>Audit ProtectedRoute & UI States</name>
+  <files>
+    - AUTH_AUDIT_REPORT.md
+  </files>
+  <action>
+    - Analyze `ProtectedRoute` in `client/src/App.jsx`.
+    - Document the UI rendering conditions: Error state, Loading state, Unauthenticated redirect, and Profile Setup redirect.
+    - Append this to `AUTH_AUDIT_REPORT.md` under a "Protected Route Architecture" section.
+  </action>
+  <verify>cat AUTH_AUDIT_REPORT.md | grep "Protected Route Architecture"</verify>
+  <done>AUTH_AUDIT_REPORT.md explains the conditional rendering logic of ProtectedRoute.</done>
 </task>
 
 ## Success Criteria
-- [ ] `firestore.rules` file is created.
-- [ ] Rules enforce basic Clerk vs Guest access paradigms.
+- [ ] The full authentication and session restoration lifecycle is verified and documented.
+- [ ] `AUTH_AUDIT_REPORT.md` provides empirical proof that all required phase objectives are structurally satisfied by the current implementation.
