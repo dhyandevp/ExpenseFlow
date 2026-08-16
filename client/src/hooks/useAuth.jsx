@@ -25,13 +25,15 @@ export function AuthProvider({ children }) {
   const clerk = useClerk();
 
   const [firebaseUser, setFirebaseUser] = useState(null);
-  const [authMode, setAuthMode] = useState(null); // 'clerk', 'guest', or null
+  const [authMode, setAuthMode] = useState(null); // 'clerk', 'guest', or 'none'
   const [groupAccess, setGroupAccess] = useState(null); // 'all' or specific groupId
-  const [isFirebaseLoaded, setIsFirebaseLoaded] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
-  const [isProfileLoaded, setIsProfileLoaded] = useState(false);
   const [firebaseAuthError, setFirebaseAuthError] = useState(null);
+
+  // Loading states
+  const [isFirebaseLoaded, setIsFirebaseLoaded] = useState(false);
   const [isBridgePending, setIsBridgePending] = useState(false);
+  const [profileStatus, setProfileStatus] = useState("loading"); // "loading", "complete", "missing", "error"
 
   // Sync Clerk Session to Firebase Custom Token
   useEffect(() => {
@@ -50,6 +52,7 @@ export function AuthProvider({ children }) {
         try {
           setIsBridgePending(true);
           setFirebaseAuthError(null);
+          setProfileStatus("loading"); // Ensure profile loading starts
           
           const sessionToken = await session.getToken();
           frontLogger.log('jwt_bridge_request_started');
@@ -85,6 +88,7 @@ export function AuthProvider({ children }) {
           setIsBridgePending(false);
           // If we fail, make sure isFirebaseLoaded becomes true so we don't hang on loading
           setIsFirebaseLoaded(true);
+          setProfileStatus("error");
         }
       } else if (!clerkUser && authMode === 'clerk') {
         // Clerk signed out, so sign out of Firebase
@@ -101,38 +105,52 @@ export function AuthProvider({ children }) {
     const unsubscribe = onIdTokenChanged(auth, async (user) => {
       setFirebaseUser(user);
       if (user) {
+        setProfileStatus("loading"); // Start loading state for the new user
         try {
           const tokenResult = await user.getIdTokenResult();
           if (tokenResult.claims.guestGroupId) {
             setAuthMode("guest");
             setGroupAccess(tokenResult.claims.guestGroupId);
             setUserProfile(null);
-            setIsProfileLoaded(true);
+            setProfileStatus("complete");
           } else if (clerkUser) {
             setAuthMode("clerk");
             setGroupAccess("all");
             // Load user profile
-            const profileRes = await getUserProfile(user.uid);
-            setUserProfile(profileRes.data);
-            setIsProfileLoaded(true);
+            try {
+              const profileRes = await getUserProfile(user.uid);
+              if (profileRes && profileRes.data) {
+                setUserProfile(profileRes.data);
+                setProfileStatus("complete");
+              } else {
+                setUserProfile(null);
+                setProfileStatus("missing");
+              }
+            } catch (err) {
+              frontLogger.error("profile_fetch_failed", { message: err.message });
+              setUserProfile(null);
+              // For 404s, consider it missing. For other errors, it might be an error state.
+              // Assuming missing to allow them to create it if backend doesn't have it.
+              setProfileStatus("missing");
+            }
           } else {
-            setAuthMode(null);
+            setAuthMode("none");
             setGroupAccess(null);
             setUserProfile(null);
-            setIsProfileLoaded(true);
+            setProfileStatus("complete");
           }
         } catch (err) {
           frontLogger.error("failed_to_parse_token_claims", { message: err.message });
-          setAuthMode(null);
+          setAuthMode("none");
           setGroupAccess(null);
           setUserProfile(null);
-          setIsProfileLoaded(true);
+          setProfileStatus("error");
         }
       } else {
-        setAuthMode(null);
+        setAuthMode("none");
         setGroupAccess(null);
         setUserProfile(null);
-        setIsProfileLoaded(true);
+        setProfileStatus("complete");
       }
       setIsFirebaseLoaded(true);
     });
@@ -150,13 +168,23 @@ export function AuthProvider({ children }) {
   };
 
   // We are fully loaded ONLY if Clerk is loaded, Firebase is loaded, 
-  // AND there is no pending bridge operation.
-  const isLoaded = isClerkLoaded && isFirebaseLoaded && !isBridgePending;
+  // there is no pending bridge operation, and the profile state is resolved.
+  const isLoaded = isClerkLoaded && isFirebaseLoaded && !isBridgePending && profileStatus !== "loading";
 
   const refreshProfile = async () => {
     if (firebaseUser && authMode === 'clerk') {
-      const profileRes = await getUserProfile(firebaseUser.uid);
-      setUserProfile(profileRes.data);
+      try {
+        const profileRes = await getUserProfile(firebaseUser.uid);
+        if (profileRes && profileRes.data) {
+          setUserProfile(profileRes.data);
+          setProfileStatus("complete");
+        } else {
+          setUserProfile(null);
+          setProfileStatus("missing");
+        }
+      } catch (err) {
+        console.error("Failed to refresh profile", err);
+      }
     }
   };
 
@@ -169,7 +197,7 @@ export function AuthProvider({ children }) {
         signOut,
         isLoaded,
         userProfile,
-        isProfileLoaded,
+        profileStatus,
         refreshProfile,
         firebaseAuthError,
       }}

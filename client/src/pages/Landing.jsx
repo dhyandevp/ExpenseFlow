@@ -1,6 +1,7 @@
 import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   TrendingUp,
@@ -74,7 +75,8 @@ const AccordionItem = ({ question, answer, isOpen, onClick }) => {
 
 function Landing() {
   const navigate = useNavigate();
-  const { user, isLoaded, authMode } = useAuth();
+  const { user, isLoaded, authMode, profileStatus } = useAuth();
+  const { isLoaded: isClerkLoaded, user: clerkUser } = useUser();
   
   const [isSignInOpen, setIsSignInOpen] = useState(false);
   const [isGuestJoinOpen, setIsGuestJoinOpen] = useState(false);
@@ -83,11 +85,26 @@ function Landing() {
   // If already authenticated, redirect
   useEffect(() => {
     if (isLoaded && user) {
-      if (authMode === "clerk" || authMode === "guest") {
-        navigate("/home"); 
+      if (authMode === "guest") {
+        navigate("/home");
+      } else if (authMode === "clerk") {
+        if (profileStatus === "missing") {
+          navigate("/profile-setup");
+        } else if (profileStatus === "complete") {
+          navigate("/home");
+        }
       }
     }
-  }, [user, isLoaded, authMode, navigate]);
+  }, [user, isLoaded, authMode, profileStatus, navigate]);
+
+  // Prevent flash of Landing page if user is logged in but Firebase/profile is still loading
+  if (!isClerkLoaded || (clerkUser && !isLoaded)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-background text-primary">
+        <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-4" />
+      </div>
+    );
+  }
 
   const scrollTo = (id) => {
     const el = document.getElementById(id);

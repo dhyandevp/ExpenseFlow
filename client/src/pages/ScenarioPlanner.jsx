@@ -105,7 +105,7 @@ function ScenarioPlanner() {
     try {
       const data = {
         actions: validActions.map((a) => ({
-          paidBy: parseInt(a.paidBy),
+          paidBy: a.paidBy,
           category: a.category,
           amount: parseFloat(a.amount),
           count: parseInt(a.count) || 1,

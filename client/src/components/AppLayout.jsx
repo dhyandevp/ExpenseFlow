@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import {
   PlusCircle,
@@ -64,6 +64,16 @@ export default function AppLayout({ children }) {
         </div>
       </div>
     );
+  }
+
+  useEffect(() => {
+    if (code && currentGroup && currentGroup.code !== code) {
+      navigate(`/join/${code}`, { replace: true });
+    }
+  }, [code, currentGroup, navigate]);
+
+  if (code && currentGroup && currentGroup.code !== code) {
+    return null;
   }
 
   // Filter out current group from recent groups

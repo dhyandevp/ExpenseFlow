@@ -266,7 +266,7 @@ export const simulateScenario = async (groupId, data) => {
 
   // Generate hypothetical expenses from scenario actions
   const hypothetical = data.actions.flatMap(a => {
-    const payer = members[a.paidBy];
+    const payer = members.find(m => m.id === a.paidBy || m.id === parseInt(a.paidBy));
     if (!payer) return [];
     return Array.from({ length: a.count || 1 }, (_, i) => ({
       id: `sim_${Date.now()}_${i}`,

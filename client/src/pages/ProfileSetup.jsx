@@ -12,12 +12,8 @@ export function ProfileSetup() {
   const { user, authMode, refreshProfile, userProfile } = useAuth();
   const navigate = useNavigate();
 
-  // If already set up, get out of here.
-  useEffect(() => {
-    if (userProfile) {
-      navigate("/home", { replace: true });
-    }
-  }, [userProfile, navigate]);
+// Removed explicit navigation, handled by ProtectedRoute
+
 
   const [displayName, setDisplayName] = useState("");
   const [isSaving, setIsSaving] = useState(false);

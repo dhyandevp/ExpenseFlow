@@ -81,7 +81,7 @@ function SettingsPage() {
   useDocumentTitle("Group Settings");
   const { currentGroup, setCurrentGroup } = useGroup();
   const navigate = useNavigate();
-  const { authMode } = useAuth();
+  const { authMode, signOut } = useAuth();
   const { session } = useSession();
 
   const [groupName, setGroupName] = useState(currentGroup?.name || "");
@@ -148,15 +148,20 @@ function SettingsPage() {
     }
   };
 
-  const handleLeave = () => {
+  const handleLeave = async () => {
     setIsLeaving(true);
-    // Simulate leaving since leaving a group usually means removing yourself from members
-    // For now, setting current group to null achieves "leaving" the active context
-    setTimeout(() => {
+    try {
+      if (authMode === "guest") {
+        await signOut();
+      }
       setCurrentGroup(null);
       navigate("/home");
+    } catch (err) {
+      console.error("Failed to leave group", err);
+    } finally {
       setIsLeaving(false);
-    }, 500);
+      setIsLeaveDialogOpen(false);
+    }
   };
 
   const handleDeleteGroup = async () => {
@@ -225,6 +230,29 @@ function SettingsPage() {
         <p className="text-text-muted">Manage your group preferences and members.</p>
       </div>
 
+      {authMode === 'guest' && (
+        <div className="p-6 bg-[#E8E300]/10 border border-[#E8E300]/20 rounded-2xl flex flex-col sm:flex-row items-start justify-between gap-4">
+          <div className="flex items-start gap-3">
+            <Shield className="text-[#E8E300] shrink-0 mt-0.5" size={20} />
+            <div>
+              <h3 className="font-semibold text-text-dark text-sm">Guest Mode</h3>
+              <p className="text-sm text-text-muted mt-1 max-w-lg">
+                You are viewing this group as a guest. Only the group owner can manage settings, edit members, and manage security options.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => setIsLeaveDialogOpen(true)}
+            className="btn-secondary border-border hover:bg-background text-text-dark shrink-0"
+          >
+            <LogOut size={16} />
+            Leave group
+          </button>
+        </div>
+      )}
+
+      {authMode !== 'guest' && (
+      <>
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Group Profile</h2>
         <div className="p-6 bg-white rounded-2xl shadow-sm border border-border space-y-4">
@@ -466,8 +494,10 @@ function SettingsPage() {
           )}
         </div>
       </section>
+      </>
+      )}
 
-      {/* Leave Group Dialog */}
+      {/* Dialogs */}
       <Dialog 
         isOpen={isLeaveDialogOpen} 
         onClose={() => setIsLeaveDialogOpen(false)} 

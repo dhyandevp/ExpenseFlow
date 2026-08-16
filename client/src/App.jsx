@@ -95,7 +95,7 @@ function PageLoader() {
 }
 
 function ProtectedRoute({ children, requireProfile = true }) {
-  const { user, isLoaded, isProfileLoaded, userProfile, authMode, firebaseAuthError } = useAuth();
+  const { user, isLoaded, userProfile, authMode, firebaseAuthError, profileStatus } = useAuth();
   
   if (firebaseAuthError) {
     return (
@@ -117,7 +117,8 @@ function ProtectedRoute({ children, requireProfile = true }) {
     );
   }
 
-  if (!isLoaded || (authMode === 'clerk' && !isProfileLoaded)) {
+  // isLoaded now inherently includes !isProfileLoading
+  if (!isLoaded) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background text-primary">
         <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin mb-4" />
@@ -128,8 +129,15 @@ function ProtectedRoute({ children, requireProfile = true }) {
   
   if (!user) return <Navigate to="/" replace />;
   
-  if (requireProfile && authMode === 'clerk' && !userProfile) {
-    return <Navigate to="/profile-setup" replace />;
+  if (authMode === 'clerk') {
+    if (requireProfile && profileStatus === 'missing') {
+      return <Navigate to="/profile-setup" replace />;
+    }
+    
+    // If the route doesn't require a profile (like ProfileSetup itself) but the profile IS complete, redirect home
+    if (!requireProfile && profileStatus === 'complete') {
+      return <Navigate to="/home" replace />;
+    }
   }
   
   return children;

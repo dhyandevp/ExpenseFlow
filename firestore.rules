@@ -28,19 +28,21 @@ service cloud.firestore {
     match /groups/{groupId} {
       allow read: if canAccessGroup(groupId);
       allow create: if isClerkUser();
-      allow update: if canAccessGroup(groupId)
+      allow update: if isClerkUser()
                     && !request.resource.data.diff(resource.data).affectedKeys()
                         .hasAny(['currentBalances']);
       allow delete: if isClerkUser();
 
       // Members
       match /members/{memberId} {
-        allow read, write: if canAccessGroup(groupId);
+        allow read: if canAccessGroup(groupId);
+        allow write: if isClerkUser();
       }
 
       // Categories
       match /categories/{catId} {
-        allow read, write: if canAccessGroup(groupId);
+        allow read: if canAccessGroup(groupId);
+        allow write: if isClerkUser();
       }
 
       // Expenses — guests can create but only Clerk users can edit/delete
@@ -49,10 +51,11 @@ service cloud.firestore {
         allow update, delete: if isClerkUser();
       }
 
-      // Settlements — append-only ledger, no edits or deletes
+      // Settlements — append-only ledger, no edits or deletes for guests
       match /settlements/{settlementId} {
         allow read, create: if canAccessGroup(groupId);
-        allow update, delete: if false;
+        allow update: if false;
+        allow delete: if isClerkUser();
       }
 
       // Scenarios

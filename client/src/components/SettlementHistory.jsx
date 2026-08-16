@@ -42,8 +42,8 @@ export default function SettlementHistory() {
     setSaving(true);
     try {
       await recordSettlement(currentGroup.id, {
-        from_member: parseInt(form.from_member),
-        to_member: parseInt(form.to_member),
+        from_member: form.from_member,
+        to_member: form.to_member,
         amount: parseFloat(form.amount),
         note: form.note,
       });

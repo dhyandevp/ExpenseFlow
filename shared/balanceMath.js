@@ -13,13 +13,29 @@ export function calculateBalances(members, expenses, settlements = []) {
 
   let totalExpenses = 0;
 
-  // Aggregate expenses (Equal Split logic for now)
-  const equalShare = members.length > 0 ? (expenses.reduce((s, e) => s + e.amount, 0) / members.length) : 0;
+  // Initialize maps
+  for (const m of members) {
+    paidMap[m.id] = 0;
+    shareMap[m.id] = 0;
+  }
 
+  // Aggregate expenses per expense instead of globally
   for (const e of expenses) {
     const payer = e.paidBy;
     paidMap[payer] = (paidMap[payer] || 0) + e.amount;
     totalExpenses += e.amount;
+
+    // Handle split logic
+    // Default to all members if split_members is undefined or empty
+    let splitBetween = e.split_members && e.split_members.length > 0 ? e.split_members : members.map(m => m.id);
+    
+    const splitCount = splitBetween.length;
+    if (splitCount > 0) {
+      const shareAmount = e.amount / splitCount;
+      for (const memberId of splitBetween) {
+        shareMap[memberId] = (shareMap[memberId] || 0) + shareAmount;
+      }
+    }
   }
 
   // Aggregate settlements
@@ -30,7 +46,7 @@ export function calculateBalances(members, expenses, settlements = []) {
 
   const balances = members.map((m) => {
     const paid = paidMap[m.id] || 0;
-    const share = equalShare; // In future, handle complex splits
+    const share = shareMap[m.id] || 0;
     const settled_out = sentMap[m.id] || 0;
     const settled_in = receivedMap[m.id] || 0;
     
@@ -163,36 +179,52 @@ export function calculateCategoryBreakdown(members, expenses) {
 
 export function calculateFairnessScore(members, expenses) {
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
-  const equalShare = members.length > 0 ? totalExpenses / members.length : 0;
 
   const memberPaid = {};
+  const memberFairShare = {};
+  
+  for (const m of members) {
+    memberPaid[m.id] = 0;
+    memberFairShare[m.id] = 0;
+  }
+
   for (const e of expenses) {
     const payer = e.paidBy;
     memberPaid[payer] = (memberPaid[payer] || 0) + e.amount;
+
+    let splitBetween = e.split_members && e.split_members.length > 0 ? e.split_members : members.map(m => m.id);
+    const splitCount = splitBetween.length;
+    if (splitCount > 0) {
+      const shareAmount = e.amount / splitCount;
+      for (const memberId of splitBetween) {
+        memberFairShare[memberId] = (memberFairShare[memberId] || 0) + shareAmount;
+      }
+    }
   }
 
   const scores = members.map((m) => {
     const paid = memberPaid[m.id] || 0;
-    const diff = Math.abs(paid - equalShare);
+    const fairShare = memberFairShare[m.id] || 0;
+    const diff = Math.abs(paid - fairShare);
     
     let score = 100;
-    if (equalShare > 0) {
-      const ratio = diff / equalShare;
+    if (fairShare > 0) {
+      const ratio = diff / fairShare;
       score = Math.max(0, Math.min(100, Math.round(100 - ratio * 50)));
     }
 
     let status = "fair";
-    let explanation = `${m.name} has contributed ${paid >= equalShare ? "more than" : paid === 0 ? "nothing compared to" : "less than"} their fair share.`;
+    let explanation = `${m.name} has contributed ${paid >= fairShare ? "more than" : paid === 0 ? "nothing compared to" : "less than"} their fair share.`;
 
     if (score >= 80) {
       status = "fair";
       explanation = `${m.name} is contributing close to their fair share. Great balance!`;
     } else if (score >= 50) {
       status = "slightly_off";
-      explanation = `${m.name} is ${paid > equalShare ? "ahead by ₹" + Math.round((paid - equalShare) * 100) / 100 : "behind by ₹" + Math.round((equalShare - paid) * 100) / 100}. A small adjustment would balance things.`;
+      explanation = `${m.name} is ${paid > fairShare ? "ahead by ₹" + Math.round((paid - fairShare) * 100) / 100 : "behind by ₹" + Math.round((fairShare - paid) * 100) / 100}. A small adjustment would balance things.`;
     } else {
       status = "significantly_off";
-      explanation = `${m.name} is ${paid > equalShare ? "significantly ahead by ₹" + Math.round((paid - equalShare) * 100) / 100 : "significantly behind by ₹" + Math.round((equalShare - paid) * 100) / 100}. Consider settling some expenses.`;
+      explanation = `${m.name} is ${paid > fairShare ? "significantly ahead by ₹" + Math.round((paid - fairShare) * 100) / 100 : "significantly behind by ₹" + Math.round((fairShare - paid) * 100) / 100}. Consider settling some expenses.`;
     }
 
     return {
@@ -202,8 +234,8 @@ export function calculateFairnessScore(members, expenses) {
       emoji: m.emoji,
       score,
       paid: Math.round(paid * 100) / 100,
-      fair_share: Math.round(equalShare * 100) / 100,
-      difference: Math.round((paid - equalShare) * 100) / 100,
+      fair_share: Math.round(fairShare * 100) / 100,
+      difference: Math.round((paid - fairShare) * 100) / 100,
       status,
       explanation,
     };
@@ -216,8 +248,7 @@ export function calculateFairnessScore(members, expenses) {
   return {
     scores,
     group_score: groupScore,
-    total_expenses: totalExpenses,
-    equal_share: Math.round(equalShare * 100) / 100,
+    total_expenses: totalExpenses
   };
 }
 
