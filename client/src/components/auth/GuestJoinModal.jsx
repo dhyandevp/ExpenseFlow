@@ -53,7 +53,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       
       // Sign into Firebase with the custom token
       const auth = getAuth(app);
-      await signInWithCustomToken(auth, data.token);
+      await signInWithCustomToken(auth, data.firebaseToken);
       
       onClose(); // Successfully joined, close modal. App.jsx router handles redirect.
       
