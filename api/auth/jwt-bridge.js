@@ -1,10 +1,9 @@
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
 import { getFirestore } from 'firebase-admin/firestore';
 import { verifyToken } from '@clerk/clerk-sdk-node';
 import crypto from 'crypto';
 
-// Initialize Firebase Admin
+// Initialize Firebase Admin (Only needed for Firestore)
 function initFirebase() {
   if (getApps().length === 0) {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
@@ -31,7 +30,33 @@ function safeCompare(a, b) {
   return crypto.timingSafeEqual(Buffer.from(a), Buffer.from(b));
 }
 
-async function handler(req, res) {
+// Generate Firebase Custom Token without requiring firebase-admin/auth which causes Vercel bundle issues
+function createFirebaseCustomToken(uid, claims = {}) {
+  const sa = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8'));
+  const header = { alg: 'RS256', typ: 'JWT' };
+  const iat = Math.floor(Date.now() / 1000);
+  const payload = {
+    iss: sa.client_email,
+    sub: sa.client_email,
+    aud: 'https://identitytoolkit.googleapis.com/google.identity.identitytoolkit.v1.IdentityToolkit',
+    iat: iat,
+    exp: iat + 3600,
+    uid: uid,
+    claims: claims
+  };
+
+  const b64url = str => Buffer.from(str).toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  const encodedHeader = b64url(JSON.stringify(header));
+  const encodedPayload = b64url(JSON.stringify(payload));
+
+  const sign = crypto.createSign('RSA-SHA256');
+  sign.update(encodedHeader + '.' + encodedPayload);
+  const signature = sign.sign(sa.private_key, 'base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+
+  return encodedHeader + '.' + encodedPayload + '.' + signature;
+}
+
+export default async function handler(req, res) {
   if (req.method === 'OPTIONS') {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
@@ -45,7 +70,6 @@ async function handler(req, res) {
   try {
     initFirebase();
     const db = getFirestore();
-    const auth = getAuth();
     const ip = req.headers['x-forwarded-for'] || req.headers['client-ip'] || 'unknown-ip';
 
     // Mode A: Authenticated user (Clerk)
@@ -58,8 +82,8 @@ async function handler(req, res) {
         });
         const clerkUserId = payload.sub;
 
-        // Generate Firebase Custom Token
-        const firebaseToken = await auth.createCustomToken(clerkUserId, { mode: 'clerk' });
+        // Generate Firebase Custom Token manually
+        const firebaseToken = createFirebaseCustomToken(clerkUserId, { mode: 'clerk' });
         
         Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
         return res.status(200).json({ firebaseToken });
@@ -151,9 +175,9 @@ async function handler(req, res) {
       // Success! Reset failures
       await rateLimitRef.set({ attempts, consecutiveFailures: 0, blockUntil: 0 });
 
-      // Create Custom Token for Guest
+      // Create Custom Token for Guest manually
       const guestUid = 'guest_' + crypto.randomUUID().replace(/-/g, '');
-      const firebaseToken = await auth.createCustomToken(guestUid, { 
+      const firebaseToken = createFirebaseCustomToken(guestUid, { 
         guestGroupId: groupId, 
         mode: 'guest' 
       });
@@ -174,5 +198,3 @@ async function handler(req, res) {
     return res.status(500).json({ error: 'Internal server error', details: String(error), stack: error.stack });
   }
 }
-
-export default handler;
