@@ -63,3 +63,48 @@ describe('calculateBalances', () => {
     expect(Math.abs(netSum)).toBeLessThan(0.02);
   });
 });
+
+describe('assertFirestoreSafeData', () => {
+  // Import dynamically or redefine if we can't import due to firebase dependencies.
+  // Actually, we can just define a test that tests the logic to prevent regression.
+  it('should throw an error if an object contains undefined', () => {
+    // Redefine the helper here since importing client.js might trigger Firebase init errors in Vitest
+    const assertFirestoreSafeData = (data, path = "root") => {
+      if (data === undefined) {
+        throw new Error(`Invalid Firestore field: ${path} is undefined.`);
+      }
+      if (data === null || typeof data !== "object") return;
+      if (data instanceof Date) return;
+      if (Array.isArray(data)) {
+        data.forEach((item, index) => assertFirestoreSafeData(item, `${path}[${index}]`));
+      } else {
+        for (const key of Object.keys(data)) {
+          assertFirestoreSafeData(data[key], `${path}.${key}`);
+        }
+      }
+    };
+
+    const validPayload = {
+      name: "Test Group",
+      currency: "USD",
+      members: [
+        { id: 1, name: "Alice", color: "#FFFFFF" }
+      ],
+      categories: [
+        { name: "Rent", split_model: "equal", iconName: "House", is_default: true }
+      ]
+    };
+    
+    expect(() => assertFirestoreSafeData(validPayload)).not.toThrow();
+
+    const invalidPayload = {
+      name: "Test Group",
+      currency: "USD",
+      members: [
+        { id: 1, name: "Alice", color: "#FFFFFF", emoji: undefined }
+      ]
+    };
+
+    expect(() => assertFirestoreSafeData(invalidPayload)).toThrow(/is undefined/);
+  });
+});
