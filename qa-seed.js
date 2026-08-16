@@ -5,7 +5,7 @@ import { getAuth } from 'firebase-admin/auth';
 process.env.FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
 process.env.FIREBASE_AUTH_EMULATOR_HOST = '127.0.0.1:9099';
 
-const app = initializeApp({ projectId: 'expenseflow-expenstracker' });
+const app = initializeApp({ projectId: process.env.VITE_FIREBASE_PROJECT_ID || 'demo-project' });
 const db = getFirestore(app);
 const auth = getAuth(app);
 
