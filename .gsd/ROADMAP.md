@@ -1,442 +1,383 @@
 # ROADMAP.md
 
-> **Current Milestone**: v1.0 — Full ExpenseFlow Rebuild
-> **Goal**: Transform BalanceBoard into ExpenseFlow with a fully serverless architecture, modern auth, mobile-first UI, receipt uploads via Cloudinary, SEO, unit tests, and a clean git history.
+> **Current Milestone**: v2.0 — Production Cleanup & Professional UX Optimization
+> **Goal**: Transform ExpenseFlow from a cluttered, inconsistent MVP into a clean, professional, production-ready financial SaaS application. Audit → Remove → Simplify → Standardize → Repair → Verify.
 
 ## Must-Haves
-- [ ] Complete brand rename from BalanceBoard to ExpenseFlow
-- [ ] Firebase Firestore migration replacing SQLite + Express
-- [ ] Firestore Security Rules (strict, tested)
-- [ ] Balance trigger Netlify Function (denormalized currentBalances)
-- [ ] SQLite → Firestore one-time migration script
-- [ ] Clerk hybrid authentication (authenticated + guest with PIN)
-- [ ] Cloudinary receipt image uploads replacing Firebase Storage
-- [ ] Mobile-first liquid glass UI redesign
-- [ ] Full SEO (meta tags, sitemap, robots.txt, PWA manifest, og:image, 404 page)
-- [ ] Vitest unit tests for all financial math logic
-- [ ] Git history cleanup and credential security
-- [ ] Legal pages (Terms, Privacy, Contact)
+- [ ] Complete architecture audit and product surface map
+- [ ] Route map with all pages classified (existing / missing / broken / dead)
+- [ ] Authentication lifecycle verified end-to-end (sign in → profile → home → group → logout → sign in again)
+- [ ] Professional post-login ExpenseFlow Home with group selection, create, and join
+- [ ] Clean global navigation (sidebar + mobile bottom nav) with consistent behavior
+- [ ] Focused group Dashboard answering "How are we doing financially?"
+- [ ] Clean Expenses page with compact list, clear expense form, and proper states
+- [ ] Understandable Scenario Planner clearly separating real from hypothetical data
+- [ ] Professional Fairness Report with clean print output
+- [ ] Organized Settings with danger zone separation
+- [ ] Standardized component library (Button, Card, Input, Modal, EmptyState, ErrorState, Skeleton)
+- [ ] Consistent icon system using Lucide only — no emoji clutter
+- [ ] Responsive design verified at 390px, 768px, 1280px, 1440px
+- [ ] Accessibility fixes (keyboard nav, focus states, form labels, heading hierarchy, contrast)
+- [ ] Dead code removal (unused components, debug scripts, test files in API, obsolete CSS)
+- [ ] Playwright production QA against https://expenseflow.site
+- [ ] All regressions fixed after cleanup
+- [ ] Production build passes, unit tests pass, no unexpected console errors
 
 ## Phases
 
-### Phase 1: Git Cleanup & Brand Rename
-**Status**: ✅ Complete
-**Objective**: Secure the repository by cleaning exposed credentials from git history, then rename every brand reference from BalanceBoard to ExpenseFlow. At the end, the app builds and runs as "ExpenseFlow" with no leaked secrets in the commit log.
+### Phase 1: Architecture & UI Audit
+**Status**: ⬜ Not Started
+**Objective**: Deep-inspect the running application and repository to understand every route, component, hook, API call, and UI primitive. Create a comprehensive PRODUCT_SURFACE_AUDIT.md documenting what exists, what's broken, what's duplicated, and what's dead. Trust actual code over documentation.
 
-**Tasks** (ordered):
-1. Rotate the live Clerk secret key immediately in the Clerk dashboard (Prompt 6 — Step 1)
-2. Add `server/.env` to `.gitignore` if not already there (Prompt 6 — Step 2)
-3. Perform git history cleanup — either fresh `git init` or `git-filter-repo` depending on commit count (Prompt 6 — Steps 3–5)
-4. Add a pre-commit hook to block `.env` files from being committed (Prompt 6 — Step 6)
-5. Create `.env.example` with placeholder values and commit it (Prompt 6 — implied)
-6. Replace every occurrence of "BalanceBoard" / "balanceboard" / "balance-board" / "balance_board" with the correct ExpenseFlow case variant across the entire codebase (Prompt 1)
-7. Update HTML `<title>` tags, meta descriptions, og:title, og:description tags (Prompt 1)
-8. Update README.md with the new project name (Prompt 1)
-9. Update `package.json` "name" field in both `/server` and `/client` (Prompt 1)
-10. Update `render.yaml` service name (Prompt 1)
-11. Update `netlify.toml` site name references (Prompt 1)
-12. Update the database filename from "balanceboard.db" to "expenseflow.db" in `db.js` (Prompt 1)
-13. Output a complete list of every file modified with the specific line(s) changed (Prompt 1)
-14. Verify app builds and runs with the new name
+**Tasks**:
+- [ ] Inspect all routes in App.jsx and map actual navigation flow
+- [ ] Catalog every page component with purpose, size, and dependencies
+- [ ] Catalog every shared component with usage count
+- [ ] Catalog every hook with usage count
+- [ ] Identify dead/debug files at project root (fix_*.mjs, test_*.mjs, qa-*.cjs, etc.)
+- [ ] Identify dead test files in api/ (test1.js–test4.js)
+- [ ] Audit CSS design tokens and utility classes for consistency
+- [ ] Document all Firestore queries and their locations
+- [ ] Check for console errors, broken imports, unused dependencies
+
+**Verification**:
+- [ ] PRODUCT_SURFACE_AUDIT.md created with full inventory
 
 ---
 
-### Phase 2: Firebase Firestore Migration
-**Status**: ✅ Complete
-**Objective**: Replace SQLite + Express with Firestore as the data layer. At the end, all data is stored in Firestore, balances are calculated dynamically on the frontend (Ponytail Ultra), and the app runs fully serverless without Netlify Functions.
+### Phase 2: Route & User Flow Mapping
+**Status**: ⬜ Not Started
+**Objective**: Map every route to its purpose, classify pages (public / authenticated / group-scoped), and identify the complete user journey from visitor → sign in → profile → home → group → usage → logout → sign in again.
 
-**Tasks** (ordered):
-1. Install `firebase` in client and `firebase-admin` in netlify/functions (Prompt 2)
-2. Create `firebase.js` config file in `client/src/` with offline persistence via `enableIndexedDbPersistence` (Prompt 2)
-3. Implement the Firestore collection structure: groups, expenses, members, categories, settlements, fairnessSnapshots (Prompt 2)
-4. Move server-side math (greedy debt simplification, fairness score) to `client/src/utils/` as pure functions (Prompt 2)
-5. Rewrite each API client call in `client/src/api/client.js` to use Firestore SDK directly (Prompt 2)
-6. Create Netlify Function: `balance-trigger.js` — recalculates currentBalances, settlementSuggestions, and fairnessScores on expense writes; uses Firebase Admin SDK with base64-encoded service account (Prompts 2, 9, 6)
-7. Create Netlify Function: `export-csv.js` — accepts groupId + date range, returns CSV (Prompt 2)
-8. Create Netlify Function: `export-pdf.js` — generates PDF fairness report (Prompt 2)
-9. Store `FIREBASE_SERVICE_ACCOUNT_B64` in Netlify environment variables; decode in functions with `Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64')` (Prompt 6)
-10. Update `netlify.toml` to point functions directory to `/netlify/functions` (Prompt 2)
-11. Write the SQLite → Firestore one-time migration script in `scripts/` directory; use batched writes of 500; preserve SQLite integer IDs as strings; run balance calculation after migration; do verification pass; add to `.netlifyignore` (Prompt 11)
-12. Run the migration script locally to seed Firestore
-13. Verify app builds and runs against Firestore (dashboard reads single group document)
+**Tasks**:
+- [ ] Create route classification table (public, global auth, group-scoped)
+- [ ] Map the primary user lifecycle flow
+- [ ] Identify missing pages (e.g., dedicated sign-up, sign-in pages if needed)
+- [ ] Identify unreachable or orphaned routes
+- [ ] Identify broken navigation links between pages
+- [ ] Document group context flow (how currentGroup gets set/cleared)
+- [ ] Document auth state flow (Clerk → JWT bridge → Firebase → Firestore)
+
+**Verification**:
+- [ ] Route map document created
+- [ ] Primary user lifecycle validated against actual code
 
 ---
 
-### Phase 3: Firestore Security Rules
-**Status**: ✅ Complete
-**Objective**: Write and test the complete `firestore.rules` file enforcing all authorization at the database level. At the end, every access pattern is locked down and verified with Firebase Emulator tests (Ponytail Ultra applied to remove rate limiting and service account restrictions).
+### Phase 3: Authentication & Session Lifecycle
+**Status**: ⬜ Not Started
+**Objective**: Verify and fix the complete auth lifecycle: sign in, Google auth, session restoration, profile setup redirect, protected route guards, logout, and re-login. Ensure every auth state renders useful UI (loading, error, no-profile, authenticated).
+**Depends on**: Phase 2
 
-**Tasks** (ordered):
-1. Write helper functions: `isClerkMember()`, `isGuestMember()`, `isGroupMember()` (Prompt 10)
-2. Write rules: authenticated user can read a group if their userId is in members subcollection (Prompt 10)
-3. Write rules: guest token can only read the group matching its `guestGroupId` claim (Prompt 10)
-4. Write rules: only Clerk-authenticated users can create new groups; guests cannot (Prompt 10)
-5. Write rules: expense read/write restricted to group members (Prompt 10)
-6. Write rules: `currentBalances`, `settlementSuggestions`, `fairnessScores` fields writable only by service account; readable by group members (Prompt 10)
-7. Write rules: member document — users can read all members in their group; can only write their own (Prompt 10)
-8. Write rules: settlement documents — creatable by group members; immutable after creation (Prompt 10)
-9. Write rules: category documents — readable by group members; writable only by Clerk-authenticated members (Prompt 10)
-10. Rate limit: enforce 10 reads per 15 minutes on group-by-code lookups via Firestore counter document with TTL (Prompt 2)
-11. Write complete Firebase Emulator test cases covering allowed and denied cases for every collection (Prompt 10)
-12. Run emulator tests and verify all pass
+**Tasks**:
+- [ ] Verify Clerk sign-in flow works end-to-end
+- [ ] Verify Google OAuth redirect and SSO callback
+- [ ] Verify JWT bridge (Clerk → Firebase custom token)
+- [ ] Verify session restoration on page refresh at every protected route
+- [ ] Verify profile setup redirect for new users without profiles
+- [ ] Verify logout clears all state (Clerk, Firebase, localStorage)
+- [ ] Verify re-login after logout works cleanly
+- [ ] Fix any auth state that renders blank/null
+- [ ] Ensure loading, error, and no-profile states show useful UI
+- [ ] Verify guest auth (code + PIN) flow still works
 
----
-
-### Phase 4: Clerk Hybrid Authentication
-**Status**: ✅ Complete
-**Objective**: Implement Clerk-based authentication with both authenticated and guest access modes, wired to Firebase custom tokens via the jwt-bridge function. At the end, users can sign in with Clerk or join with a code+PIN, and Firestore Security Rules enforce scoped access.
-
-**Tasks** (ordered):
-1. Install `@clerk/clerk-react` in client (Prompt 3)
-2. Wrap `App.jsx` in `<ClerkProvider publishableKey={...}>` (Prompt 3)
-3. Create Netlify Function: `jwt-bridge.js` — exchanges Clerk session token for Firebase custom token; for guests: verifies code+PIN against Firestore, issues scoped token with `{ guestGroupId, mode: "guest" }` claim, 1-hour expiry (Prompts 2, 3)
-4. Implement jwt-bridge rate limiting: 10 attempts per 15 minutes per IP; block IP for 1 hour after 3 consecutive PIN failures (Prompt 3)
-5. Create Netlify Function: `clerk-webhook.js` — handles `user.created` from Clerk, seeds Firestore user document (Prompt 2)
-6. Create `<SignInModal>` using Clerk's `<SignIn />` component with modal appearance (Prompt 3)
-7. Create `PINVerification.jsx` component: 6-digit masked input, `inputMode="numeric"`, auto-advance, show/hide toggle, shake animation on wrong PIN, Aurora Forest tokens (Prompt 5 — Verification Flow)
-8. Create guest join modal: group code input (6 chars) + PIN input + "Join group" button (Prompt 3)
-9. After auth, call `firebase.auth().signInWithCustomToken()` (Prompt 3)
-10. Create `useAuth()` custom hook returning `{ user, authMode, groupAccess, signOut, isLoaded }` (Prompt 3)
-11. Store auth mode (`clerk | guest`) in React Context (Prompt 3)
-12. Implement UI flows: Landing page with two CTAs — "Sign in with Clerk" and "Join with a code" (Prompt 3)
-13. After any auth, redirect to `/dashboard` (Prompt 3)
-14. Group setup page only available to Clerk-authenticated users (Prompt 3)
-15. Settings page shows auth mode badge: "Signed in" (green) or "Guest access" (grey) with upgrade option (Prompt 3)
-16. Handle error states: wrong PIN, code not found, locked out, network error (Prompt 5 — Verification Flow)
-17. Verify Clerk + guest auth both work end-to-end against Firestore Security Rules
+**Verification**:
+- [ ] All auth flows tested via Playwright MCP on production
+- [ ] No blank screens during any auth transition
 
 ---
 
-### Phase 5: Cloudinary Receipt Uploads
-**Status**: ✅ Complete
-**Objective**: Replace Firebase Storage with Cloudinary for all receipt image uploads. At the end, receipts upload directly to Cloudinary with automatic WebP compression, and the Firestore expense document stores a permanent Cloudinary URL.
+### Phase 4: Post-Login ExpenseFlow Home
+**Status**: ⬜ Not Started
+**Objective**: Refine GroupsHome.jsx to be a clean, professional authenticated home screen. Show greeting, existing groups, and get-started actions. Never show a blank dashboard, never auto-open an arbitrary group, never expose technical IDs prominently.
+**Depends on**: Phase 3
 
-**Tasks** (ordered):
-1. Set up Cloudinary upload preset: `your_upload_preset_here`, unsigned, folder receipts/, allowed formats jpg/png/webp, max 5 MB, incoming transformations (format: webp, quality: auto, width: 1600 crop: limit) (Prompt 8)
-2. Add `VITE_CLOUDINARY_CLOUD_NAME` and `VITE_CLOUDINARY_UPLOAD_PRESET` to `client/.env` and Netlify environment variables (Prompt 8)
-3. `npm uninstall browser-image-compression` in client (Prompt 8)
-4. Remove `firebase/storage` import from `firebase.js` (Prompt 8)
-5. Remove `getStorage`, `uploadBytesResumable`, `getDownloadURL` imports everywhere (Prompt 8)
-6. Delete `storage.rules` file (Prompt 8)
-7. Create `client/src/hooks/useReceiptUpload.js` with XHR-based upload, progress tracking, file type/size validation (Prompt 8)
-8. Update `ReceiptUpload.jsx` / `ExpenseForm.jsx` to use `useReceiptUpload()` hook (Prompt 8)
-9. Rename `receiptPath` field to `receiptUrl` in Firestore expense document schema; update all reads in UI (Prompt 8)
-10. Update receipt display to use Cloudinary URL directly in `<img>` tags with `loading="lazy"` (Prompt 8)
-11. Implement thumbnail URL transformation for expense list view (`/upload/w_200,f_auto,q_auto/`) (Prompt 8)
-12. Run the Prompt 8 checklist: test 4 MB JPEG → WebP, test SVG rejection, verify `receiptUrl` in Firestore, verify `<img>` renders (Prompt 8)
+**Tasks**:
+- [ ] Verify greeting section shows correct time-of-day and user name
+- [ ] Clean group cards to show: name (visual priority), member count, currency, "Open group"
+- [ ] Remove or de-emphasize group codes from card display
+- [ ] Remove decorative background blobs if they add visual noise without value
+- [ ] Ensure zero-group state shows clear CTA (Create / Join)
+- [ ] Ensure loading state shows skeleton UI
+- [ ] Ensure error state shows retry option
+- [ ] Verify Create Group button navigates to /setup
+- [ ] Verify Join Group inline form works correctly
 
----
-
-### Phase 6: Mobile-First UI Redesign (Liquid Glass Theme)
-**Status**: ✅ Complete
-**Objective**: Redesign the entire UI as mobile-first with liquid glass aesthetic using Stitch MCP and Motion AI, preserving the Aurora Forest color palette. At the end, the app is fully responsive at 390px and 768px breakpoints with performant glass effects and animations.
-
-**Tasks** (ordered):
-1. Run `npx stitch generate --from tailwind.config.js --output src/tokens/` to generate design tokens (Prompt 4)
-2. Import stitch tokens in `index.css` as CSS custom properties (Prompt 4)
-3. Define liquid glass CSS: `backdrop-filter: blur()` only on bottom nav, sticky header, modal overlays — never on full-page backgrounds or card grids (Prompt 4)
-4. Add performance fallback: `@media (prefers-reduced-transparency: reduce)` disables all blur (Prompt 4)
-5. Glass tint: `rgba(235, 250, 219, 0.72)`; glass border: `1px solid rgba(194, 203, 201, 0.4)` (Prompt 4)
-6. Run `npx motion-ai` to generate animation presets (Prompt 4)
-7. Implement motion animations: page transitions (slide-up/fade-out 150ms), card hover (desktop only), FAB spring scale, balance count-up (800ms), fairness gauge arc draw (600ms), sheet slide-up (350ms spring) (Prompt 4)
-8. Redesign `AppLayout.jsx` — glass bottom navigation bar (Home · Add · Groups · Reports) + glass sticky top header (Prompt 4)
-9. Redesign `Dashboard.jsx` — mobile-optimized card grid + swipeable chart tabs (Prompt 4)
-10. Redesign `ExpenseLogger.jsx` — bottom sheet instead of page transition (Prompt 4)
-11. Redesign `Landing.jsx` — hero section with subtle glass card; two CTAs wired to auth (Prompt 4)
-12. Redesign `GroupSetup.jsx` — wizard step cards (mobile-friendly steps) (Prompt 4)
-13. Redesign `SettlementHistory.jsx` — timeline list view (Prompt 4)
-14. Implement swipe gestures on expense list: swipe-left to delete, swipe-right to edit (Framer Motion drag) (Prompt 4)
-15. Mobile layout targets: FAB bottom-right with --primary color, cards full-width on mobile / 2-column on tablet, dashboard charts horizontal scroll on mobile (Prompt 4)
-16. Verify UI at 390px and 768px; ensure `will-change: transform` only on animated glass elements (Prompt 4)
+**Verification**:
+- [ ] GroupsHome renders correctly with 0, 1, and 3+ groups
+- [ ] No blank states in any scenario
 
 ---
 
-### Phase 7: SEO, Meta Tags, Legal Pages & 404
-**Status**: ✅ Complete
-**Objective**: Implement full SEO infrastructure, legal pages, the 404 page, and PWA manifest. At the end, the site is search-engine ready with proper meta tags, structured data, sitemap, and all legal/utility pages in place.
+### Phase 5: Global Navigation Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Standardize the desktop sidebar and mobile bottom nav + header. Fix inconsistent nav labels, ensure group switching works, verify the FAB and mobile menu. Remove duplicate navigation paths.
+**Depends on**: Phase 4
 
-**Tasks** (ordered):
-1. Add all base meta tags to `client/index.html`: charset, viewport, title, description, keywords, author, theme-color, Open Graph, Twitter Card, canonical, JSON-LD structured data (Prompt 5)
-2. Install `react-helmet-async`; create `useSEO(config)` custom hook in `client/src/utils/seo.js` (Prompt 5)
-3. Add `<HelmetProvider>` to `client/src/App.jsx` (Prompt 5)
-4. Apply `useSEO()` in each page component with unique title, description, canonical (Prompt 5)
-5. Create `/public/sitemap.xml` with all public routes (Prompt 5)
-6. Create `/public/robots.txt` — allow `/`, disallow `/api/`, `/dashboard/`, `/group/` (Prompt 5)
-7. Create `/public/manifest.json` — PWA manifest with name, icons, theme_color, background_color (Prompt 5)
-8. Generate `og-image.png` (1200×630px) — Aurora Forest palette, ExpenseFlow wordmark, tagline, fairness gauge; place in client public directory (Prompt 13)
-9. Create 404 page component at correct path for Netlify; register as catch-all in React Router; Aurora Forest palette; "Go home" and "Join group" actions; `<title>` = "404 — Page Not Found"; noindex meta tag (Prompt 12)
-10. Configure `netlify.toml` to return actual 404 HTTP status code for unmatched routes (Prompt 12)
-11. Create Terms and Conditions page at `/terms` route (Part 2 — Legal)
-12. Create Privacy Policy page at `/privacy` route (Part 2 — Legal)
-13. Create Contact page at `/contact` route (Part 2 — Legal)
-14. Verify: Lighthouse audit, opengraph.xyz preview, unique titles per page, structured data validation, mobile-friendly test (Prompts 5, 13, Part 3)
+**Tasks**:
+- [ ] Audit desktop sidebar nav items vs mobile bottom nav items for consistency
+- [ ] Fix mobile bottom nav label "Groups" pointing to /settings (incorrect mapping)
+- [ ] Ensure AccountMenu works consistently in both desktop sidebar and mobile header
+- [ ] Verify group switcher dropdown works on desktop
+- [ ] Verify "Global Home" link works from mobile menu
+- [ ] Verify mobile FAB (Add Expense) appears on correct pages
+- [ ] Clean up mobile hamburger menu items
+- [ ] Ensure "No Group Selected" state redirects cleanly to /home
 
----
-
-### Phase 8: Vitest Unit Tests
-**Status**: ✅ Complete
-**Objective**: Add comprehensive unit tests for all financial math logic using Vitest. At the end, all balance calculations, fairness scores, recurring logic, CSV safety, and split models are tested and passing.
-
-**Tasks** (ordered):
-1. Install `vitest` and `@vitest/ui` as dev dependencies in client (Prompt 7)
-2. Add `"test": "vitest"` and `"test:ui": "vitest --ui"` to `package.json` scripts (Prompt 7)
-3. Create `client/src/utils/__tests__/balanceMath.test.js` (Prompt 7)
-4. Test `greedySettle()`: 3-member case, 4-member unequal splits (≤ N-1 transactions), all-settled (empty array), single member (Prompt 7)
-5. Test `fairnessScore()`: equal contributions (all 100), one payer (100/0), range [0,100], rounds to integer (Prompt 7)
-6. Test `applyRecurring()`: weekly trigger (7+ days), monthly no-trigger (<30 days), next_run advancement (Prompt 7)
-7. Test `csvSafe()`: values starting with `=` or `+` get `'` prefix, normal strings unchanged, numbers unchanged (Prompt 7)
-8. Test `calculateSplits()`: equal split, custom percentage, rounding (sum equals total) (Prompt 7)
-9. Run `npx vitest run` and verify all tests pass (Prompt 7)
+**Verification**:
+- [ ] Navigation is consistent at 390px and 1280px
+- [ ] Every nav item leads to the correct page
 
 ---
 
-### Phase 9: Final Cleanup & Server Removal
-**Status**: ✅ Complete
-**Objective**: Remove the legacy Express/SQLite server directory and verify the fully serverless app runs end-to-end with no references to the old stack.
+### Phase 6: Dashboard Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Clean the group dashboard to answer "How are we doing financially?" with focused metrics: total spending, balances, fairness, settlements, then trends and breakdown. Remove duplicate cards, meaningless metrics, and decorative noise.
+**Depends on**: Phase 5
 
-**Tasks** (ordered):
-1. Delete the `/server` directory entirely (Prompt 2 — Step 6)
-2. Remove `render.yaml` (no longer deploying to Render)
-3. Remove any remaining references to Express, better-sqlite3, or Render from package.json, README, and config files
-4. Update README.md with final architecture description, setup instructions, and deployment guide
-5. Final end-to-end verification: auth flows, expense CRUD, balance calculation, receipt upload, CSV/PDF export, all pages render, all tests pass
-6. Run the complete Security Testing Checklist from Part 4 of the docs
+**Tasks**:
+- [ ] Audit all 467 lines of Dashboard.jsx for duplicate/unnecessary cards
+- [ ] Prioritize: total spending → balances → fairness → settlement status
+- [ ] Remove giant decorative numbers and repeated information
+- [ ] Ensure charts provide useful information (remove charts that don't)
+- [ ] Ensure all dashboard data loads with proper loading/empty/error states
+- [ ] Verify formatINR/formatCurrency works correctly
+- [ ] Verify settlement history component renders cleanly within dashboard
+- [ ] Verify time filter functionality works
+
+**Verification**:
+- [ ] Dashboard renders correctly with real data
+- [ ] Dashboard renders correctly with zero expenses
+- [ ] No duplicate information visible
 
 ---
 
-### Phase 10: Desktop UI Redesign (Using Stitch MCP & Motion-AI)
-**Status**: ✅ Complete
-**Objective**: Build a Desktop-optimized view utilizing stitch mcp for layout primitives and npx motion-ai for interactions, applying multi-column grid layouts and strict Aurora Forest / Timeless Grey color constraints (no alarmist red).
+### Phase 7: Expenses Page Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Clean the expense page to prioritize: balance → add expense → recent expenses → filters. Each expense shows description, amount, payer, category, date, and receipt indicator. Clean the expense form to use a simple sequential flow.
+**Depends on**: Phase 6
+
+**Tasks**:
+- [ ] Audit ExpenseLogger.jsx (406 lines) for unnecessary complexity
+- [ ] Ensure expense list is compact and scannable
+- [ ] Ensure each expense clearly shows: description, amount, payer, category, date, receipt
+- [ ] Audit ExpenseForm.jsx (317 lines) for UX issues
+- [ ] Ensure form follows: Amount → Paid by → Category → Split → Date → Description → Receipt → Save
+- [ ] Prevent duplicate submission
+- [ ] Prevent invalid values
+- [ ] Ensure clear error states for failed operations
+- [ ] Verify receipt upload integration works (Cloudinary)
+
+**Verification**:
+- [ ] Expense creation works end-to-end
+- [ ] Expense list renders correctly with 0 and 10+ expenses
+- [ ] Form validation prevents invalid submissions
+
+---
+
+### Phase 8: Scenario Planner Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Make the Scenario Planner feel like a focused simulation tool. Clearly distinguish real financial data from hypothetical scenario data.
+**Depends on**: Phase 7
+
+**Tasks**:
+- [ ] Audit ScenarioPlanner.jsx (461 lines) for clarity
+- [ ] Ensure clear visual separation between real data and hypothetical projections
+- [ ] Simplify input flow: Scenario → Inputs → Run → Results
+- [ ] Remove unnecessary decorative elements
+- [ ] Ensure loading/empty/error states exist
+
+**Verification**:
+- [ ] Scenario creation and simulation works
+- [ ] Real vs hypothetical data is visually distinct
+
+---
+
+### Phase 9: Fairness Report Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Clean the report page to follow: Overview → Fairness → Members → Categories → Settlement → Export. Make print output professional. Remove decorative noise.
+**Depends on**: Phase 8
+
+**Tasks**:
+- [ ] Audit FairnessReport.jsx (381 lines) for noise
+- [ ] Ensure structured flow: overview → fairness → members → categories → settlement → export
+- [ ] Verify PDF export works
+- [ ] Verify print layout is professional
+- [ ] Remove decorative gradients or animated elements
+- [ ] Ensure all sections have loading/empty states
+
+**Verification**:
+- [ ] Report renders correctly with real data
+- [ ] PDF export produces clean output
+- [ ] Print view is professional
+
+---
+
+### Phase 10: Settings Cleanup
+**Status**: ⬜ Not Started
+**Objective**: Organize settings into clear sections: Group → Members → Categories → Access & Security → Preferences → Danger Zone. Keep destructive operations clearly separated.
 **Depends on**: Phase 9
 
 **Tasks**:
-- [ ] TBD (run /plan 10 to create)
+- [ ] Audit Settings.jsx (405 lines) for organization
+- [ ] Group sections logically with clear headers
+- [ ] Separate danger zone (delete group, leave group) with visual warning
+- [ ] Verify member management works
+- [ ] Verify category management works (AddCategoryModal.jsx)
+- [ ] Verify group code/PIN display and sharing
+- [ ] Ensure all settings mutations show loading/success/error feedback
 
 **Verification**:
-- TBD
+- [ ] Settings page is organized and readable
+- [ ] Destructive actions require confirmation
+- [ ] All settings operations work end-to-end
 
 ---
 
-### Phase 11: Database Schema & Shared Architecture
-**Status**: ✅ Complete
-**Objective**: Correct the Firestore database schema structure and extract financial math logic into a shared directory for reuse between client and serverless functions.
+### Phase 11: Design System & Component Standardization
+**Status**: ⬜ Not Started
+**Objective**: Standardize the visual language across the app. Audit typography, spacing, radius, shadows, and colors. Replace emoji with Lucide icons. Standardize repeated components (Button, Card, Input, Modal, EmptyState, ErrorState, Skeleton).
 **Depends on**: Phase 10
 
 **Tasks**:
-- [x] Fix client API to query `settlements` subcollection.
-- [x] Fix export functions to query `expenses` subcollection.
-- [x] Standardize expense schema to `paidBy`, `createdAt`, `receiptUrl` in API and Math logic.
-- [x] Standardize frontend components to strictly use new schema fields.
+- [ ] Audit CSS design tokens in index.css for completeness
+- [ ] Standardize typography hierarchy: page title, section title, body, label, helper, financial value
+- [ ] Standardize spacing scale usage
+- [ ] Standardize border-radius (consistent set)
+- [ ] Audit shadows for subtlety
+- [ ] Audit all pages for emoji usage — replace with Lucide icons
+- [ ] Identify genuinely repeated component patterns and extract if not already done
+- [ ] Verify btn-primary, btn-secondary, btn-ghost, card, card-hover, input-field classes are used consistently
+- [ ] Remove any ad-hoc inline styles that should use design tokens
 
 **Verification**:
-- [x] Confirmed unit tests pass with updated schema fields.
-- [x] Codebase successfully grep'd for elimination of legacy fields (`paid_by`, `expense_date`).
+- [ ] No emoji in professional UI context
+- [ ] Consistent visual language across all pages
+- [ ] All buttons, cards, and inputs use standardized classes
 
 ---
 
-### Phase 12: Firestore Security Rules
-**Status**: ✅ Complete
-**Objective**: Implement strict deny-all default security rules with appropriate role-based access control.
+### Phase 12: Responsive Design & Accessibility
+**Status**: ⬜ Not Started
+**Objective**: Test and fix responsive layout at 390px, 768px, 1280px, and 1440px. Fix accessibility: keyboard navigation, focus states, form labels, heading hierarchy, contrast, touch targets.
 **Depends on**: Phase 11
 
 **Tasks**:
-- [ ] TBD (run /plan 12 to create)
+- [ ] Test every page at 390px — fix horizontal scrolling, clipped content, overflow
+- [ ] Test every page at 768px — fix tablet layout issues
+- [ ] Test every page at 1280px and 1440px — fix desktop layout issues
+- [ ] Fix charts that overflow on mobile
+- [ ] Fix modals that break on small screens
+- [ ] Add missing form labels and aria attributes
+- [ ] Verify heading hierarchy (single h1 per page, proper nesting)
+- [ ] Verify focus states on all interactive elements
+- [ ] Verify keyboard navigation through nav and forms
+- [ ] Verify icon-only buttons have aria-labels
+- [ ] Verify touch targets are at least 44x44px
+- [ ] Check color contrast against WCAG AA
 
 **Verification**:
-- TBD
+- [ ] No horizontal scrolling at any breakpoint
+- [ ] All forms are keyboard-navigable
+- [ ] Touch targets meet minimum size
 
 ---
 
-### Phase 13: Netlify Functions Infrastructure & Auth Bridge
-**Status**: ✅ Complete
-**Objective**: Scaffold the Netlify functions directory and implement the JWT token exchange for hybrid authentication.
+### Phase 13: Dead Code & Junk Removal
+**Status**: ⬜ Not Started
+**Objective**: Remove dead components, unused hooks, duplicate files, debug scripts, test stubs in api/, obsolete CSS, unnecessary dependencies. Verify usage before deleting.
 **Depends on**: Phase 12
 
 **Tasks**:
-- [x] Configure Netlify Functions Environment
-- [x] Implement jwt-bridge.js Core Logic
+- [ ] Delete debug scripts from project root: fix_app.mjs, fix_applayout.mjs, fix_guards.mjs, test_blank.mjs, login.mjs, find_icons.cjs, qa-debug.cjs, qa-script.cjs, run_test.cjs, test_prod.cjs, qa-seed.js, seed_prod.js, test_custom_token.js, test_token.js
+- [ ] Delete test stubs from api/: test1.js, test2.js, test3.js, test4.js
+- [ ] Delete debug screenshots from root: after_login.png, blank_screen.png, test_error.png, test_modal.png
+- [ ] Verify and remove unused npm dependencies
+- [ ] Remove any unused imports across all source files
+- [ ] Remove commented-out code blocks
+- [ ] Remove unused CSS classes
+- [ ] Clean up visual-audit/ directory if no longer needed
 
 **Verification**:
-- [x] Verified via npm list and grep "functions" netlify.toml
-- [x] Verified via npx vitest run tests/jwt-bridge.test.js
+- [ ] `npm run build` still succeeds after removals
+- [ ] `npx vitest run` still passes
+- [ ] No import errors
 
 ---
 
-### Phase 14: Netlify Functions Webhooks & Triggers
-**Status**: ✅ Complete
-**Objective**: Implement server-side logic for balancing expenses and syncing Clerk users.
+### Phase 14: Playwright Production QA
+**Status**: ⬜ Not Started
+**Objective**: Use Playwright MCP against https://expenseflow.site to test the complete user lifecycle as a real user. Capture screenshots at 390x844, 1280x720, and 1440x900.
 **Depends on**: Phase 13
 
 **Tasks**:
-- [x] Configure Clerk webhook function (`clerk-webhook.js`)
-- [x] Implement Balance Trigger function (`balance-trigger.js`)
+- [ ] Test: Landing → Sign in → ExpenseFlow Home
+- [ ] Test: Home → Create group → Group Setup → Dashboard
+- [ ] Test: Home → Open existing group → Dashboard
+- [ ] Test: Home → Join group → Code → Dashboard
+- [ ] Test: Dashboard → Expenses → Add expense
+- [ ] Test: Dashboard → Scenarios → Report → Settings
+- [ ] Test: Logout → Landing → Login again → Home
+- [ ] Test: Refresh at every authenticated route
+- [ ] Capture screenshots at 390x844 (mobile)
+- [ ] Capture screenshots at 1280x720 (desktop)
+- [ ] Capture screenshots at 1440x900 (wide desktop)
+- [ ] Inspect console for errors at every page
+- [ ] Inspect network for failed requests
 
 **Verification**:
-- [x] Verified via `vitest run tests/clerk-webhook.test.js` (5 passing tests)
-- [x] Verified via `vitest run tests/balance-trigger.test.js` (4 passing tests)
+- [ ] All user flows complete without errors
+- [ ] No unexpected console errors
+- [ ] No failed network requests
+- [ ] Screenshots captured and reviewed
 
 ---
 
-### Phase 15: Authentication State & Landing Routing
-**Status**: ✅ Complete
-**Objective**: Implement the hybrid authentication hooks and dual call-to-action landing page.
+### Phase 15: Regression Fixes
+**Status**: ⬜ Not Started
+**Objective**: Fix any bugs or regressions found during Playwright QA in Phase 14. Do not suppress errors — fix root causes.
 **Depends on**: Phase 14
 
 **Tasks**:
-- [x] Enforce authMode in useAuth.js
-- [x] Block Guest Group Creation
-- [x] Add Auth Badge to Settings
-- [x] Update Landing Page CTAs
-- [x] Mandatory PIN in Join Flow
+- [ ] Fix any console errors found during QA
+- [ ] Fix any broken navigation discovered
+- [ ] Fix any layout issues at tested breakpoints
+- [ ] Fix any failed network requests
+- [ ] Fix any auth flow issues
+- [ ] Re-run Playwright tests to verify fixes
 
 **Verification**:
-- [x] Visually verified UI updates in Landing, JoinGroup, Settings, and GroupSetup.
+- [ ] All previously failing tests now pass
+- [ ] No new regressions introduced
 
 ---
 
-### Phase 16: PIN Verification Component
-**Status**: ✅ Complete
-**Objective**: Build a secure, accessible, and robust PIN entry component.
+### Phase 16: Final Build, Tests & Deployment Verification
+**Status**: ⬜ Not Started
+**Objective**: Final verification: production build passes, unit tests pass, no console errors, no unresolved network failures. Create PRODUCTION_CLEANUP_REPORT.md documenting everything that was done.
 **Depends on**: Phase 15
 
 **Tasks**:
-- [x] Framer Motion Shake
-- [x] Remove Unauthorized Colors
-- [x] Lockout Logic
-- [x] Accessibility Fixes
+- [ ] Run `npx vitest run` — all tests pass
+- [ ] Run `npx vite build` — production build succeeds
+- [ ] Run final Playwright sweep on production
+- [ ] Verify bundle size hasn't regressed significantly
+- [ ] Create PRODUCTION_CLEANUP_REPORT.md with:
+  - Current state (what was wrong)
+  - Cleanup (what was removed)
+  - UX (what was improved)
+  - Authentication (what was fixed)
+  - Post-login Home (how group selection works)
+  - Core pages (Dashboard, Expenses, Scenarios, Report, Settings)
+  - Responsive (mobile and desktop fixes)
+  - Accessibility (changes made)
+  - Bugs (found and fixed)
+  - Verification (build, tests, Playwright, production QA)
+  - Remaining issues (only real unresolved issues)
 
 **Verification**:
-- [x] Verified `PINVerification.jsx` uses `framer-motion` and `--accent` colors.
-- [x] Verified attempt lockout logic and `aria-live` region.
-
----
-
-### Phase 17: Cloudinary Receipt Uploads
-**Status**: ✅ Complete
-**Objective**: Implement direct-to-Cloudinary receipt uploads and remove Firebase Storage.
-**Depends on**: Phase 16
-
-**Tasks**:
-- [x] Remove Legacy Mock Upload
-
-**Verification**:
-- [x] Verified `useReceiptUpload.js` correctly implements Cloudinary XMLHttpRequest uploads.
-- [x] Verified legacy mocks are removed from `client.js`.
-
----
-
-### Phase 18: Mobile-First UI & Styling Enforcement
-**Status**: ✅ Complete
-**Objective**: Enforce strict mobile layouts, glassmorphism constraints, and palette adherence.
-**Depends on**: Phase 17
-
-**Tasks**:
-- [x] Navigation Components
-- [x] Floating Action Button
-- [x] Mobile Layout & Scrolling
-- [x] Transitions and Colors
-
-**Verification**:
-- [x] Verified bottom nav and FAB exist on mobile layouts.
-- [x] Verified charts/tables fit 390px without horizontal scroll.
-- [x] Verified red colors purged from the UI.
-
----
-
-### Phase 19: Data Export Functions
-**Status**: ✅ Complete
-**Objective**: Implement secure CSV and PDF data export endpoints.
-**Depends on**: Phase 18
-
-**Tasks**:
-- [x] CSV Export and Sanitization
-- [x] PDF Export Function
-
-**Verification**:
-- [x] Confirmed `csvSafe` logic exists and neutralizes formulas.
-- [x] Verified `export-csv.js` returns proper CSV headers.
-- [x] Verified `export-pdf.js` returns base64 encoded PDF.
-
----
-
-### Phase 20: Vitest Unit Testing
-**Status**: ✅ Complete
-**Objective**: Ensure comprehensive unit test coverage for all financial math and utilities.
-**Depends on**: Phase 19
-
-**Tasks**:
-- [x] Vitest Setup and Utility Tests
-- [x] Financial Math and Split Integrity Tests
-
-**Verification**:
-- [x] Confirmed `npm run test:unit` passes.
-- [x] Verified Split Integrity test passes with exact logic.
-
----
-
-### Phase 21: Data Migration Script
-**Status**: ✅ Complete
-**Objective**: Safely migrate legacy SQLite data to the new Firestore structure.
-**Depends on**: Phase 20
-
-**Tasks**:
-- [x] Create migration script (`scripts/migrate.js`).
-- [x] Implement 500-doc batching and proper relational data mapping.
-- [x] Add verification counts and logs.
-- [x] Ignore `scripts/` from Netlify deployment via `.netlifyignore`.
-
-**Verification**:
-- [x] Confirmed `.netlifyignore` contains `scripts/`.
-- [x] Confirmed `migrate.js` contains batched writing logic and validation checks.
-
----
-
-### Phase 22: Legal Pages & Footer
-**Status**: ✅ Complete
-**Objective**: Add required legal documentation and developer links.
-**Depends on**: Phase 21
-
-**Tasks**:
-- [x] Create `Terms.jsx`, `Privacy.jsx`, and `Contact.jsx` components.
-- [x] Explicitly list required developer information in `Contact.jsx`.
-- [x] Add application routes for all three legal pages.
-- [x] Integrate footer links to these pages on the Landing page.
-
-**Verification**:
-- [x] Confirmed the pages exist and are mapped in `App.jsx`.
-- [x] Confirmed the Contact page contains the correct email and developer link.
-
----
-
-### Phase 23: SEO, Meta Tags & 404 Routing
-**Status**: ✅ Complete
-**Objective**: Finalize search engine optimization and routing fallbacks.
-**Depends on**: Phase 22
-
-**Tasks**:
-- [x] Create `<SEO />` component based on `react-helmet-async`.
-- [x] Inject `<SEO />` tags across all 12 page components.
-- [x] Explicitly apply `noindex` tag to the `NotFound.jsx` page.
-- [x] Validate `netlify.toml` forwarding rules.
-- [x] Create/update `sitemap.xml` with all main public pages.
-
-**Verification**:
-- [x] Confirmed pages return correct titles/metatags when rendering.
-- [x] Confirmed 404 page correctly renders `noindex`.
-- [x] Confirmed `sitemap.xml` includes legal pages.
-
----
-
-### Phase 24: Git Security & Cleanup
-**Status**: ✅ Complete
-**Objective**: Clean the repository of legacy references and secure git commits.
-**Depends on**: Phase 23
-
-**Tasks**:
-- [x] Create `.git/hooks/pre-commit` to prevent committing `.env` files.
-- [x] Regenerate lockfiles (`package-lock.json`) to flush out old `balanceboard` strings.
-- [x] Delete `bun.lock` legacy files.
-
-**Verification**:
-- [x] Confirmed pre-commit hook exists and blocks `.env` files.
-- [x] Ran `grep -ri "balanceboard"` and confirmed 0 remaining results in active code/lockfiles.
+- [ ] Production build passes
+- [ ] All unit tests pass
+- [ ] Playwright QA passes
+- [ ] PRODUCTION_CLEANUP_REPORT.md created
+- [ ] Git tagged as v2.0
