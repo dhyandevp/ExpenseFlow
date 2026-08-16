@@ -5,6 +5,8 @@ import PINVerification from "./PINVerification";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { useGroup } from "../../App";
+import { getGroupById } from "../../api/client";
 
 export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [code, setCode] = useState(defaultCode);
@@ -13,6 +15,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { setCurrentGroup } = useGroup();
 
   const handleSubmit = async (finalPin = pin) => {
     if (!code) {
@@ -56,6 +59,10 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       // Sign into Firebase with the custom token
       const auth = getAuth(app);
       await signInWithCustomToken(auth, data.firebaseToken);
+      
+      // Fetch the group data and set it in context
+      const groupRes = await getGroupById(data.groupId);
+      setCurrentGroup(groupRes.data);
       
       onClose(); // Successfully joined, close modal.
       navigate(`/group/${code.trim().toUpperCase()}/dashboard`);
