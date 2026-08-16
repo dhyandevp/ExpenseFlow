@@ -1,0 +1,10 @@
+- generic [ref=f23e6]:
+  - heading "Join Group" [level=1] [ref=f23e7]
+  - generic [ref=f23e8]:
+    - generic [ref=f23e9]: 🔒
+    - heading "PIN Required" [level=2] [ref=f23e10]
+    - paragraph [ref=f23e11]: Group TEST4 requires a PIN to join.
+    - generic [ref=f23e12]:
+      - textbox "Enter PIN" [active] [ref=f23e17]
+      - button "Join Group" [disabled] [ref=f23e18]
+    - button "← Back to Home" [ref=f23e22] [cursor=pointer]

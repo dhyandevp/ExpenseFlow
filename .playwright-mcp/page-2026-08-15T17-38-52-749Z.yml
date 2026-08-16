@@ -1,0 +1,46 @@
+- generic [ref=f20e3]:
+  - navigation [ref=f20e4]:
+    - generic [ref=f20e5]:
+      - img "ExpenseFlow logo" [ref=f20e6]
+      - generic [ref=f20e10]: ExpenseFlow
+    - generic [ref=f20e11]:
+      - button "Sign In" [ref=f20e12] [cursor=pointer]
+      - button "Join with Code" [ref=f20e13] [cursor=pointer]
+  - generic [ref=f20e16]:
+    - generic [ref=f20e17]:
+      - generic [ref=f20e18]: Fair sharing, clear minds.
+      - heading "Stop arguing about who paid what." [level=1] [ref=f20e21]
+      - paragraph [ref=f20e22]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+    - generic [ref=f20e23]:
+      - button "Sign In to Create" [ref=f20e24] [cursor=pointer]
+      - button "Join with Code & PIN" [ref=f20e27] [cursor=pointer]
+  - generic [ref=f20e33]:
+    - heading "Why ExpenseFlow?" [level=2] [ref=f20e34]
+    - generic [ref=f20e35]:
+      - generic [ref=f20e36]:
+        - heading "Long-term fairness" [level=3] [ref=f20e41]
+        - paragraph [ref=f20e42]: Track who pays what over months, not just per bill. See the big picture.
+      - generic [ref=f20e43]:
+        - heading "Category insights" [level=3] [ref=f20e47]
+        - paragraph [ref=f20e48]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+      - generic [ref=f20e49]:
+        - heading "Scenario planning" [level=3] [ref=f20e53]
+        - paragraph [ref=f20e54]: Simulate future expenses before they happen. Plan ahead with confidence.
+  - contentinfo [ref=f20e55]:
+    - generic [ref=f20e56]:
+      - generic [ref=f20e57]:
+        - generic [ref=f20e58]: ExpenseFlow — Fair sharing, clear minds.
+        - paragraph [ref=f20e64]: Made for roommates, couples, and close friends.
+      - generic [ref=f20e65]:
+        - link "Terms of Service" [ref=f20e66] [cursor=pointer]:
+          - /url: /terms
+        - link "Privacy Policy" [ref=f20e67] [cursor=pointer]:
+          - /url: /privacy
+        - link "Contact" [ref=f20e68] [cursor=pointer]:
+          - /url: /contact
+  - button "Join with Code" [ref=f20e69] [cursor=pointer]
+  - navigation [ref=f20e75]:
+    - generic [ref=f20e76]:
+      - button "Home" [ref=f20e77] [cursor=pointer]
+      - button "Features" [ref=f20e82] [cursor=pointer]
+      - button "Sign In" [ref=f20e86] [cursor=pointer]

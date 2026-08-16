@@ -64,4 +64,5 @@ graph TD
 - **Testing:** Vitest for unit testing (`/tests/unit.test.js`), Playwright for E2E and visual tests, `@firebase/rules-unit-testing` for Firestore rules.
 
 ## Technical Debt
-- [ ] No major technical debt markers found (TODOs, FIXMEs, console logs, or deprecated methods). Codebase is remarkably clean.
+- Resolved: Permissive Firestore rules, committed secrets, and test mock branches were removed during the production-ready transformation.
+- Addressed: Code duplication for categories, models, and logos has been extracted to shared utilities.

@@ -1,0 +1,61 @@
+- generic [ref=f4e1]:
+  - generic [ref=f4e5]:
+    - navigation [ref=f4e6]:
+      - generic [ref=f4e7]: ExpenseFlow
+      - generic [ref=f4e13]:
+        - button [ref=f4e14] [cursor=pointer]: Sign In
+        - button [ref=f4e15] [cursor=pointer]: Join with Code
+    - generic [ref=f4e18]:
+      - generic [ref=f4e19]:
+        - generic [ref=f4e20]: Fair sharing, clear minds.
+        - heading [level=1] [ref=f4e23]: Stop arguing about who paid what.
+        - paragraph [ref=f4e24]: ExpenseFlow tracks shared expenses over weeks and months, showing you who's contributing fairly — not just who owes what right now.
+      - generic [ref=f4e25]:
+        - button [ref=f4e26] [cursor=pointer]: Sign In to Create
+        - button [ref=f4e29] [cursor=pointer]: Join with Code & PIN
+    - generic [ref=f4e35]:
+      - heading [level=2] [ref=f4e36]: Why ExpenseFlow?
+      - generic [ref=f4e37]:
+        - generic [ref=f4e38]:
+          - heading [level=3] [ref=f4e43]: Long-term fairness
+          - paragraph [ref=f4e44]: Track who pays what over months, not just per bill. See the big picture.
+        - generic [ref=f4e45]:
+          - heading [level=3] [ref=f4e49]: Category insights
+          - paragraph [ref=f4e50]: See fairness patterns by category. Who's covering groceries? Who pays rent?
+        - generic [ref=f4e51]:
+          - heading [level=3] [ref=f4e55]: Scenario planning
+          - paragraph [ref=f4e56]: Simulate future expenses before they happen. Plan ahead with confidence.
+    - contentinfo [ref=f4e57]:
+      - generic [ref=f4e58]:
+        - generic [ref=f4e59]:
+          - generic [ref=f4e60]: ExpenseFlow — Fair sharing, clear minds.
+          - paragraph [ref=f4e66]: Made for roommates, couples, and close friends.
+        - generic [ref=f4e67]:
+          - link [ref=f4e68] [cursor=pointer]:
+            - /url: /terms
+            - text: Terms of Service
+          - link [ref=f4e69] [cursor=pointer]:
+            - /url: /privacy
+            - text: Privacy Policy
+          - link [ref=f4e70] [cursor=pointer]:
+            - /url: /contact
+            - text: Contact
+  - generic:
+    - generic:
+      - generic:
+        - dialog [active]:
+          - generic [ref=f4e73]:
+            - button "Close" [ref=f4e74] [cursor=pointer]
+            - generic [ref=f4e78]: ExpenseFlow
+            - generic [ref=f4e84]:
+              - button "Sign In" [ref=f4e85] [cursor=pointer]
+              - button "Create Account" [ref=f4e89] [cursor=pointer]
+            - button "Continue with Google" [ref=f4e93] [cursor=pointer]
+            - generic [ref=f4e99]: or continue with email
+            - generic [ref=f4e103]:
+              - textbox "Email Address" [ref=f4e105]
+              - textbox "Password" [ref=f4e107]
+              - button "Sign In" [ref=f4e108] [cursor=pointer]
+            - paragraph [ref=f4e112]:
+              - text: Don't have an account?
+              - button "Sign Up" [ref=f4e113] [cursor=pointer]

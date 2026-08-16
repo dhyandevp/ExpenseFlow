@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
           const { firebaseToken } = await res.json();
           await signInWithCustomToken(auth, firebaseToken);
         } catch (err) {
-          console.error("Clerk->Firebase Auth Bridge failed", err);
+          if (import.meta.env.DEV) console.error("Clerk->Firebase Auth Bridge failed", err);
         }
       } else if (!clerkUser && authMode === 'clerk') {
         // Clerk signed out, so sign out of Firebase
@@ -66,7 +66,7 @@ export function AuthProvider({ children }) {
             setGroupAccess(null);
           }
         } catch (err) {
-          console.error("Failed to parse token claims", err);
+          if (import.meta.env.DEV) console.error("Failed to parse token claims", err);
           setAuthMode(null);
           setGroupAccess(null);
         }

@@ -122,7 +122,9 @@ export function calculateCategoryBreakdown(members, expenses) {
   for (const e of expenses) {
     if (breakdown[e.category]) {
       const payer = e.paidBy;
-      breakdown[e.category].members[payer].amount += e.amount;
+      if (breakdown[e.category].members[payer]) {
+        breakdown[e.category].members[payer].amount += e.amount;
+      }
     }
   }
 

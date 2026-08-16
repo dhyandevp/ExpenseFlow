@@ -5,19 +5,7 @@ import { sheetSlide, modalSpring } from "../utils/motion";
 import { useGroup } from "../App";
 import ReceiptUpload from "./ReceiptUpload";
 
-// Categories from group data - defaults if not loaded yet
-function getGroupCategories(group) {
-  return group?.categories?.length > 0
-    ? group.categories
-    : [
-        { name: "Rent", emoji: "🏠" },
-        { name: "Utilities", emoji: "⚡" },
-        { name: "Groceries", emoji: "🛒" },
-        { name: "Repairs", emoji: "🔧" },
-        { name: "Outings", emoji: "🎉" },
-        { name: "Other", emoji: "📦" },
-      ];
-}
+import { getGroupCategories } from "../utils/groupHelpers";
 
 export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) {
   const { currentGroup } = useGroup();

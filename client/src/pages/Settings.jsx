@@ -20,26 +20,7 @@ import { updateGroup, removeMember, regenerateCode, setGroupPin } from "../api/c
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { useAuth } from "../hooks/useAuth";
 
-function getCategories(group) {
-  return group?.categories?.length > 0
-    ? group.categories
-    : [
-        { name: "Rent", emoji: "🏠" },
-        { name: "Utilities", emoji: "⚡" },
-        { name: "Groceries", emoji: "🛒" },
-        { name: "Repairs", emoji: "🔧" },
-        { name: "Outings", emoji: "🎉" },
-        { name: "Other", emoji: "📦" },
-      ];
-}
-
-const modelOptions = [
-  { value: "equal", label: "Equal split" },
-  { value: "room_size", label: "Room-size weighted" },
-  { value: "income_weighted", label: "Income weighted" },
-  { value: "shared_pot", label: "Shared pot" },
-  { value: "pay_as_you_go", label: "Pay-as-you-go" },
-];
+import { getGroupCategories, MODEL_OPTIONS as modelOptions } from "../utils/groupHelpers";
 
 function SettingsPage() {
   useDocumentTitle("Group Settings");
@@ -54,7 +35,7 @@ function SettingsPage() {
   );
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [showReset, setShowReset] = useState(false);
+
 
   // Security: PIN and code
   const [pinInput, setPinInput] = useState("");
@@ -113,16 +94,7 @@ function SettingsPage() {
     }
   };
 
-  const handleReset = () => {
-    if (
-      !confirm(
-        "Are you sure? This will delete all expenses, splits, and scenarios. This cannot be undone!"
-      )
-    )
-      return;
-    setShowReset(false);
-    alert("Data reset is handled server-side. Contact your group admin.");
-  };
+
 
   const handleRegenerateCode = async () => {
     if (!confirm("Regenerate invite code? The old code will stop working immediately.")) return;
@@ -377,12 +349,11 @@ function SettingsPage() {
       {/* Categories */}
       <div className="card">
         <h2 className="font-heading font-semibold text-text-dark mb-4 flex items-center gap-2">
-          <SettingsIcon size={18} className="text-primary" />
           Categories & Fairness
         </h2>
 
         <div className="space-y-3">
-          {getCategories(currentGroup).map((cat) => {
+          {getGroupCategories(currentGroup).map((cat) => {
             const model = fairnessModels.find((fm) => fm.category === cat.name);
             return (
               <div
@@ -420,31 +391,7 @@ function SettingsPage() {
             Leave Group
           </button>
 
-          {showReset ? (
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowReset(false)}
-                className="btn-secondary flex-1"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleReset}
-                className="btn-primary bg-accent hover:bg-accent/80 flex-1"
-              >
-                <RefreshCw size={16} />
-                Confirm Reset
-              </button>
-            </div>
-          ) : (
-            <button
-              onClick={() => setShowReset(true)}
-              className="btn-secondary border-accent/30 text-accent hover:bg-accent/10 w-full"
-            >
-              <RefreshCw size={16} />
-              Reset All Data
-            </button>
-          )}
+
         </div>
       </div>
     </div>

@@ -1,0 +1,77 @@
+- generic [ref=f24e3]:
+  - generic [ref=f24e4]:
+    - generic [ref=f24e10]:
+      - heading "QA Test Group" [level=2] [ref=f24e11]
+      - paragraph [ref=f24e12]: "#TEST4"
+    - generic [ref=f24e13]:
+      - generic [ref=f24e14]: Guest
+      - button [ref=f24e15] [cursor=pointer]
+  - main [ref=f24e17]:
+    - generic [ref=f24e19]:
+      - generic [ref=f24e21]:
+        - heading "QA Test Group" [level=1] [ref=f24e22]
+        - paragraph [ref=f24e23]: "#TEST4"
+      - button [ref=f24e24] [cursor=pointer]
+      - generic [ref=f24e26]:
+        - button "👩🏻 Alice ++₹533" [ref=f24e27] [cursor=pointer]:
+          - generic [ref=f24e28]: 👩🏻
+          - generic [ref=f24e29]: Alice
+          - generic [ref=f24e30]: ++₹533
+        - button "👨🏻 Bob ++₹133" [ref=f24e31] [cursor=pointer]:
+          - generic [ref=f24e32]: 👨🏻
+          - generic [ref=f24e33]: Bob
+          - generic [ref=f24e34]: ++₹133
+        - button "👱🏻 Charlie -₹667" [ref=f24e35] [cursor=pointer]:
+          - generic [ref=f24e36]: 👱🏻
+          - generic [ref=f24e37]: Charlie
+          - generic [ref=f24e38]: "-₹667"
+      - paragraph [ref=f24e40]:
+        - text: "Settlement suggestion:"
+        - generic [ref=f24e41]: Charlie pays Alice ₹533.33,
+        - generic [ref=f24e42]: Charlie pays Bob ₹133.33
+      - generic [ref=f24e43]:
+        - generic [ref=f24e44]:
+          - heading "Settlement History" [level=3] [ref=f24e45]
+          - button "Record" [ref=f24e52] [cursor=pointer]
+        - paragraph [ref=f24e54]: No settlements recorded yet.
+      - generic [ref=f24e55]:
+        - combobox [ref=f24e56]:
+          - option "All Categories" [selected]
+          - option "Rent"
+          - option "Utilities"
+          - option "Groceries"
+          - option "Repairs"
+          - option "Outings"
+          - option "Other"
+        - combobox [ref=f24e57]:
+          - option "All Members" [selected]
+          - option "👩🏻 Alice"
+          - option "👨🏻 Bob"
+          - option "👱🏻 Charlie"
+      - generic [ref=f24e58]:
+        - generic [ref=f24e64]:
+          - generic [ref=f24e65]: 🛒
+          - generic [ref=f24e68]:
+            - generic [ref=f24e69]:
+              - paragraph [ref=f24e70]: Groceries
+              - paragraph [ref=f24e71]: · 15 Aug
+            - generic [ref=f24e72]: ₹800
+          - button [ref=f24e74] [cursor=pointer]
+        - generic [ref=f24e83]:
+          - generic [ref=f24e84]: 🎉
+          - generic [ref=f24e87]:
+            - generic [ref=f24e88]:
+              - paragraph [ref=f24e89]: Dinner
+              - paragraph [ref=f24e90]: · 15 Aug
+            - generic [ref=f24e91]: ₹1,200
+          - button [ref=f24e93] [cursor=pointer]
+  - navigation [ref=f24e97]:
+    - generic [ref=f24e98]:
+      - link "Home" [ref=f24e99] [cursor=pointer]:
+        - /url: /group/TEST4/dashboard
+      - link "Add" [ref=f24e106] [cursor=pointer]:
+        - /url: /group/TEST4
+      - link "Groups" [ref=f24e110] [cursor=pointer]:
+        - /url: /group/TEST4/settings
+      - link "Reports" [ref=f24e117] [cursor=pointer]:
+        - /url: /group/TEST4/report

@@ -24,12 +24,10 @@ const DEFAULT_CATEGORIES = [
   { name: "Other", emoji: "📦", color: "#C2CBC9", split_model: "equal", is_default: true },
 ];
 
+import { MODEL_OPTIONS } from "../utils/groupHelpers";
+
 const modelOptions = [
-  { value: "equal", label: "Equal split" },
-  { value: "room_size", label: "Room-size weighted" },
-  { value: "income_weighted", label: "Income weighted" },
-  { value: "shared_pot", label: "Shared pot" },
-  { value: "pay_as_you_go", label: "Pay-as-you-go" },
+  ...MODEL_OPTIONS,
   { value: "custom", label: "Custom percentages" },
 ];
 
