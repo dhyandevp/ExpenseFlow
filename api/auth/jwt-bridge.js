@@ -1,7 +1,6 @@
 import admin from 'firebase-admin';
 
-import clerk from '@clerk/clerk-sdk-node';
-const { verifyToken } = clerk;
+import { verifyToken } from '@clerk/clerk-sdk-node';
 import crypto from 'crypto';
 // Initialize Firebase Admin
 function initFirebase() {
