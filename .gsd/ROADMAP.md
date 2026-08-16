@@ -46,7 +46,7 @@
 ---
 
 ### Phase 2: Route & User Flow Mapping
-**Status**: ⬜ Not Started
+**Status**: ✅ Complete
 **Objective**: Map every route to its purpose, classify pages (public / authenticated / group-scoped), and identify the complete user journey from visitor → sign in → profile → home → group → usage → logout → sign in again.
 
 **Tasks**:
@@ -59,8 +59,8 @@
 - [ ] Document auth state flow (Clerk → JWT bridge → Firebase → Firestore)
 
 **Verification**:
-- [ ] Route map document created
-- [ ] Primary user lifecycle validated against actual code
+- [x] Route map document created
+- [x] Primary user lifecycle validated against actual code
 
 ---
 

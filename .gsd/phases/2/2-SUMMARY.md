@@ -1,16 +1,10 @@
-# Plan 2.2 Summary
+# Plan 2.2 Summary: Flow Mapping (Auth & Group Context)
 
-## Completed Work
-- Rewrote `client/src/api/client.js` entirely. Removed all `fetch()` calls to the Express API.
-- Implemented Firebase Firestore SDK for all CRUD operations (`getGroup`, `addExpense`, `getMembers`, etc.).
-- Integrated `balanceMath.js` to dynamically compute fairness scores, breakdowns, and balances on the client.
-- Modified `client/src/pages/FairnessReport.jsx` to export CSV reports locally via `Blob` generation.
-- Deleted `server/routes/balances.js` and `server/routes/reports.js`.
+## Actions Taken
+- Mapped the primary user lifecycle from visitor through authentication, group access, and logout.
+- Analyzed and documented the state flow for `currentGroup` via `GroupContext` and `localStorage`.
+- Analyzed and documented the authentication state flow (Clerk -> JWT Bridge -> Firebase Custom Token -> Firestore Profile).
+- Added these sections to `ROUTE_MAP.md`.
 
-## Deviations & Notes
-- Followed Ponytail Ultra simplification: CSV exports are now securely generated in the browser without serverless functions.
-- The React application is now decoupled from the SQLite/Express math endpoints.
-
-## Verification
-- API client fully relies on Firestore queries.
-- CSV export correctly utilizes `csvSafe` and Blob generation.
+## Result
+User lifecycle and state architecture (Auth & Group Context) fully mapped and documented in `ROUTE_MAP.md`.

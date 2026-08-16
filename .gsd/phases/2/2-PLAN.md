@@ -4,52 +4,45 @@ plan: 2
 wave: 1
 ---
 
-# Plan 2.2: Rewrite API Client & Data Access
+# Plan 2.2: Flow Mapping (Auth & Group Context)
 
 ## Objective
-Refactor the React application to use the Firestore SDK directly instead of fetching from the old Express REST API. Implement CSV exports purely on the frontend.
+Map the primary user lifecycle flow and document how the authentication state and group context are managed across the application.
 
 ## Context
-- .gsd/SPEC.md
-- .gsd/phases/2/RESEARCH.md
-- client/src/api/client.js
-- client/src/pages/FairnessReport.jsx
+- `client/src/App.jsx`
+- `client/src/hooks/useAuth.jsx`
+- `client/src/components/AppLayout.jsx`
 
 ## Tasks
 
 <task type="auto">
-  <name>Rewrite API Client to Firestore</name>
+  <name>Map Primary User Lifecycle Flow</name>
   <files>
-    client/src/api/client.js
+    - ROUTE_MAP.md
   </files>
   <action>
-    - Rewrite `client/src/api/client.js` entirely. Remove all `fetch()` calls to the Express API.
-    - Import `db` from `../firebase.js`.
-    - Implement the identical exported function signatures (`getGroup`, `createGroup`, `addExpense`, `getMembers`, `getExpenses`, `getBalances`, `getFairnessScore`, `getCategoryBreakdown`, etc.).
-    - For `getBalances`, `getFairnessScore`, and `getCategoryBreakdown`, use the functions from `utils/balanceMath.js` locally by first fetching the required expenses and members from Firestore.
-    - Delete `server/routes/balances.js` and `server/routes/reports.js` to prevent accidental usage.
+    - Document the flow from visitor -> sign in -> profile setup -> home -> group -> usage -> logout -> sign in again.
+    - Create a flowchart or sequential step list in `ROUTE_MAP.md` under "User Lifecycle Flow".
   </action>
-  <verify>grep "getDocs" client/src/api/client.js || grep "getDoc" client/src/api/client.js</verify>
-  <done>API client is fully powered by Firestore queries.</done>
+  <verify>cat ROUTE_MAP.md | grep "User Lifecycle Flow"</verify>
+  <done>User Lifecycle Flow section is present in ROUTE_MAP.md.</done>
 </task>
 
 <task type="auto">
-  <name>Client-Side Exports (CSV)</name>
+  <name>Document State Flows</name>
   <files>
-    client/src/pages/FairnessReport.jsx
+    - ROUTE_MAP.md
   </files>
   <action>
-    - Currently CSV is downloaded via an API endpoint.
-    - Update `FairnessReport.jsx` to generate the CSV locally using the already fetched expense data.
-    - Use `csvSafe` logic (prevent formula injection) directly in the frontend.
-    - Create a Blob and trigger a download via `URL.createObjectURL(blob)`.
-    - Apply Ponytail: Add a comment documenting that client-side export avoids a Netlify function.
+    - Document how `currentGroup` gets set (from `GroupsHome`, local storage, `AppLayout` selection) and cleared.
+    - Document the Auth State Flow (Clerk -> JWT bridge -> Firebase custom token -> Firestore) based on `useAuth.jsx`.
+    - Append these documentation sections to `ROUTE_MAP.md` under "State Architecture".
   </action>
-  <verify>grep "createObjectURL" client/src/pages/FairnessReport.jsx || grep "Blob" client/src/pages/FairnessReport.jsx</verify>
-  <done>CSV is generated and downloaded securely on the client side.</done>
+  <verify>cat ROUTE_MAP.md | grep "State Architecture"</verify>
+  <done>State Architecture section is present in ROUTE_MAP.md documenting auth and group context flow.</done>
 </task>
 
 ## Success Criteria
-- [ ] The React app fetches data directly from Firestore.
-- [ ] Balance and report metrics are calculated locally.
-- [ ] CSV reports are generated and downloaded on the client side.
+- [ ] Primary user lifecycle is mapped out.
+- [ ] Group context and Auth state flow are documented in `ROUTE_MAP.md`.

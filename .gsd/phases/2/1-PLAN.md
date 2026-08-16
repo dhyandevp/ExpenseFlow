@@ -4,54 +4,47 @@ plan: 1
 wave: 1
 ---
 
-# Plan 2.1: Firebase Client SDK & Core Utils
+# Plan 2.1: Route Classification & Missing Page Identification
 
 ## Objective
-Set up the Firebase Client SDK with offline persistence and port the backend math logic (balances, greedy settlement, fairness scores) to the frontend as pure functions. This is a Ponytail Ultra simplification to avoid unnecessary Netlify Functions.
+Create a route classification table to classify all pages based on required authentication level, and identify missing, unreachable, or broken routes based on actual code.
 
 ## Context
-- .gsd/SPEC.md
-- .gsd/phases/2/RESEARCH.md
-- server/routes/balances.js
-- server/routes/reports.js
+- `client/src/App.jsx`
+- `PRODUCT_SURFACE_AUDIT.md`
 
 ## Tasks
 
 <task type="auto">
-  <name>Install Firebase SDK</name>
+  <name>Create Route Classification Table</name>
   <files>
-    client/package.json
-    client/src/firebase.js
+    - ROUTE_MAP.md
   </files>
   <action>
-    - Install `firebase` dependency in the client via npm.
-    - Create `client/src/firebase.js` that initializes the Firebase app.
-    - Enable offline IndexedDB persistence for Firestore.
-    - Export `db` (Firestore instance).
-    - Read configuration from `import.meta.env` (VITE_FIREBASE_*).
+    - Create a new file `ROUTE_MAP.md`.
+    - Build a markdown table classifying all routes defined in App.jsx (e.g., Public, Global Auth, Group-Scoped).
+    - Note the component rendered and the access conditions for each route.
   </action>
-  <verify>grep "firebase" client/package.json && test -f client/src/firebase.js</verify>
-  <done>Firebase client SDK is installed and config file exists.</done>
+  <verify>cat ROUTE_MAP.md | grep "Route Classification"</verify>
+  <done>Route Classification table is present in ROUTE_MAP.md.</done>
 </task>
 
 <task type="auto">
-  <name>Port Math Logic to Client</name>
+  <name>Identify Missing and Orphaned Routes</name>
   <files>
-    client/src/utils/balanceMath.js
+    - ROUTE_MAP.md
+    - client/src/pages/
   </files>
   <action>
-    - Extract the math and logic from `server/routes/balances.js` (greedy settlement, net balances).
-    - Extract the math and logic from `server/routes/reports.js` (fairness scores, category breakdown).
-    - Write these as pure, exported JS functions in `client/src/utils/balanceMath.js`.
-    - Functions should take raw arrays of members and expenses as input, and return the computed values (balances, suggestions, scores, insights).
-    - Do NOT import any database logic here, just pure math.
-    - Apply Ponytail: Add a comment documenting that client-side dynamic calculation replaces the need for a backend trigger.
+    - Identify if there are any orphaned page components that are not imported into `App.jsx`.
+    - Identify if dedicated sign-up or sign-in pages are missing (if relying exclusively on Clerk components, note this).
+    - Document any unreachable or broken navigation links discovered in the code.
+    - Append findings to `ROUTE_MAP.md` under a "Routing Issues" section.
   </action>
-  <verify>test -f client/src/utils/balanceMath.js && grep "export" client/src/utils/balanceMath.js</verify>
-  <done>All math logic is extracted into pure, testable client-side functions.</done>
+  <verify>cat ROUTE_MAP.md | grep "Routing Issues"</verify>
+  <done>Routing Issues section is present in ROUTE_MAP.md detailing any gaps or missing pages.</done>
 </task>
 
 ## Success Criteria
-- [ ] Firebase SDK installed in client.
-- [ ] `firebase.js` config created with offline persistence.
-- [ ] `balanceMath.js` created with all necessary pure functions for balances, settlements, and fairness scores.
+- [ ] `ROUTE_MAP.md` contains a classification table for all routes.
+- [ ] Any missing or orphaned routes are documented in `ROUTE_MAP.md`.
