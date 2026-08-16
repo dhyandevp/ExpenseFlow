@@ -1,0 +1,11 @@
+- generic [ref=f17e184]:
+  - generic [ref=f17e185]: 🎉
+  - heading "Group Created!" [level=2] [ref=f17e186]
+  - paragraph [ref=f17e187]: Share this code with your group members so they can join.
+  - generic [ref=f17e188] [cursor=pointer]:
+    - generic [ref=f17e189]: OTAD6V
+    - generic [ref=f17e190]: Tap to copy
+  - paragraph [ref=f17e191]:
+    - text: "Or share this link:"
+    - generic [ref=f17e192]: https://www.expenseflow.site/group/OTAD6V
+  - button "Go to Group →" [ref=f17e193] [cursor=pointer]

@@ -1,0 +1,105 @@
+- generic [ref=f17e5]:
+  - banner [ref=f17e6]:
+    - link [ref=f17e7] [cursor=pointer]:
+      - /url: /
+    - generic [ref=f17e10]:
+      - heading "Create a Group" [level=1] [ref=f17e11]
+      - paragraph [ref=f17e12]: Step 3 of 3
+  - generic [ref=f17e43]:
+    - heading "Fairness per category" [level=2] [ref=f17e44]
+    - paragraph [ref=f17e45]: Choose how each type of expense should be split. Add your own categories too.
+    - generic [ref=f17e46]:
+      - generic [ref=f17e47]:
+        - button [ref=f17e48]
+        - generic [ref=f17e56]: 🏠
+        - generic [ref=f17e58]:
+          - generic [ref=f17e59]: Rent
+          - generic "Default category — name is locked" [ref=f17e60]: Default
+        - combobox [ref=f17e64]:
+          - option "Equal split" [selected]
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go"
+          - option "Custom percentages"
+        - button [ref=f17e65] [cursor=pointer]
+      - generic [ref=f17e68]:
+        - button [ref=f17e69]
+        - generic [ref=f17e77]: ⚡
+        - generic [ref=f17e79]:
+          - generic [ref=f17e80]: Utilities
+          - generic "Default category — name is locked" [ref=f17e81]: Default
+        - combobox [ref=f17e85]:
+          - option "Equal split" [selected]
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go"
+          - option "Custom percentages"
+        - button [ref=f17e86] [cursor=pointer]
+      - generic [ref=f17e89]:
+        - button [ref=f17e90]
+        - generic [ref=f17e98]: 🛒
+        - generic [ref=f17e100]:
+          - generic [ref=f17e101]: Groceries
+          - generic "Default category — name is locked" [ref=f17e102]: Default
+        - combobox [ref=f17e106]:
+          - option "Equal split" [selected]
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go"
+          - option "Custom percentages"
+        - button [ref=f17e107] [cursor=pointer]
+      - generic [ref=f17e110]:
+        - button [ref=f17e111]
+        - generic [ref=f17e119]: 🔧
+        - generic [ref=f17e121]:
+          - generic [ref=f17e122]: Repairs
+          - generic "Default category — name is locked" [ref=f17e123]: Default
+        - combobox [ref=f17e127]:
+          - option "Equal split" [selected]
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go"
+          - option "Custom percentages"
+        - button [ref=f17e128] [cursor=pointer]
+      - generic [ref=f17e131]:
+        - button [ref=f17e132]
+        - generic [ref=f17e140]: 🎉
+        - generic [ref=f17e142]:
+          - generic [ref=f17e143]: Outings
+          - generic "Default category — name is locked" [ref=f17e144]: Default
+        - combobox [ref=f17e148]:
+          - option "Equal split"
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go" [selected]
+          - option "Custom percentages"
+        - button [ref=f17e149] [cursor=pointer]
+      - generic [ref=f17e152]:
+        - button [ref=f17e153]
+        - generic [ref=f17e161]: 📦
+        - generic [ref=f17e163]:
+          - generic [ref=f17e164]: Other
+          - generic "Default category — name is locked" [ref=f17e165]: Default
+        - combobox [ref=f17e169]:
+          - option "Equal split" [selected]
+          - option "Room-size weighted"
+          - option "Income weighted"
+          - option "Shared pot"
+          - option "Pay-as-you-go"
+          - option "Custom percentages"
+        - button [ref=f17e170] [cursor=pointer]
+      - button "Add a Category" [ref=f17e173] [cursor=pointer]
+    - generic [ref=f17e175]:
+      - generic [ref=f17e176]: Settlement threshold
+      - paragraph [ref=f17e177]: Alert when someone is ahead by more than this amount.
+      - generic [ref=f17e178]:
+        - generic [ref=f17e179]: ₹
+        - spinbutton [ref=f17e180]: "500"
+    - generic [ref=f17e181]:
+      - button "Back" [ref=f17e182] [cursor=pointer]
+      - button "Review & Create →" [active] [ref=f17e183] [cursor=pointer]

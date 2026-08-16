@@ -1,0 +1,42 @@
+- generic [ref=f17e194]:
+  - complementary [ref=f17e195]:
+    - generic [ref=f17e202]:
+      - heading "Test Group" [level=2] [ref=f17e203]
+      - paragraph [ref=f17e204]: "#OTAD6V"
+    - navigation [ref=f17e205]:
+      - link "Expenses" [ref=f17e206] [cursor=pointer]:
+        - /url: /group/OTAD6V
+      - link "Dashboard" [ref=f17e209] [cursor=pointer]:
+        - /url: /group/OTAD6V/dashboard
+      - link "Scenarios" [ref=f17e215] [cursor=pointer]:
+        - /url: /group/OTAD6V/scenarios
+      - link "Report" [ref=f17e219] [cursor=pointer]:
+        - /url: /group/OTAD6V/report
+      - link "Settings" [ref=f17e223] [cursor=pointer]:
+        - /url: /group/OTAD6V/settings
+    - button "Leave Group" [ref=f17e227] [cursor=pointer]
+  - main [ref=f17e231]:
+    - generic [ref=f17e233]:
+      - generic [ref=f17e234]:
+        - generic [ref=f17e235]:
+          - heading "Test Group" [level=1] [ref=f17e236]
+          - paragraph [ref=f17e237]: "#OTAD6V"
+        - button "Add Expense" [ref=f17e238] [cursor=pointer]
+      - generic [ref=f17e240]:
+        - generic [ref=f17e241]:
+          - heading "Settlement History" [level=3] [ref=f17e242]
+          - button "Record" [ref=f17e249] [cursor=pointer]
+        - paragraph [ref=f17e251]: No settlements recorded yet.
+      - generic [ref=f17e252]:
+        - combobox [ref=f17e253]:
+          - option "All Categories" [selected]
+          - option "📦 Rent"
+          - option "📦 Utilities"
+          - option "📦 Groceries"
+          - option "📦 Repairs"
+          - option "📦 Outings"
+          - option "📦 Other"
+        - combobox [ref=f17e254]:
+          - option "All Members" [selected]
+          - option "😊 Alice"
+          - option "🦊 Bob"

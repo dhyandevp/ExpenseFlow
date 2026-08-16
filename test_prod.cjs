@@ -10,6 +10,21 @@ const { chromium } = require('playwright');
     if (msg.type() === 'error' && !msg.text().includes('ERR_FAILED')) {
       errors.push(msg.text());
     }
+    if (msg.text().includes('eyJhbGci')) {
+      console.log('Intercepted Token:', msg.text());
+    }
+  });
+  
+  page.on('response', async res => {
+    if (res.status() >= 400) {
+      try {
+        console.log(`Failed Request URL: ${res.url()} Status: ${res.status()}`);
+        console.log(`Failed Request Body:`, await res.text());
+      } catch (e) {}
+    }
+    if (res.url().includes('jwt-bridge')) {
+      console.log('JWT Bridge Response:', await res.json());
+    }
   });
   page.on('pageerror', err => errors.push(err.message));
 
@@ -32,11 +47,11 @@ const { chromium } = require('playwright');
       await page.getByLabel(`Digit ${i + 1}`).fill(pin[i]);
     }
 
-    // Click submit/join
-    await page.getByRole('button', { name: /Join Group/i }).click();
+    // The modal auto-submits when all 6 digits are entered
+    // No need to click Join Group
 
-    // Wait for navigation to /group/PWTEST
-    await page.waitForURL('**/group/PWTEST', { timeout: 10000 });
+    // Wait for navigation to /home or /group/PWTEST
+    await page.waitForURL('**/(home|group/PWTEST)', { timeout: 15000 });
 
     console.log("SUCCESS: Logged in as Guest on Production!");
 

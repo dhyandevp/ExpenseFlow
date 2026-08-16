@@ -1,0 +1,32 @@
+- generic [ref=f17e5]:
+  - banner [ref=f17e6]:
+    - link [ref=f17e7] [cursor=pointer]:
+      - /url: /
+    - generic [ref=f17e10]:
+      - heading "Create a Group" [level=1] [ref=f17e11]
+      - paragraph [ref=f17e12]: Step 2 of 3
+  - generic [ref=f17e18]:
+    - heading "Name your group" [level=2] [ref=f17e19]
+    - paragraph [ref=f17e20]: Something like "Flat 4B", "The Squad", or "Us"
+    - textbox "e.g. Flat 4B" [ref=f17e22]: Test Group
+    - generic [ref=f17e23]:
+      - heading "Members" [level=3] [ref=f17e24]
+      - button "Add" [ref=f17e25] [cursor=pointer]
+    - generic [ref=f17e27]:
+      - generic:
+        - button "😊" [ref=f17e28] [cursor=pointer]
+        - textbox "Member 1" [ref=f17e29]: Alice
+        - generic [ref=f17e30]:
+          - button [ref=f17e31] [cursor=pointer]
+          - button [ref=f17e32] [cursor=pointer]
+          - button [ref=f17e33] [cursor=pointer]
+          - button [ref=f17e34] [cursor=pointer]
+      - generic:
+        - button "🦊" [ref=f17e35] [cursor=pointer]
+        - textbox "Member 2" [ref=f17e36]: Bob
+        - generic [ref=f17e37]:
+          - button [ref=f17e38] [cursor=pointer]
+          - button [ref=f17e39] [cursor=pointer]
+          - button [ref=f17e40] [cursor=pointer]
+          - button [ref=f17e41] [cursor=pointer]
+    - button "Continue →" [active] [ref=f17e42] [cursor=pointer]
