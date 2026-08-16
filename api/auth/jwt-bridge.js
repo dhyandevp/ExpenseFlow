@@ -1,12 +1,11 @@
-import { initializeApp, cert, getApps } from 'firebase-admin/app';
-import { getAuth } from 'firebase-admin/auth';
-import { getFirestore } from 'firebase-admin/firestore';
+import admin from 'firebase-admin';
+
 import clerk from '@clerk/clerk-sdk-node';
 const { verifyToken } = clerk;
 import crypto from 'crypto';
 // Initialize Firebase Admin
 function initFirebase() {
-  if (getApps().length === 0) {
+  if (admin.apps.length === 0) {
     if (!process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
       console.warn('FIREBASE_SERVICE_ACCOUNT_B64 environment variable not set');
     } else {
@@ -14,8 +13,8 @@ function initFirebase() {
         const serviceAccount = JSON.parse(
           Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT_B64, 'base64').toString('utf8')
         );
-        initializeApp({
-          credential: cert(serviceAccount)
+        admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount)
         });
       } catch (err) {
         console.error('Failed to initialize Firebase Admin:', err);
@@ -44,8 +43,8 @@ async function handler(req, res) {
 
   try {
     initFirebase();
-    const db = getFirestore();
-    const auth = getAuth();
+    const db = admin.firestore();
+    const auth = admin.auth();
     const ip = req.headers['x-forwarded-for'] || req.headers['client-ip'] || 'unknown-ip';
 
     // Mode A: Authenticated user (Clerk)
