@@ -1,11 +1,12 @@
 import SEO from "../components/SEO";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Plus, UserPlus, ArrowRight, UsersRound, Loader2, LogOut, User } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useRecentGroups } from "../App";
 import useDocumentTitle from "../hooks/useDocumentTitle";
+import { getGroupById } from "../api/client";
 import GuestJoinModal from "../components/auth/GuestJoinModal";
 import AccountMenu from "../components/AccountMenu";
 
@@ -17,13 +18,49 @@ export function GroupsHome() {
 
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [joinCode, setJoinCode] = useState("");
+  const [populatedGroups, setPopulatedGroups] = useState([]);
+  const [isFetchingGroups, setIsFetchingGroups] = useState(false);
+
+  useEffect(() => {
+    if (!recentGroups || recentGroups.length === 0) {
+      setPopulatedGroups([]);
+      return;
+    }
+    let isMounted = true;
+    const fetchGroups = async () => {
+      setIsFetchingGroups(true);
+      try {
+        const promises = recentGroups.map(async (rg) => {
+          try {
+            const { data } = await getGroupById(rg.id);
+            return data;
+          } catch (err) {
+            console.error(`Failed to fetch group ${rg.id}`, err);
+            return null; // Return null if fetching fails (e.g., group deleted)
+          }
+        });
+        const results = await Promise.all(promises);
+        if (isMounted) {
+          setPopulatedGroups(results.filter(Boolean));
+        }
+      } catch (err) {
+        console.error("Error fetching recent groups", err);
+      } finally {
+        if (isMounted) {
+          setIsFetchingGroups(false);
+        }
+      }
+    };
+    fetchGroups();
+    return () => { isMounted = false; };
+  }, [recentGroups]);
 
   if (!isLoaded) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="flex flex-col items-center gap-4 text-primary">
           <Loader2 size={32} className="animate-spin" />
-          <p className="text-sm font-medium">Loading your groups...</p>
+          <p className="text-sm font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -41,12 +78,7 @@ export function GroupsHome() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative z-0">
-      {/* Background Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute -top-[10%] -left-[10%] w-[50vh] h-[50vh] rounded-full bg-highlight opacity-40 blur-[100px] mix-blend-multiply" />
-        <div className="absolute top-[20%] -right-[10%] w-[40vh] h-[40vh] rounded-full bg-success opacity-15 blur-[120px] mix-blend-multiply" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[60vh] h-[60vh] rounded-full bg-highlight opacity-30 blur-[100px] mix-blend-multiply" />
-      </div>
+
 
       {/* Global Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto w-full">
@@ -94,34 +126,45 @@ export function GroupsHome() {
               <h2 className="text-[10px] font-bold tracking-[0.2em] uppercase text-text-muted mb-4">
                 Your Groups
               </h2>
-              <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {recentGroups.map((group, idx) => (
-                  <motion.button
-                    key={group.code}
-                    initial={{ opacity: 0, scale: 0.95 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.1 + (idx * 0.05), duration: 0.3 }}
-                    onClick={() => navigate(`/join/${group.code}`)}
-                    className="card-hover p-5 text-left group flex flex-col h-full bg-surface border border-border rounded-2xl"
-                  >
-                    <div className="flex-1 mb-4">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4">
-                        <UsersRound size={20} />
+              {isFetchingGroups && populatedGroups.length === 0 ? (
+                <div className="flex items-center justify-center py-8">
+                  <Loader2 size={24} className="animate-spin text-primary opacity-50" />
+                </div>
+              ) : (
+                <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {populatedGroups.map((group, idx) => (
+                    <motion.button
+                      key={group.code}
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.1 + (idx * 0.05), duration: 0.3 }}
+                      onClick={() => navigate(`/join/${group.code}`)}
+                      className="card-hover p-5 text-left group flex flex-col h-full bg-surface border border-border rounded-2xl"
+                    >
+                      <div className="flex-1 mb-4">
+                        <div className="flex items-start justify-between mb-4">
+                          <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+                            <UsersRound size={20} />
+                          </div>
+                          <span className="text-xs font-semibold text-text-muted bg-background px-2 py-1 rounded-md border border-border">
+                            {group.currency || "INR"}
+                          </span>
+                        </div>
+                        <h3 className="font-heading font-bold text-lg text-text-dark truncate">
+                          {group.name}
+                        </h3>
+                        <p className="text-sm text-text-muted mt-1">
+                          {group.members?.length || 0} {(group.members?.length === 1) ? 'member' : 'members'}
+                        </p>
                       </div>
-                      <h3 className="font-heading font-bold text-lg text-text-dark truncate">
-                        {group.name}
-                      </h3>
-                      <p className="text-xs text-text-muted font-mono mt-1">
-                        #{group.code}
-                      </p>
-                    </div>
-                    <div className="flex items-center text-sm font-semibold text-primary group-hover:text-primary-dark transition-colors mt-auto">
-                      Open group
-                      <ArrowRight size={16} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
-                    </div>
-                  </motion.button>
-                ))}
-              </div>
+                      <div className="flex items-center text-sm font-semibold text-primary group-hover:text-primary-dark transition-colors mt-auto">
+                        Open group
+                        <ArrowRight size={16} className="ml-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      </div>
+                    </motion.button>
+                  ))}
+                </div>
+              )}
             </motion.div>
           </section>
         )}

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useGroup } from "../App";
 import { simulateScenario, saveScenario, getScenarios } from "../api/client";
-import { formatINR } from "../utils/formatCurrency";
+import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import { getFairnessColor } from "../../../shared/fairness";
 import {
   BarChart,
@@ -334,6 +334,12 @@ function ScenarioPlanner() {
             className="space-y-4"
           >
             {/* Verdict */}
+            <div className="flex items-center gap-2 mb-2">
+              <span className="bg-primary/20 text-primary px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider">
+                Simulated Projection
+              </span>
+              <span className="text-xs text-text-muted">Not real data</span>
+            </div>
             <div
               className={`card p-4 ${
                 simulation.average_fairness_score >= 90
@@ -346,7 +352,7 @@ function ScenarioPlanner() {
               <p className="text-sm text-text-dark">{simulation.verdict}</p>
               <p className="text-xs text-text-muted mt-1">
                 Fairness score: {simulation.average_fairness_score}/100 · Total:{` `}
-                {formatINR(simulation.total_expenses)}
+                {formatCurrency(simulation.total_expenses, currentGroup?.currency)}
               </p>
             </div>
 
@@ -368,7 +374,7 @@ function ScenarioPlanner() {
                           border: "none",
                           boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                         }}
-                        formatter={(value) => formatINR(value)}
+                        formatter={(value) => formatCurrency(value, currentGroup?.currency)}
                       />
                       <Bar dataKey="balance" name="Net Balance" radius={[4, 4, 0, 0]}>
                         {chartData.map((entry, idx) => (
@@ -414,7 +420,7 @@ function ScenarioPlanner() {
 
       {/* Saved Scenarios */}
       <AnimatePresence>
-        {showSaved && savedScenarios.length > 0 && (
+        {showSaved && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
@@ -424,25 +430,31 @@ function ScenarioPlanner() {
             <h3 className="font-heading font-semibold text-text-dark">
               Saved Scenarios
             </h3>
-            {savedScenarios.map((sc) => (
-              <div key={sc.id} className="card flex items-center justify-between">
-                <div>
-                  <p className="font-medium text-text-dark text-sm">{sc.name}</p>
-                  <p className="text-xs text-text-muted">
-                    {new Date(sc.created_at).toLocaleDateString("en-IN")}
-                  </p>
+            {savedScenarios.length > 0 ? (
+              savedScenarios.map((sc) => (
+                <div key={sc.id} className="card flex items-center justify-between">
+                  <div>
+                    <p className="font-medium text-text-dark text-sm">{sc.name}</p>
+                    <p className="text-xs text-text-muted">
+                      {new Date(sc.created_at).toLocaleDateString("en-IN")}
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => {
+                      setActions(sc.actions || actions);
+                      setShowSaved(false);
+                    }}
+                    className="btn-ghost text-xs"
+                  >
+                    Load
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    setActions(sc.actions || actions);
-                    setShowSaved(false);
-                  }}
-                  className="btn-ghost text-xs"
-                >
-                  Load
-                </button>
+              ))
+            ) : (
+              <div className="p-4 bg-surface rounded-xl text-center border border-border">
+                <p className="text-sm text-text-muted">No saved scenarios yet.</p>
               </div>
-            ))}
+            )}
           </motion.div>
         )}
       </AnimatePresence>

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { useGroup } from "../App";
 import { getReport } from "../api/client";
-import { formatINR } from "../utils/formatCurrency";
+import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import useDocumentTitle from "../hooks/useDocumentTitle";
 import { csvSafe } from "../../../shared/balanceMath";
 import Avatar from "../components/Avatar";
@@ -143,17 +143,17 @@ function FairnessReport() {
   const gridColumns = ["Member", ...categories, "Total"];
 
   return (
-    <div>
+    <div className="print:bg-white print:text-black">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark">
+          <h1 className="font-heading font-bold text-xl md:text-2xl text-text-dark print:text-black">
             Fairness Report
           </h1>
-          <p className="text-sm text-text-muted">
+          <p className="text-sm text-text-muted print:text-gray-600">
             Auto-generated expense summary for {currentGroup.name}
           </p>
         </div>
-        <div className="flex gap-1 bg-highlight/30 rounded-xl p-1">
+        <div className="flex gap-1 bg-highlight/30 rounded-xl p-1 print:hidden">
           {periodOptions.map((opt) => (
             <button
               key={opt.value}
@@ -171,23 +171,23 @@ function FairnessReport() {
       </div>
 
       {actionError && (
-        <div className="mb-4 p-3 bg-[#E8E300]/10 text-[#E8E300] border border-[#E8E300]/20 rounded-xl">
+        <div className="mb-4 p-3 bg-red-100 text-red-700 border border-red-200 rounded-xl print:hidden">
           {actionError}
         </div>
       )}
       {error ? (
-        <div className="flex flex-col items-center justify-center py-12 space-y-4">
+        <div className="flex flex-col items-center justify-center py-12 space-y-4 print:hidden">
           <p className="text-accent">{error}</p>
           <button onClick={loadData} className="btn-primary">Retry</button>
         </div>
       ) : loading ? (
-        <div className="space-y-4">
+        <div className="space-y-4 print:hidden">
           <div className="skeleton h-24 rounded-xl" />
           <div className="skeleton h-64 rounded-xl" />
           <div className="skeleton h-48 rounded-xl" />
         </div>
       ) : !report ? (
-        <div className="text-center py-16">
+        <div className="text-center py-16 print:hidden">
           <div className="flex justify-center mb-4"><ChartColumn size={48} className="text-text-muted" /></div>
           <h3 className="font-heading font-semibold text-lg text-text-muted mb-2">
             No data to report
@@ -202,51 +202,89 @@ function FairnessReport() {
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="card bg-primary/5"
+            className="card print:border-none print:shadow-none print:p-0"
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-surface border border-border flex items-center justify-center flex-shrink-0 print:hidden">
                 <FileText size={20} className="text-primary" />
               </div>
               <div>
-                <h3 className="font-heading font-semibold text-text-dark mb-2">
-                  Summary
+                <h3 className="font-heading font-semibold text-text-dark mb-2 print:text-black">
+                  Overview
                 </h3>
-                <p className="text-sm text-text-dark leading-relaxed">
+                <p className="text-sm text-text-dark leading-relaxed print:text-black">
                   {report.narrative}
                 </p>
               </div>
             </div>
           </motion.div>
 
+          {/* Fairness Overview */}
+          <div className="card print:border-none print:shadow-none print:p-0 print:mt-4">
+            <h3 className="font-heading font-semibold text-text-dark mb-3 flex items-center gap-2 print:text-black">
+              <TrendingUp size={18} className="text-primary print:hidden" />
+              Fairness Overview
+            </h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 print:grid-cols-4">
+              {report.member_summary?.map((member) => {
+                const total = report.total_expenses || 1;
+                const pct = Math.round((member.total_paid / total) * 100);
+                const fairShare = 100 / (report.members?.length || 1);
+                const diff = Math.abs(pct - fairShare);
+                const isFair = diff < 10;
+
+                return (
+                  <div key={member.name} className="p-3 rounded-xl border border-border text-center flex flex-col items-center print:border-gray-300">
+                    <div className="mb-2 print:hidden">
+                      <Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={40} />
+                    </div>
+                    <p className="font-medium text-text-dark text-sm print:text-black">
+                      {member.name}
+                    </p>
+                    <p className="font-mono text-lg font-bold text-text-dark print:text-black">
+                      {pct}%
+                    </p>
+                    <p
+                      className={`text-xs ${
+                        isFair ? "text-success print:text-gray-600" : "text-accent print:text-black"
+                      }`}
+                    >
+                      {isFair ? "Fair" : `${diff > 20 ? "Off" : "Slightly off"}`}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Category × Member Grid */}
           {categories.length > 0 && (
-            <div className="card">
-              <h3 className="font-heading font-semibold text-text-dark mb-3">
+            <div className="card print:border-none print:shadow-none print:p-0 print:mt-4">
+              <h3 className="font-heading font-semibold text-text-dark mb-3 print:text-black">
                 Expense Breakdown
               </h3>
-              <table className="w-full text-sm block md:table">
-                <thead className="hidden md:table-header-group">
-                  <tr className="border-b border-border">
+              <table className="w-full text-sm block md:table print:table">
+                <thead className="hidden md:table-header-group print:table-header-group">
+                  <tr className="border-b border-border print:border-gray-300">
                     {gridColumns.map((col) => (
                       <th
-                        key={col}
-                        className={`text-left py-2 px-3 text-xs font-medium text-text-muted ${
-                          col === "Total" ? "text-right" : ""
-                        }`}
+                         key={col}
+                         className={`text-left py-2 px-3 text-xs font-medium text-text-muted print:text-black ${
+                           col === "Total" ? "text-right" : ""
+                         }`}
                       >
-                        {col}
+                         {col}
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="block md:table-row-group">
+                <tbody className="block md:table-row-group print:table-row-group">
                   {report.member_summary?.map((member) => (
-                    <tr key={member.name} className="block md:table-row mb-4 md:mb-0 border-b border-border/50 md:border-b-0 pb-2 md:pb-0">
-                      <td className="py-2 px-3 block md:table-cell bg-highlight/10 md:bg-transparent mb-1 md:mb-0 rounded md:rounded-none">
+                    <tr key={member.name} className="block md:table-row mb-4 md:mb-0 border-b border-border/50 md:border-b-0 print:border-b-0 pb-2 md:pb-0 print:pb-0">
+                      <td className="py-2 px-3 block md:table-cell print:table-cell bg-highlight/10 md:bg-transparent print:bg-transparent mb-1 md:mb-0 rounded md:rounded-none">
                         <div className="flex items-center gap-2">
-                          <Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={20} />
-                          <span className="font-medium text-text-dark">
+                          <div className="print:hidden"><Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={20} /></div>
+                          <span className="font-medium text-text-dark print:text-black">
                             {member.name}
                           </span>
                         </div>
@@ -258,29 +296,29 @@ function FairnessReport() {
                         ];
                         const amount = memberEntry?.amount || 0;
                         return (
-                          <td key={cat} className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono text-xs border-b border-border/10 md:border-none">
-                            <span className="md:hidden font-sans text-text-muted">{cat}</span>
-                            <span>{amount > 0 ? formatINR(amount) : "-"}</span>
+                          <td key={cat} className="py-1 px-3 md:py-2 print:py-2 flex md:table-cell print:table-cell justify-between items-center font-mono text-xs border-b border-border/10 md:border-none print:border-none">
+                            <span className="md:hidden print:hidden font-sans text-text-muted">{cat}</span>
+                            <span className="print:text-black">{amount > 0 ? formatCurrency(amount, currentGroup?.currency) : "-"}</span>
                           </td>
                         );
                       })}
-                      <td className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono font-semibold md:text-right border-t border-border/50 md:border-none mt-1 md:mt-0 pt-2">
-                        <span className="md:hidden font-sans font-medium">Total</span>
-                        <span>{formatINR(member.total_paid)}</span>
+                      <td className="py-1 px-3 md:py-2 print:py-2 flex md:table-cell print:table-cell justify-between items-center font-mono font-semibold md:text-right print:text-right border-t border-border/50 md:border-none print:border-none mt-1 md:mt-0 pt-2">
+                        <span className="md:hidden print:hidden font-sans font-medium">Total</span>
+                        <span className="print:text-black">{formatCurrency(member.total_paid, currentGroup?.currency)}</span>
                       </td>
                     </tr>
                   ))}
-                  <tr className="bg-highlight/20 font-medium block md:table-row mt-4 md:mt-0 rounded-xl md:rounded-none p-3 md:p-0">
-                    <td className="py-2 px-3 text-text-muted text-xs block md:table-cell text-center md:text-left mb-2 md:mb-0">Group Totals</td>
+                  <tr className="bg-surface font-medium block md:table-row print:table-row mt-4 md:mt-0 rounded-xl md:rounded-none p-3 md:p-0 print:bg-transparent print:border-t print:border-gray-300">
+                    <td className="py-2 px-3 text-text-dark text-xs block md:table-cell print:table-cell text-center md:text-left mb-2 md:mb-0 print:text-black">Group Totals</td>
                     {categories.map((cat) => (
-                      <td key={cat} className="py-1 px-3 md:py-2 flex md:table-cell justify-between items-center font-mono text-xs border-b border-border/20 md:border-none">
-                        <span className="md:hidden font-sans text-text-muted">{cat}</span>
-                        <span>{formatINR(report.category_grid[cat]?.total || 0)}</span>
+                      <td key={cat} className="py-1 px-3 md:py-2 print:py-2 flex md:table-cell print:table-cell justify-between items-center font-mono text-xs border-b border-border/20 md:border-none print:border-none">
+                        <span className="md:hidden print:hidden font-sans text-text-muted">{cat}</span>
+                        <span className="print:text-black">{formatCurrency(report.category_grid[cat]?.total || 0, currentGroup?.currency)}</span>
                       </td>
                     ))}
-                    <td className="py-2 px-3 flex md:table-cell justify-between items-center font-mono md:text-right border-t border-border/30 md:border-none mt-2 md:mt-0 pt-2">
-                      <span className="md:hidden font-sans font-medium">Grand Total</span>
-                      <span>{formatINR(report.total_expenses)}</span>
+                    <td className="py-2 px-3 flex md:table-cell print:table-cell justify-between items-center font-mono md:text-right print:text-right border-t border-border/30 md:border-none print:border-none mt-2 md:mt-0 pt-2 print:text-black">
+                      <span className="md:hidden print:hidden font-sans font-medium">Grand Total</span>
+                      <span>{formatCurrency(report.total_expenses, currentGroup?.currency)}</span>
                     </td>
                   </tr>
                 </tbody>
@@ -288,60 +326,23 @@ function FairnessReport() {
             </div>
           )}
 
-          <div className="card">
-            <h3 className="font-heading font-semibold text-text-dark mb-3 flex items-center gap-2">
-              <TrendingUp size={18} className="text-primary" />
-              Fairness Overview
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              {report.member_summary?.map((member) => {
-                const total = report.total_expenses || 1;
-                const pct = Math.round((member.total_paid / total) * 100);
-                const fairShare = 100 / (report.members?.length || 1);
-                const diff = Math.abs(pct - fairShare);
-                const isFair = diff < 10;
-
-                return (
-                  <div key={member.name} className="p-3 rounded-xl bg-highlight/20 text-center flex flex-col items-center">
-                    <div className="mb-2">
-                      <Avatar member={currentGroup.members?.find((m) => m.name === member.name) || {name: member.name}} size={40} />
-                    </div>
-                    <p className="font-medium text-text-dark text-sm">
-                      {member.name}
-                    </p>
-                    <p className="font-mono text-lg font-bold text-primary">
-                      {pct}%
-                    </p>
-                    <p
-                      className={`text-xs ${
-                        isFair ? "text-success" : "text-accent"
-                      }`}
-                    >
-                      {isFair ? "Fair" : `${diff > 20 ? "Off" : "Slightly off"}`}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
           {/* Settlement plan */}
           {report.settlement_plan?.length > 0 && (
-            <div className="card bg-success/10 border border-success/30">
-              <h3 className="font-heading font-semibold text-text-dark mb-3">
+            <div className="card border border-border print:border-none print:shadow-none print:p-0 print:mt-4">
+              <h3 className="font-heading font-semibold text-text-dark mb-3 print:text-black">
                 Settlement Plan
               </h3>
               <div className="space-y-2">
                 {report.settlement_plan.map((s, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between p-3 rounded-xl bg-white"
+                    className="flex items-center justify-between p-3 rounded-xl bg-surface border border-border print:border-gray-300 print:bg-transparent"
                   >
-                    <span className="text-sm text-text-dark">
+                    <span className="text-sm text-text-dark print:text-black">
                       <strong>{s.from}</strong> pays <strong>{s.to}</strong>
                     </span>
-                    <span className="font-mono font-bold text-success">
-                      {formatINR(s.amount)}
+                    <span className="font-mono font-bold text-text-dark print:text-black">
+                      {formatCurrency(s.amount, currentGroup?.currency)}
                     </span>
                   </div>
                 ))}
@@ -350,7 +351,7 @@ function FairnessReport() {
           )}
 
           {/* Export buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 print:hidden">
             <button onClick={handleExportPDF} className="btn-primary">
               <Download size={16} />
               Download PDF

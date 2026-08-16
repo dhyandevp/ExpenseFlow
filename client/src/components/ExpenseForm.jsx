@@ -22,7 +22,7 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     receiptUrl: null,
   });
   const [errors, setErrors] = useState({});
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   // Lock body scroll when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -60,8 +60,9 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
   const members = currentGroup?.members || [];
   const isEditing = !!initialData;
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
     const amount = parseFloat(form.amount);
     const newErrors = {};
     if (!amount || amount <= 0) newErrors.amount = "Please enter a valid amount.";
@@ -74,20 +75,27 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     }
     setErrors({});
 
-    onSubmit({
-      group_id: currentGroup.id,
-      paidBy: parseInt(form.paidBy),
-      amount,
-      category: form.category,
-      description: form.description,
-      createdAt: form.createdAt,
-      split_type: form.split_type,
-      receiptUrl: form.receiptUrl,
-      split_members:
-        form.split_members.length > 0
-          ? form.split_members.map(Number)
-          : members.map((m) => m.id),
-    });
+    setIsSubmitting(true);
+    try {
+      await onSubmit({
+        group_id: currentGroup.id,
+        paidBy: parseInt(form.paidBy),
+        amount,
+        category: form.category,
+        description: form.description,
+        createdAt: form.createdAt,
+        split_type: form.split_type,
+        receiptUrl: form.receiptUrl,
+        split_members:
+          form.split_members.length > 0
+            ? form.split_members.map(Number)
+            : members.map((m) => m.id),
+      });
+    } catch (err) {
+      setErrors({ submit: err.message || "Failed to save expense." });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const toggleMember = (id) => {
@@ -135,12 +143,12 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </label>
                 <div className="relative">
                   <span className="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted font-medium">
-                    ₹
+                    {currentGroup?.currency || "₹"}
                   </span>
                   <input
                     type="number"
                     step="0.01"
-                    min="0"
+                    min="0.01"
                     required
                     value={form.amount}
                     onChange={(e) => {
@@ -203,44 +211,6 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </div>
               </div>
 
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium text-text-dark mb-1">
-                  Description{" "}
-                  <span className="text-text-muted font-normal">(optional)</span>
-                </label>
-                <input
-                  type="text"
-                  value={form.description}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                  className="input-field"
-                  placeholder="What was this for?"
-                />
-              </div>
-
-              {/* Receipt Upload */}
-              <ReceiptUpload
-                value={form.receiptUrl}
-                onChange={(url) => setForm((f) => ({ ...f, receiptUrl: url }))}
-              />
-
-              {/* Date */}
-              <div>
-                <label className="block text-sm font-medium text-text-dark mb-1">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={form.createdAt}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, createdAt: e.target.value }))
-                  }
-                  className="input-field"
-                />
-              </div>
-
               {/* Split Type */}
               <div>
                 <label className="block text-sm font-medium text-text-dark mb-1">
@@ -291,21 +261,62 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </div>
               </div>
 
+              {/* Date */}
+              <div>
+                <label className="block text-sm font-medium text-text-dark mb-1">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={form.createdAt}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, createdAt: e.target.value }))
+                  }
+                  className="input-field"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium text-text-dark mb-1">
+                  Description{" "}
+                  <span className="text-text-muted font-normal">(optional)</span>
+                </label>
+                <input
+                  type="text"
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                  className="input-field"
+                  placeholder="What was this for?"
+                />
+              </div>
+
+              {/* Receipt Upload */}
+              <ReceiptUpload
+                value={form.receiptUrl}
+                onChange={(url) => setForm((f) => ({ ...f, receiptUrl: url }))}
+              />
+
+
+              {errors.submit && <p className="text-accent text-sm text-center mb-2">{errors.submit}</p>}
               {/* Submit */}
               <div className="flex gap-3 pt-2">
                 <button
                   type="button"
                   onClick={onClose}
                   className="btn-secondary flex-1"
+                  disabled={isSubmitting}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   className="btn-primary flex-1"
-                  disabled={!form.amount || !form.paidBy}
+                  disabled={!form.amount || !form.paidBy || isSubmitting}
                 >
-                  {isEditing ? "Update" : "Add Expense"}
+                  {isSubmitting ? "Saving..." : (isEditing ? "Update" : "Add Expense")}
                 </button>
               </div>
             </form>

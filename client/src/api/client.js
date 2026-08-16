@@ -134,8 +134,21 @@ export const updateGroup = async (id, data) => {
   return { success: true };
 };
 
-export const deleteGroup = async (id) => {
-  await deleteDoc(doc(db, "groups", id));
+export const deleteGroup = async (id, clerkToken) => {
+  const res = await fetch(`/api/delete-group?groupId=${id}`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${clerkToken}`
+    }
+  });
+  if (!res.ok) {
+    let errMessage = "Failed to delete group";
+    try {
+      const data = await res.json();
+      errMessage = data.error || errMessage;
+    } catch (e) {}
+    throw new Error(errMessage);
+  }
   return { success: true };
 };
 

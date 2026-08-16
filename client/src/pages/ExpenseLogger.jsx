@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useGroup } from "../App";
 import { getExpenses, createExpense, deleteExpense } from "../api/client";
-import { formatINR } from "../utils/formatCurrency";
+import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import ExpenseForm from "../components/ExpenseForm";
 import BalanceChip from "../components/BalanceChip";
 import { getBalances } from "../api/client";
@@ -195,7 +195,7 @@ function ExpenseLogger() {
             <span className="font-semibold">Settlement suggestion: </span>
             {balances.settlement_suggestions.map((s, i) => (
               <span key={i}>
-                {s.from} pays {s.to} {formatINR(s.amount)}
+                {s.from} pays {s.to} {formatCurrency(s.amount, currentGroup.currency)}
                 {i < balances.settlement_suggestions.length - 1 && ", "}
               </span>
             ))}
@@ -305,14 +305,14 @@ function ExpenseLogger() {
                       }
                     }}
                     style={{ willChange: "transform" }}
-                    className="card-hover p-4 flex items-start gap-3 bg-surface relative z-10"
+                    className="card-hover p-3 flex items-start gap-3 bg-surface relative z-10"
                   >
                   {/* Category icon */}
                   <div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 text-primary"
+                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 text-primary"
                     style={{ backgroundColor: catColor + "15", color: catColor }}
                   >
-                    <CategoryIcon category={{name: expense.category}} size={20} />
+                    <CategoryIcon category={{name: expense.category}} size={18} />
                   </div>
 
                   {/* Details */}
@@ -330,8 +330,8 @@ function ExpenseLogger() {
                           )}
                         </p>
                       </div>
-                      <span className="font-mono font-bold text-base text-text-dark whitespace-nowrap">
-                        {formatINR(expense.amount)}
+                      <span className="font-mono font-semibold text-[15px] text-text-dark whitespace-nowrap">
+                        {formatCurrency(expense.amount, currentGroup.currency)}
                       </span>
                     </div>
 
@@ -346,7 +346,7 @@ function ExpenseLogger() {
                             color: split.color || "#767F7D",
                           }}
                         >
-                          <Avatar member={members.find(m => m.id === split.member_id) || {name: split.member_name}} size={10} /> {formatINR(split.share_amount)}
+                          <Avatar member={members.find(m => m.id === split.member_id) || {name: split.member_name}} size={10} /> {formatCurrency(split.share_amount, currentGroup.currency)}
                         </span>
                       ))}
                     </div>
