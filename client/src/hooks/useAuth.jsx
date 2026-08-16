@@ -30,6 +30,8 @@ export function AuthProvider({ children }) {
   const [isFirebaseLoaded, setIsFirebaseLoaded] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [isProfileLoaded, setIsProfileLoaded] = useState(false);
+  const [firebaseAuthError, setFirebaseAuthError] = useState(null);
+  const [isBridgePending, setIsBridgePending] = useState(false);
 
   // Sync Clerk Session to Firebase Custom Token
   useEffect(() => {
@@ -38,7 +40,17 @@ export function AuthProvider({ children }) {
 
       if (clerkUser && session) {
         frontLogger.log('clerk_session_available', { clerkUserId: clerkUser.id });
+        
+        // Don't re-run if already signed into Firebase with the right uid
+        if (firebaseUser && firebaseUser.uid === clerkUser.id) {
+          setIsBridgePending(false);
+          return;
+        }
+
         try {
+          setIsBridgePending(true);
+          setFirebaseAuthError(null);
+          
           const sessionToken = await session.getToken();
           frontLogger.log('jwt_bridge_request_started');
           
@@ -66,8 +78,13 @@ export function AuthProvider({ children }) {
           frontLogger.log('firebase_sign_in_started');
           await signInWithCustomToken(auth, responseData.firebaseToken);
           frontLogger.log('firebase_sign_in_success');
+          setIsBridgePending(false);
         } catch (err) {
           frontLogger.error("firebase_auth_bridge_failed", { message: err.message });
+          setFirebaseAuthError(err);
+          setIsBridgePending(false);
+          // If we fail, make sure isFirebaseLoaded becomes true so we don't hang on loading
+          setIsFirebaseLoaded(true);
         }
       } else if (!clerkUser && authMode === 'clerk') {
         // Clerk signed out, so sign out of Firebase
@@ -77,7 +94,7 @@ export function AuthProvider({ children }) {
     }
 
     syncClerkToFirebase();
-  }, [clerkUser, session, isClerkLoaded]);
+  }, [clerkUser, session, isClerkLoaded, firebaseUser]);
 
   // Listen to Firebase Auth state to determine auth mode and claims
   useEffect(() => {
@@ -132,7 +149,9 @@ export function AuthProvider({ children }) {
     frontLogger.log('sign_out_success');
   };
 
-  const isLoaded = isClerkLoaded && isFirebaseLoaded;
+  // We are fully loaded ONLY if Clerk is loaded, Firebase is loaded, 
+  // AND there is no pending bridge operation.
+  const isLoaded = isClerkLoaded && isFirebaseLoaded && !isBridgePending;
 
   const refreshProfile = async () => {
     if (firebaseUser && authMode === 'clerk') {
@@ -152,6 +171,7 @@ export function AuthProvider({ children }) {
         userProfile,
         isProfileLoaded,
         refreshProfile,
+        firebaseAuthError,
       }}
     >
       {children}
