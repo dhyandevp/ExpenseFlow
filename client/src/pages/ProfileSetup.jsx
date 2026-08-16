@@ -55,18 +55,20 @@ export function ProfileSetup() {
         profilePayload.photoURL = user.imageUrl;
       }
 
-      await createUserProfile(user.id, profilePayload);
+      await createUserProfile(firebaseUser.uid, profilePayload);
       
-      console.log("[ProfileSetup] profile_save_success", { userId: user.id });
+      console.log("[ProfileSetup] profile_save_success", { userId: firebaseUser.uid });
       await refreshProfile();
-      // Navigate to home handled by useEffect above when userProfile updates
+      
+      // Onboarding successfully completed
     } catch (err) {
       console.error("[ProfileSetup] profile_save_failed", { 
         code: err.code,
         message: err.message,
-        userIdPresent: !!user?.id
+        firebaseUid: firebaseUser?.uid
       });
-      setError("Couldn't save your profile. Please try again.");
+      setError(`Couldn't save your profile: ${err.code || 'unknown'} - ${err.message || 'Please try again.'}`);
+    } finally {
       setIsSaving(false);
     }
   };
