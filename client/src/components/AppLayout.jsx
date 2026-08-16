@@ -27,13 +27,6 @@ const navItems = [
   { path: "/settings", icon: Settings, label: "Settings" },
 ];
 
-const mobileNavItems = [
-  { path: "/dashboard", icon: LayoutDashboard, label: "Home" },
-  { path: "", icon: PlusCircle, label: "Add" },
-  { path: "/settings", icon: Users, label: "Groups" },
-  { path: "/report", icon: FileText, label: "Reports" },
-];
-
 export default function AppLayout({ children }) {
   const { code } = useParams();
   const location = useLocation();
@@ -80,12 +73,7 @@ export default function AppLayout({ children }) {
 
   return (
     <div className="min-h-screen bg-background flex relative z-0">
-      {/* Background Blobs */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none -z-10">
-        <div className="absolute -top-[10%] -left-[10%] w-[50vh] h-[50vh] rounded-full bg-highlight opacity-40 blur-[100px] mix-blend-multiply" />
-        <div className="absolute top-[20%] -right-[10%] w-[40vh] h-[40vh] rounded-full bg-success opacity-15 blur-[120px] mix-blend-multiply" />
-        <div className="absolute -bottom-[10%] left-[20%] w-[60vh] h-[60vh] rounded-full bg-highlight opacity-30 blur-[100px] mix-blend-multiply" />
-      </div>
+
 
       {/* Desktop Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-surface border-r border-border min-h-screen p-4 sticky top-0">
@@ -209,26 +197,7 @@ export default function AppLayout({ children }) {
             className="md:hidden fixed top-[57px] left-0 right-0 z-30 bg-surface border-b border-border shadow-lg"
           >
             <div className="p-3 space-y-1">
-              {navItems.map((item) => {
-                const basePath = `/group/${code}`;
-                const itemPath = `${basePath}${item.path}`;
-                const isActive = location.pathname === itemPath;
-                return (
-                  <Link
-                    key={item.label}
-                    to={itemPath}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                      isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-background"
-                    }`}
-                  >
-                    <item.icon size={20} />
-                    {item.label}
-                  </Link>
-                );
-              })}
+
 
               {/* Mobile group switcher */}
               {otherGroups.length > 0 && (
@@ -282,21 +251,12 @@ export default function AppLayout({ children }) {
         </AnimatePresence>
       </main>
 
-      {/* Mobile FAB */}
-      {location.pathname !== `/group/${code}` && (
-        <Link
-          to={`/group/${code}`}
-          className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center"
-          aria-label="Add Expense"
-        >
-          <PlusCircle size={28} />
-        </Link>
-      )}
+
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
         <div className="flex items-center justify-around py-2">
-          {mobileNavItems.map((item) => {
+          {navItems.map((item) => {
             const basePath = `/group/${code}`;
             const itemPath = `${basePath}${item.path}`;
             const isActive = location.pathname === itemPath || (item.path === "" && location.pathname === basePath);
