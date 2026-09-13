@@ -1,20 +1,24 @@
 import { logger, generateRequestId } from './_lib/logger.js';
 
-export default function handler(req, res) {
-  const requestId = req.headers['x-request-id'] || generateRequestId();
-  const timestamp = new Date().toISOString();
-  
+export default async function handler(reqOrRequest, resOrEnv) {
+  const isNode = resOrEnv && typeof resOrEnv.status === 'function';
+  const requestId = isNode
+    ? (reqOrRequest.headers?.['x-request-id'] || generateRequestId())
+    : (reqOrRequest.headers?.get?.('x-request-id') || generateRequestId());
+  const method = reqOrRequest.method;
+  const env = isNode ? (typeof process !== 'undefined' ? process.env : {}) : (resOrEnv || {});
+
   logger.info('request_received', {
     requestId,
-    method: req.method,
+    method,
     route: '/api/health'
   });
 
   const responsePayload = {
     status: 'ok',
-    timestamp,
-    environment: process.env.NODE_ENV || 'production',
-    runtime: 'vercel',
+    timestamp: new Date().toISOString(),
+    environment: env?.ENVIRONMENT || env?.NODE_ENV || 'production',
+    runtime: 'cloudflare-workers',
     requestId
   };
 
@@ -23,5 +27,16 @@ export default function handler(req, res) {
     status: 200
   });
 
-  return res.status(200).json(responsePayload);
+  if (isNode) {
+    return resOrEnv.status(200).json(responsePayload);
+  }
+
+  return new Response(JSON.stringify(responsePayload), {
+    status: 200,
+    headers: {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'x-request-id': requestId
+    }
+  });
 }

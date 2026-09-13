@@ -9,7 +9,6 @@ const MOCK_GROUP = JSON.stringify({
   id: "test-group-123",
   code: "TEST",
   name: "Test Group",
-  pinHash: "mock",
   createdAt: new Date().toISOString(),
 });
 

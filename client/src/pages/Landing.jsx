@@ -196,7 +196,7 @@ function Landing() {
                 className="btn-secondary text-base px-8 py-4 bg-white/60 hover:bg-white border border-border"
               >
                 <Users size={18} />
-                Join with Code & PIN
+                Join as Guest
               </button>
             </motion.div>
           </div>
@@ -328,7 +328,7 @@ function Landing() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { num: "01", title: "Create or join a group", desc: "Set up a group and securely invite members with a unique code and PIN.", icon: UserPlus },
+              { num: "01", title: "Create or join a group", desc: "Set up a group and securely invite members with a unique code.", icon: UserPlus },
               { num: "02", title: "Track shared expenses", desc: "Record who paid, how much, and securely attach receipts if needed.", icon: Calculator },
               { num: "03", title: "See balances & fairness", desc: "View real-time balances and an overall fairness score for the group.", icon: BarChart3 },
               { num: "04", title: "Settle up with clarity", desc: "Follow simplified settlement suggestions to clear debts efficiently.", icon: ArrowDownUp }
@@ -436,7 +436,7 @@ function Landing() {
 
       {/* Product Preview */}
       <section className="px-6 py-20 bg-text-dark text-background overflow-hidden relative">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsIDI1NSLCAyNTUsIDAuMSkiLz48L3N2Zz4=')] opacity-30"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjEpIi8+PC9zdmc+')] opacity-30"></div>
         
         <div className="max-w-6xl mx-auto relative z-10 grid lg:grid-cols-2 gap-16 items-center">
           <motion.div
@@ -562,7 +562,7 @@ function Landing() {
             { label: "Settlement suggestions", icon: ArrowDownUp },
             { label: "Scenario planning", icon: RefreshCw },
             { label: "Reports & CSV export", icon: Download },
-            { label: "PIN-protected access", icon: Lock }
+            { label: "Instant guest access", icon: Users }
           ].map((feature, i) => (
             <div key={i} className="flex items-center gap-3">
               <feature.icon size={18} className="text-primary shrink-0" />
@@ -597,7 +597,7 @@ function Landing() {
               },
               {
                 q: "Can I join a group without creating an account?",
-                a: "Yes! Group owners can generate a unique 6-character Group Code and an optional secure PIN. You can join directly as a Guest using only this code and PIN without signing up."
+                a: "Yes! Group owners can generate a unique 6-character Group Code. You can join directly as a Guest using only this code without signing up."
               },
               {
                 q: "How does fairness work?",
@@ -661,7 +661,7 @@ function Landing() {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto bg-primary text-white rounded-[2.5rem] p-10 md:p-16 shadow-2xl relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsIDI1NSLCAyNTUsIDAuMTkiLz48L3N2Zz4=')] opacity-20"></div>
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjE5KSIvPjwvc3ZnPg==')] opacity-20"></div>
           
           <div className="relative z-10">
             <h2 className="font-heading font-bold text-3xl md:text-5xl mb-6 leading-tight">

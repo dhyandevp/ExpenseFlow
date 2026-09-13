@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
-import PINVerification from "./PINVerification";
 import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
@@ -10,22 +9,17 @@ import { getGroupById } from "../../api/client";
 
 export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [code, setCode] = useState(defaultCode);
-  const [pin, setPin] = useState("");
   const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
 
-  const handleSubmit = async (finalPin = pin) => {
-    if (!code) {
+  const handleSubmit = async (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    if (!code || !code.trim()) {
       setIsError(true);
       setErrorMsg("Group Code is required.");
-      return;
-    }
-    if (finalPin.length < 6) {
-      setIsError(true);
-      setErrorMsg("PIN must be 6 digits.");
       return;
     }
     
@@ -40,8 +34,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             type: "guest",
-            code: code.trim().toUpperCase(),
-            pin: finalPin
+            code: code.trim().toUpperCase()
           })
         }),
         new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
@@ -51,8 +44,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       
       if (!res.ok) {
         setIsError(true);
-        setErrorMsg(data.message || "Failed to join group");
-        setPin(""); // Clear PIN on error
+        setErrorMsg(data.error || data.message || "Failed to join group");
         return;
       }
       
@@ -94,10 +86,10 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
             Join as Guest
           </DialogTitle>
           <p className="text-text-muted text-center mb-6 text-sm">
-            Enter the group code and 6-digit PIN provided by your group admin.
+            Enter the group code provided by your group admin.
           </p>
           
-          <div className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <label className="block text-sm font-medium text-text-muted mb-1">Group Code</label>
               <input 
@@ -106,20 +98,11 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
                 onChange={(e) => setCode(e.target.value.toUpperCase())}
                 placeholder="e.g. A1B2C3"
                 maxLength={6}
+                autoFocus
                 className="w-full bg-white border border-[#C2CBC9] text-text-dark rounded-lg px-4 py-3 font-mono text-center tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-primary"
               />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-text-muted mb-2 text-center">Group PIN</label>
-              <PINVerification 
-                pin={pin} 
-                setPin={setPin} 
-                isError={isError} 
-                onSubmit={handleSubmit} 
-              />
               {errorMsg && (
-                <p className="text-text-muted font-semibold text-sm text-center mt-2 flex items-center justify-center gap-1.5">
+                <p className="text-accent font-semibold text-sm text-center mt-3 flex items-center justify-center gap-1.5">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="12" y1="8" x2="12" y2="12"></line>
@@ -131,13 +114,13 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
             </div>
             
             <button
-              onClick={() => handleSubmit(pin)}
-              disabled={isLoading || !code || pin.length < 6}
+              type="submit"
+              disabled={isLoading || !code.trim()}
               className="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {isLoading ? "Joining..." : "Join Group"}
             </button>
-          </div>
+          </form>
         </DialogPanel>
       </div>
     </Dialog>

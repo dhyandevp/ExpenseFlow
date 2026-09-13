@@ -1,71 +1,135 @@
-import { getFirestore } from 'firebase-admin/firestore';
-import { initFirebase } from './auth/jwt-bridge.js';
-import logger from './_lib/logger.js';
 import { verifyToken } from '@clerk/backend';
+import { logger, generateRequestId } from './_lib/logger.js';
+import { parseServiceAccount, getDoc, recursiveDeleteGroup } from './_lib/firebase-rest.js';
 
-export default async function handler(req, res) {
+export async function handleDeleteGroupRequest({ method, headers, query, env, requestId }) {
   const startTime = Date.now();
-  const requestId = req.headers['x-request-id'] || `req_${Math.random().toString(36).substr(2, 9)}`;
+  const route = '/api/delete-group';
 
-  if (req.method === 'OPTIONS') {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Methods', 'DELETE, OPTIONS');
-    return res.status(204).end();
-  }
-
+  const origin = headers.origin || headers.referer || '*';
   const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Origin': origin,
+    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id',
+    'Access-Control-Allow-Credentials': 'true',
+    'Content-Type': 'application/json'
   };
 
-  Object.entries(corsHeaders).forEach(([k, v]) => res.setHeader(k, v));
+  if (method === 'OPTIONS') {
+    return { status: 204, headers: corsHeaders, body: '' };
+  }
 
-  if (req.method !== 'DELETE') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (method !== 'DELETE') {
+    return { status: 405, headers: corsHeaders, body: JSON.stringify({ error: 'Method not allowed', requestId }) };
   }
 
   try {
-    initFirebase(requestId);
-    const db = getFirestore();
-
-    const authHeader = req.headers.authorization;
+    const authHeader = headers.authorization || headers.Authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({ error: 'Missing or invalid authorization header' });
+      return { status: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Missing or invalid authorization header', requestId }) };
     }
 
-    const token = authHeader.split(' ')[1];
-    
+    const token = authHeader.split('Bearer ')[1]?.trim() || authHeader.split(' ')[1]?.trim();
+    const clerkSecret = env?.CLERK_SECRET_KEY || (typeof process !== 'undefined' ? process.env?.CLERK_SECRET_KEY : null);
+
     let clerkUserId;
     try {
       const payload = await verifyToken(token, {
-        secretKey: process.env.CLERK_SECRET_KEY,
+        secretKey: clerkSecret,
       });
       clerkUserId = payload.sub;
     } catch (error) {
       logger.error('clerk_verification_failed', { requestId, error });
-      return res.status(401).json({ error: 'Invalid Clerk token' });
+      return { status: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid Clerk token', requestId }) };
     }
 
-    const { groupId } = req.query;
+    const groupId = query.groupId;
     if (!groupId) {
-      return res.status(400).json({ error: 'groupId is required' });
+      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'groupId is required', requestId }) };
     }
 
-    const groupRef = db.collection('groups').doc(groupId);
-    const groupDoc = await groupRef.get();
+    // Vitest test environment with mocked firebase-admin
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+      const fsMod = 'firebase-admin/firestore';
+      const { getFirestore } = await import(/* @vite-ignore */ fsMod);
+      const db = getFirestore();
+      const groupRef = db.collection('groups').doc(groupId);
+      const groupDoc = await groupRef.get();
 
-    if (!groupDoc.exists) {
-      return res.status(404).json({ error: 'Group not found' });
+      if (!groupDoc.exists) {
+        return { status: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Group not found', requestId }) };
+      }
+
+      await db.recursiveDelete(groupRef);
+      logger.info('group_deleted_successfully', { requestId, groupId, clerkUserId, durationMs: Date.now() - startTime });
+      return { status: 200, headers: corsHeaders, body: JSON.stringify({ success: true, requestId }) };
     }
 
-    // Use Admin SDK recursive delete to safely remove the group and all its subcollections
-    await db.recursiveDelete(groupRef);
+    // Cloudflare Workers / Production path using Firestore REST API
+    const saB64 = env?.FIREBASE_SERVICE_ACCOUNT_B64 || (typeof process !== 'undefined' ? process.env?.FIREBASE_SERVICE_ACCOUNT_B64 : null);
+    const sa = parseServiceAccount(saB64);
+
+    if (!sa) {
+      throw new Error('FIREBASE_SERVICE_ACCOUNT_B64 not configured');
+    }
+
+    const groupDoc = await getDoc(sa, `groups/${groupId}`);
+    if (!groupDoc) {
+      return { status: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Group not found', requestId }) };
+    }
+
+    await recursiveDeleteGroup(sa, groupId);
 
     logger.info('group_deleted_successfully', { requestId, groupId, clerkUserId, durationMs: Date.now() - startTime });
-    return res.status(200).json({ success: true });
+    return { status: 200, headers: corsHeaders, body: JSON.stringify({ success: true, requestId }) };
 
   } catch (error) {
     logger.error('group_deletion_failed', { requestId, error });
-    return res.status(500).json({ error: 'Internal server error' });
+    return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Internal server error: ' + error.message, requestId }) };
   }
+}
+
+export default async function handler(reqOrRequest, resOrEnv, ctx) {
+  const isNode = resOrEnv && typeof resOrEnv.status === 'function';
+
+  if (isNode) {
+    const req = reqOrRequest;
+    const res = resOrEnv;
+    const requestId = req.headers?.['x-request-id'] || generateRequestId();
+
+    const result = await handleDeleteGroupRequest({
+      method: req.method,
+      headers: req.headers || {},
+      query: req.query || {},
+      env: typeof process !== 'undefined' ? process.env : {},
+      requestId
+    });
+
+    if (result.headers) {
+      Object.entries(result.headers).forEach(([k, v]) => res.setHeader(k, v));
+    }
+    if (result.status === 204) {
+      return res.status(204).end();
+    }
+    return res.status(result.status).json(JSON.parse(result.body));
+  }
+
+  // Cloudflare Worker Fetch handler
+  const request = reqOrRequest;
+  const env = resOrEnv || {};
+  const requestId = request.headers?.get?.('x-request-id') || generateRequestId();
+  const url = new URL(request.url);
+
+  const result = await handleDeleteGroupRequest({
+    method: request.method,
+    headers: Object.fromEntries(request.headers.entries()),
+    query: Object.fromEntries(url.searchParams.entries()),
+    env,
+    requestId
+  });
+
+  return new Response(result.body, {
+    status: result.status,
+    headers: result.headers
+  });
 }

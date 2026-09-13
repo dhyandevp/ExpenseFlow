@@ -6,6 +6,8 @@ dist/
 .env
 .env.*
 !.env.example
+.dev.vars
+.dev.vars.*
 
 # Debug logs
 firestore-debug.log
@@ -19,3 +21,15 @@ lighthouse-report.*
 
 # Local Vercel folder
 .vercel
+
+# Cloudflare Wrangler state
+.wrangler/
+
+# Design screenshots
+ExpenseFlow Image/
+
+# Playwright MCP artifacts
+.playwright-mcp/
+
+# Foglamp scan (contains edit token)
+.foglamp/

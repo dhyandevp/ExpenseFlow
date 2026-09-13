@@ -46,6 +46,12 @@ export default function AppLayout({ children }) {
     navigate(`/join/${group.code}`);
   };
 
+  useEffect(() => {
+    if (code && currentGroup && currentGroup.code !== code) {
+      navigate(`/join/${code}`, { replace: true });
+    }
+  }, [code, currentGroup, navigate]);
+
   if (!currentGroup) {
     return (
       <div className="min-h-screen bg-[#F0F2F5] flex flex-col items-center justify-center p-6">
@@ -65,12 +71,6 @@ export default function AppLayout({ children }) {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (code && currentGroup && currentGroup.code !== code) {
-      navigate(`/join/${code}`, { replace: true });
-    }
-  }, [code, currentGroup, navigate]);
 
   if (code && currentGroup && currentGroup.code !== code) {
     return null;

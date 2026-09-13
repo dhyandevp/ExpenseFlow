@@ -1,17 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
+import crypto from 'crypto';
+
+// Generate a dummy RSA private key for testing JWT signing
+const { privateKey } = crypto.generateKeyPairSync('rsa', {
+  modulusLength: 2048,
+  publicKeyEncoding: { type: 'spki', format: 'pem' },
+  privateKeyEncoding: { type: 'pkcs8', format: 'pem' }
+});
 
 // Mock dependencies before importing the module
 vi.mock('firebase-admin/app', () => ({
   initializeApp: vi.fn(),
   cert: vi.fn(),
   getApps: vi.fn(() => []),
-}));
-
-const mockCreateCustomToken = vi.fn();
-vi.mock('firebase-admin/auth', () => ({
-  getAuth: vi.fn(() => ({
-    createCustomToken: mockCreateCustomToken,
-  })),
 }));
 
 const mockDocGet = vi.fn();
@@ -41,14 +42,13 @@ vi.mock('firebase-admin/firestore', () => ({
   FieldValue: {},
 }));
 
-vi.mock('@clerk/clerk-sdk-node', () => ({
+vi.mock('@clerk/backend', () => ({
   verifyToken: vi.fn(),
 }));
 
-import { verifyToken } from '@clerk/clerk-sdk-node';
+import { verifyToken } from '@clerk/backend';
 import vercelHandler from '../api/auth/jwt-bridge.js';
 
-// Adapter: convert Netlify-style event to Vercel (req, res) and return Netlify-style response
 function handler(event) {
   return new Promise((resolve) => {
     const req = {
@@ -73,7 +73,12 @@ function handler(event) {
 describe('jwt-bridge function', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    process.env.FIREBASE_SERVICE_ACCOUNT_B64 = Buffer.from(JSON.stringify({ project_id: 'test' })).toString('base64');
+    process.env.FIREBASE_SERVICE_ACCOUNT_B64 = Buffer.from(JSON.stringify({ 
+      project_id: 'test',
+      client_email: 'test@example.com',
+      private_key: privateKey
+    })).toString('base64');
+    process.env.CLERK_SECRET_KEY = 'sk_test_mock';
     
     mockWhere.mockReturnValue({ limit: mockLimit });
     mockLimit.mockReturnValue({ get: mockGet });
@@ -81,7 +86,6 @@ describe('jwt-bridge function', () => {
 
   it('Mode A: Successfully exchanges Clerk token for Firebase token', async () => {
     verifyToken.mockResolvedValueOnce({ sub: 'user_123' });
-    mockCreateCustomToken.mockResolvedValueOnce('firebase_custom_token');
 
     const event = {
       httpMethod: 'POST',
@@ -90,109 +94,83 @@ describe('jwt-bridge function', () => {
       },
     };
 
-    const response = await handler(event, {});
+    const response = await handler(event);
     
     expect(response.statusCode).toBe(200);
-    expect(JSON.parse(response.body).firebaseToken).toBe('firebase_custom_token');
-    expect(verifyToken).toHaveBeenCalledWith('clerk_token_here', expect.any(Object));
-    expect(mockCreateCustomToken).toHaveBeenCalledWith('user_123', { mode: 'clerk' });
+    const body = JSON.parse(response.body);
+    expect(body.firebaseToken).toBeDefined();
+    expect(typeof body.firebaseToken).toBe('string');
+    expect(verifyToken).toHaveBeenCalledWith('clerk_token_here', { secretKey: 'sk_test_mock' });
   });
 
-  it('Mode B: Successfully authenticates guest and issues scoped token', async () => {
+  it('Mode B: Successfully authenticates guest with group code only (no PIN)', async () => {
     const event = {
       httpMethod: 'POST',
       headers: { 'x-forwarded-for': '127.0.0.1' },
-      body: JSON.stringify({ code: 'ABCDEF', pinHash: 'hash123' }),
+      body: JSON.stringify({ code: 'ABCDEF' }),
     };
 
     mockDocGet.mockResolvedValueOnce({ exists: false }); // No rate limit doc yet
     mockGet.mockResolvedValueOnce({
       empty: false,
       docs: [
-        { id: 'group_456', data: () => ({ pinHash: 'hash123' }) }
+        { id: 'group_456', data: () => ({ name: 'Test Group' }) }
       ]
     });
-    mockCreateCustomToken.mockResolvedValueOnce('guest_firebase_token');
 
-    const response = await handler(event, {});
+    const response = await handler(event);
     
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
-    expect(body.firebaseToken).toBe('guest_firebase_token');
+    expect(body.firebaseToken).toBeDefined();
     expect(body.groupId).toBe('group_456');
-    expect(mockCreateCustomToken).toHaveBeenCalledWith(expect.stringContaining('guest_'), { guestGroupId: 'group_456', mode: 'guest' });
+    expect(mockWhere).toHaveBeenCalledWith('code', '==', 'ABCDEF');
   });
 
-  it('Mode B: Rejects invalid PIN and updates rate limit', async () => {
+  it('Mode B: Rejects request if code is missing', async () => {
     const event = {
       httpMethod: 'POST',
       headers: { 'x-forwarded-for': '127.0.0.1' },
-      body: JSON.stringify({ code: 'ABCDEF', pinHash: 'wronghash' }),
+      body: JSON.stringify({}),
     };
 
-    mockDocGet.mockResolvedValueOnce({ 
-      exists: true, 
-      data: () => ({ attempts: [], consecutiveFailures: 0, blockUntil: 0 }) 
-    });
-    mockGet.mockResolvedValueOnce({
-      empty: false,
-      docs: [
-        { id: 'group_456', data: () => ({ pinHash: 'hash123' }) }
-      ]
-    });
-
-    const response = await handler(event, {});
+    const response = await handler(event);
     
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(400);
     const body = JSON.parse(response.body);
-    expect(body.error).toBe('Incorrect PIN');
-    expect(mockDocSet).toHaveBeenCalledWith(expect.objectContaining({
-      consecutiveFailures: 1
-    }));
+    expect(body.error).toBe('Code is required for guest access');
   });
 
-  it('Mode B: Blocks IP after 3 consecutive failed PIN attempts', async () => {
+  it('Mode B: Returns 404 when group is not found', async () => {
     const event = {
       httpMethod: 'POST',
       headers: { 'x-forwarded-for': '127.0.0.1' },
-      body: JSON.stringify({ code: 'ABCDEF', pinHash: 'wronghash' }),
+      body: JSON.stringify({ code: 'NOTFOUND' }),
     };
 
-    mockDocGet.mockResolvedValueOnce({ 
-      exists: true, 
-      data: () => ({ attempts: [Date.now(), Date.now()], consecutiveFailures: 2, blockUntil: 0 }) 
-    });
-    mockGet.mockResolvedValueOnce({
-      empty: false,
-      docs: [
-        { id: 'group_456', data: () => ({ pinHash: 'hash123' }) }
-      ]
-    });
+    mockDocGet.mockResolvedValueOnce({ exists: false });
+    mockGet.mockResolvedValueOnce({ empty: true, docs: [] });
 
-    const response = await handler(event, {});
+    const response = await handler(event);
     
-    expect(response.statusCode).toBe(401);
+    expect(response.statusCode).toBe(404);
     const body = JSON.parse(response.body);
-    expect(body.blockUntil).toBeGreaterThan(Date.now()); // blocked
-    expect(mockDocSet).toHaveBeenCalledWith(expect.objectContaining({
-      consecutiveFailures: 3,
-      blockUntil: expect.any(Number)
-    }));
+    expect(body.error).toBe('Group not found');
   });
 
-  it('Mode B: Rejects request if IP is blocked', async () => {
+  it('Mode B: Rejects request if IP is blocked by rate limiting', async () => {
     const event = {
       httpMethod: 'POST',
       headers: { 'x-forwarded-for': '127.0.0.1' },
-      body: JSON.stringify({ code: 'ABCDEF', pinHash: 'hash123' }),
+      body: JSON.stringify({ code: 'ABCDEF' }),
     };
 
     mockDocGet.mockResolvedValueOnce({ 
       exists: true, 
-      data: () => ({ attempts: [], consecutiveFailures: 3, blockUntil: Date.now() + 10000 }) 
+      data: () => ({ attempts: [], blockUntil: Date.now() + 10000 }) 
     });
 
-    const response = await handler(event, {});
+    const response = await handler(event);
     
     expect(response.statusCode).toBe(429);
     const body = JSON.parse(response.body);

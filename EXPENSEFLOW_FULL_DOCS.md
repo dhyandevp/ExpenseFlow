@@ -58,7 +58,6 @@ FIRESTORE COLLECTION STRUCTURE to implement:
 groups/{groupId}
   - name: string
   - code: string (6-char, indexed)
-  - pinHash: string (SHA-256)
   - currency: string
   - settlementThreshold: number
   - currentBalances: map { memberId: number }   ← denormalized, 1 read = full dashboard
@@ -105,7 +104,7 @@ NETLIFY FUNCTIONS to create (in /netlify/functions/):
 5. jwt-bridge.js — exchanges Clerk session token for Firebase custom token
 
 FIRESTORE SECURITY RULES to write (firestore.rules):
-- A user can read a group if: (a) they are authenticated via Clerk JWT AND their userId is in members collection, OR (b) they provide the correct 6-char code AND correct PIN hash
+- A user can read a group if: (a) they are authenticated via Clerk JWT AND their userId is in members collection, OR (b) they provide the correct 6-char code via guest authentication
 - A user can write expenses only if they are a verified group member
 - The currentBalances field can only be written by a service account (via jwt-bridge function)
 - Rate limit: enforce 10 reads per 15 minutes on group-by-code lookups (implement as a Firestore counter document with TTL)
@@ -302,13 +301,11 @@ Implement a hybrid authentication system for ExpenseFlow using Clerk.
 
 AUTH MODEL:
 - Mode A (Authenticated): User signs in with Clerk. Clerk issues a custom Firebase JWT. The Firebase Client SDK uses this JWT to satisfy Firestore Security Rules. The user can access any group they are a member of.
-- Mode B (Guest access): User provides a 6-character group code AND a mandatory PIN. The app calls the jwt-bridge Netlify Function which verifies the code+PIN against Firestore, then issues a scoped Firebase custom token that grants access ONLY to that specific group document.
+- Mode B (Guest access): User provides a 6-character group code. The app calls the jwt-bridge Netlify Function which verifies the code against Firestore, then issues a scoped Firebase custom token that grants access ONLY to that specific group document.
 
 MODE B SECURITY REQUIREMENTS (critical):
-- PIN is mandatory — there is NO code-only access path
-- The PIN is SHA-256 hashed before storage (already done in groups.js — carry this over)
-- The code+PIN lookup is rate-limited to 10 attempts per 15 minutes per IP at the Netlify Function level (use a simple in-memory store or Upstash Redis)
-- On 3 failed PIN attempts in a row, the IP is blocked for 1 hour
+- Guest joining uses the group code directly without requiring a PIN.
+- The code lookup is rate-limited to 10 attempts per 15 minutes per IP at the Netlify Function level (use a simple in-memory store or Upstash Redis)
 - The Firebase custom token issued for guest access has expiry of 1 hour and contains a custom claim: { guestGroupId: "groupId", mode: "guest" }
 - Firestore Security Rules check this claim so guest tokens cannot access other groups
 
@@ -321,7 +318,7 @@ CLERK SETUP:
 
 UI FLOWS to implement:
 1. Landing page has two CTAs: "Sign in with Clerk" and "Join with a code"
-2. "Join with a code" opens a modal with: group code input (6 chars) + PIN input (masked) + "Join group" button
+2. "Join with a code" opens a modal with: group code input (6 chars) + "Join group" button
 3. After any auth, redirect to /dashboard
 4. The group setup page is only available to Clerk-authenticated users (guests can view but not create groups)
 5. Settings page shows auth mode badge: "Signed in" (green) or "Guest access" (grey) with option to upgrade to full Clerk account
@@ -785,9 +782,9 @@ You must be at least 13 years of age to use ExpenseFlow. By using the Service, y
 
 The Service offers two access modes:
 - Authenticated access via Clerk (email/social login)
-- Guest access using a 6-character group code and mandatory PIN
+- Guest access using a 6-character group code
 
-You are responsible for keeping your group code and PIN confidential. We are not liable for unauthorized access caused by sharing your credentials.
+You are responsible for keeping your group code confidential. We are not liable for unauthorized access caused by sharing your credentials.
 
 **4. User Content**
 
@@ -901,7 +898,7 @@ ExpenseFlow is not directed at children under 13. We do not knowingly collect da
 
 We implement industry-standard security measures including:
 - Firestore Security Rules enforcing per-user data access
-- Mandatory PIN for guest group access
+- Instant guest access via group code
 - Rate limiting on all code lookup endpoints
 - HTTPS enforced across all connections
 
@@ -993,9 +990,9 @@ We appreciate responsible disclosure and will respond to security reports within
 ### Pre-launch Security Testing
 
 **A. Authentication & Access Control**
-- [ ] Test Mode B (guest): try code without PIN → should reject with 401
-- [ ] Test Mode B: try 11 code+PIN attempts → should block IP after 10
-- [ ] Test Mode B: try a valid code with wrong PIN 3 times → should block for 1 hour
+- [ ] Test Mode B (guest): try valid code → should return custom token
+- [ ] Test Mode B: try 11 code attempts → should block IP after 10
+- [ ] Test Mode B: try invalid code → should return 404 Group not found
 - [ ] Test guest token: try to access a different group's Firestore path → should reject with Firestore permission-denied
 - [ ] Test Clerk JWT: expire the token, try a Firestore write → should reject
 - [ ] Test group creation: try as guest → should reject (only authenticated users)
@@ -1063,7 +1060,7 @@ await assertFails(authedDb.collection('groups').doc(myGroupId).update({ currentB
 
 ### Full Verification System Design
 
-ExpenseFlow needs email verification for registered users and PIN verification for guests. Here is the complete flow.
+ExpenseFlow provides email verification for registered users and instant code-based access for guests. Here is the complete flow.
 
 **Verification Flow A — Clerk Email Verification**
 
@@ -1073,62 +1070,36 @@ Clerk handles this automatically. After a user signs up with email:
 3. On success, Clerk marks `emailAddresses[0].verification.status = "verified"`
 4. Your app checks `user.primaryEmailAddress?.verification.status === 'verified'` before allowing group creation
 
-**Verification Flow B — Guest PIN Verification (custom)**
+**Verification Flow B — Guest Code Verification**
 
 ```
 User enters:
   ┌──────────────────────────────────┐
   │  Group code:  [_ _ _ _ _ _]      │
-  │  Group PIN:   [● ● ● ● ● ●]      │
   │                                  │
   │  [  Join group  ]                │
   └──────────────────────────────────┘
 
 On submit:
-  1. Client calls POST /netlify/functions/jwt-bridge
-     body: { code: "XYZABC", pinHash: sha256(userEnteredPIN) }
+  1. Client calls POST /api/auth/jwt-bridge
+     body: { type: "guest", code: "XYZABC" }
 
   2. jwt-bridge function:
-     a. Look up Firestore: groups where code == "XYZABC"
-     b. Check rateLimit counter for this IP (reject if > 10 in 15min)
-     c. Compare pinHash to stored group.pinHash (constant-time compare)
-     d. On match: issue Firebase custom token with claim { guestGroupId: groupId, mode: "guest" }
-     e. Return: { firebaseToken: "...", groupId: "...", expiresIn: 3600 }
-     f. On fail: increment attempt counter. After 3 failures: set blockUntil = now + 1hr
+     a. Check rateLimit counter for this IP (reject if > 10 in 15min)
+     b. Look up Firestore: groups where code == "XYZABC"
+     c. On match: issue Firebase custom token with claim { guestGroupId: groupId, mode: "guest" }
+     d. Return: { firebaseToken: "...", groupId: "...", expiresIn: 3600 }
+     e. On not found: return 404 Group not found
 
-  3. Client calls firebase.auth().signInWithCustomToken(firebaseToken)
+  3. Client calls signInWithCustomToken(auth, firebaseToken)
   4. Firebase SDK is now authenticated with scoped guest access
-  5. Redirect to /dashboard (group context set in React Context)
+  5. Redirect to /group/XYZABC/dashboard (group context set in React Context)
 ```
 
 **Error States to handle in UI:**
-- Wrong PIN: "Incorrect PIN. X attempts remaining before lockout."
 - Code not found: "Group not found. Check the code and try again."
-- Locked out: "Too many attempts. Please try again in 60 minutes."
-- Network error: "Could not connect. Check your connection and retry." (with retry button)
-
-**PIN Input Component Requirements:**
-- 6-character masked input (dots, not asterisks — better mobile UX)
-- Number pad optimized: `inputMode="numeric"` on mobile
-- Auto-advance focus on 6th character entry
-- Show/hide toggle (eye icon) for accessibility
-- Shake animation on wrong PIN (Framer Motion: keyframes x: [0, -8, 8, -8, 8, 0])
-- Clear on 3rd failure
-
-**Antigravity Prompt for Verification Component:**
-```
-Create a PINVerification.jsx component for ExpenseFlow with the following spec:
-- 6-digit masked PIN input using individual <input> elements (one per digit) for mobile number pad UX
-- inputMode="numeric" on each input for mobile keyboard optimization
-- Auto-focus next input on digit entry, auto-focus previous on backspace
-- "Show PIN" toggle using an eye icon
-- Shake animation using Framer Motion when PIN is incorrect
-- Submit button disabled until all 6 digits are entered
-- Props: { onSubmit(pin: string), isLoading: boolean, errorMessage: string, attemptsRemaining: number }
-- Use Aurora Forest tokens: --primary for active input border, --border for inactive, --accent for error shake
-- Mobile-first: full-width inputs on mobile, centered max-width 340px on desktop
-- Accessible: aria-labels on each input, aria-live region for error messages
-```
+- Locked out: "Too many attempts. Please try again later."
+- Network error: "Network error. Please try again."
 
 ---
 

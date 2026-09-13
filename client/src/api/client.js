@@ -57,7 +57,7 @@ export const updateUserProfile = async (userId, data) => {
 
 // ── Groups ──────────────────────────────────────────────────────────────
 export const createGroup = async (groupData) => {
-  const { pin, members, fairness_models, ...restData } = groupData;
+  const { members, fairness_models, ...restData } = groupData;
   const batch = writeBatch(db);
   const groupRef = doc(collection(db, "groups"));
   
@@ -66,7 +66,6 @@ export const createGroup = async (groupData) => {
   const newGroupData = cleanFirestoreData({
     name: groupData.name || "Untitled Group",
     code: code,
-    pinHash: pin || groupData.pinHash || null,
     currency: groupData.currency || "INR",
     settlementThreshold: groupData.settlement_threshold || 500,
     currentBalances: {},
@@ -108,14 +107,14 @@ export const createGroup = async (groupData) => {
   return { success: true, data: { id: groupRef.id, ...newGroupData, members: returnedMembers, categories: returnedCategories } };
 };
 
-export const getGroupByCode = async (code, pin) => {
-  const q = query(collection(db, "groups"), where("code", "==", code));
+export const getGroupByCode = async (code) => {
+  const cleanCode = code ? code.trim().toUpperCase() : "";
+  const q = query(collection(db, "groups"), where("code", "==", cleanCode));
   const snapshot = await getDocs(q);
   if (snapshot.empty) throw new Error("Group not found");
   
   const groupDoc = snapshot.docs[0];
   const data = { id: groupDoc.id, ...groupDoc.data() };
-  if (pin && data.pinHash && data.pinHash !== pin) throw new Error("Invalid PIN");
 
   const membersSnap = await getDocs(collection(db, `groups/${groupDoc.id}/members`));
   data.members = membersSnap.docs.map(d => d.data());
@@ -167,11 +166,6 @@ export const regenerateCode = async (groupId) => {
   const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
   await updateDoc(doc(db, "groups", groupId), { code: newCode });
   return { success: true, data: { code: newCode } };
-};
-
-export const setGroupPin = async (groupId, data) => {
-  await updateDoc(doc(db, "groups", groupId), { pinHash: data.pin });
-  return { success: true };
 };
 
 // ── Members ─────────────────────────────────────────────────────────────

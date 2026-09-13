@@ -1,7 +1,8 @@
-import crypto from 'crypto';
-
 export function generateRequestId() {
-  return crypto.randomUUID();
+  if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.randomUUID) {
+    return globalThis.crypto.randomUUID();
+  }
+  return 'req_' + Math.random().toString(36).substring(2, 11);
 }
 
 function sanitizePayload(payload) {
@@ -9,7 +10,7 @@ function sanitizePayload(payload) {
   
   const sanitized = { ...payload };
   const sensitiveKeys = [
-    'authorization', 'bearer', 'token', 'password', 'pin', 'pinhash', 
+    'authorization', 'bearer', 'token', 'password',
     'clerk_secret_key', 'clerk_webhook_secret', 'firebase_service_account_b64',
     'privatekey', 'session'
   ];

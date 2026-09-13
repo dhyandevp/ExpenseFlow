@@ -15,7 +15,7 @@ function Terms() {
         <p className="text-text-muted leading-relaxed">ExpenseFlow is a tool to help groups manage shared expenses and calculate fairness scores.</p>
         
         <h4 className="text-foreground font-semibold text-xl mt-8 mb-4">3. User Data</h4>
-        <p className="text-text-muted leading-relaxed">You agree to provide accurate information. You are responsible for maintaining the security of your group codes and PINs.</p>
+        <p className="text-text-muted leading-relaxed">You agree to provide accurate information. You are responsible for maintaining the security of your group codes.</p>
         
         <h4 className="text-foreground font-semibold text-xl mt-8 mb-4">4. Limitation of Liability</h4>
         <p className="text-text-muted leading-relaxed">ExpenseFlow is provided "as is" without warranty of any kind. We are not liable for financial discrepancies or loss of data.</p>

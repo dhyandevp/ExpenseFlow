@@ -9,7 +9,6 @@ import {
   Save,
   LogOut,
   RefreshCw,
-  KeyRound,
   Copy,
   Check,
   Shield,
@@ -18,7 +17,7 @@ import {
   PieChart
 } from "lucide-react";
 import { useGroup } from "../App";
-import { updateGroup, removeMember, regenerateCode, setGroupPin, deleteGroup } from "../api/client";
+import { updateGroup, removeMember, regenerateCode, deleteGroup } from "../api/client";
 import { useAuth } from "../hooks/useAuth";
 import { useSession } from "@clerk/clerk-react";
 
@@ -90,10 +89,7 @@ function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
-  // Security: PIN and code
-  const [pinInput, setPinInput] = useState("");
-  const [pinSaving, setPinSaving] = useState(false);
-  const [pinMessage, setPinMessage] = useState("");
+  // Security: invite code
   const [regenerating, setRegenerating] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
 
@@ -189,27 +185,6 @@ function SettingsPage() {
       alert("Failed to regenerate: " + err.message);
     } finally {
       setRegenerating(false);
-    }
-  };
-
-  const handleSetPin = async () => {
-    setPinSaving(true);
-    setPinMessage("");
-    try {
-      if (pinInput.trim() === "") {
-        await setGroupPin(currentGroup.id, { pin: null });
-        setPinMessage("PIN removed.");
-        setCurrentGroup({ ...currentGroup, has_pin: false });
-      } else {
-        await setGroupPin(currentGroup.id, { pin: pinInput });
-        setPinMessage("PIN set!");
-        setCurrentGroup({ ...currentGroup, has_pin: true });
-      }
-      setPinInput("");
-    } catch (err) {
-      setPinMessage(err.message);
-    } finally {
-      setPinSaving(false);
     }
   };
 
@@ -412,47 +387,6 @@ function SettingsPage() {
             <p className="text-sm text-text-muted mt-2">
               Regenerating invalidates the old code — members will need the new one to rejoin.
             </p>
-          </div>
-
-          <div className="pt-4 border-t border-border">
-            <label className="block text-sm font-medium text-text-dark mb-2 flex items-center gap-2">
-              Group PIN
-              {currentGroup.has_pin && (
-                <span className="inline-flex items-center px-2 py-0.5 rounded text-xs bg-success/10 text-success font-medium">
-                  Active
-                </span>
-              )}
-            </label>
-            <p className="text-sm text-text-muted mb-3">
-              Optional 4-8 character PIN required when joining via invite code. Leave empty to remove.
-            </p>
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
-              <input
-                type="text"
-                value={pinInput}
-                onChange={(e) => setPinInput(e.target.value)}
-                className="input-field max-w-[200px]"
-                placeholder={currentGroup.has_pin ? "Enter new PIN..." : "Set a PIN..."}
-                maxLength={8}
-              />
-              <button
-                onClick={handleSetPin}
-                disabled={pinSaving}
-                className="btn-primary text-sm"
-              >
-                <KeyRound size={16} />
-                {pinSaving ? "Saving..." : pinInput.trim() ? "Set PIN" : "Remove PIN"}
-              </button>
-            </div>
-            {pinMessage && (
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-sm text-success mt-2"
-              >
-                {pinMessage}
-              </motion.p>
-            )}
           </div>
         </div>
       </section>
