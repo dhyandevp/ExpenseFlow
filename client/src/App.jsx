@@ -7,6 +7,8 @@ import NotFound from "./pages/NotFound";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 import Contact from "./pages/Contact";
+import CookiePolicy from "./pages/CookiePolicy";
+import RefundPolicy from "./pages/RefundPolicy";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -167,11 +169,14 @@ export default function App() {
         <AuthProvider>
           <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
             <Suspense fallback={<PageLoader />}>
+              <main>
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/terms" element={<Terms />} />
                 <Route path="/privacy" element={<Privacy />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/cookie-policy" element={<CookiePolicy />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
                 <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
                 <Route path="/home" element={<ProtectedRoute><GroupsHome /></ProtectedRoute>} />
                 <Route path="/profile-setup" element={<ProtectedRoute requireProfile={false}><ProfileSetup /></ProtectedRoute>} />
@@ -220,6 +225,7 @@ export default function App() {
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
+              </main>
         </Suspense>
       </GroupContext.Provider>
       </AuthProvider>
