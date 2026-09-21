@@ -49,6 +49,7 @@ export default function AccountMenu() {
           <img
             src={user.imageUrl}
             alt={displayName}
+            loading="lazy"
             className="w-8 h-8 rounded-full object-cover ring-2 ring-background"
           />
         ) : (

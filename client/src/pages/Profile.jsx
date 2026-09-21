@@ -74,9 +74,10 @@ export function Profile() {
           
           <div className="flex flex-col sm:flex-row gap-8 items-start">
             <div className="flex flex-col items-center gap-3 shrink-0">
-              <img 
-                src={user?.imageUrl} 
-                alt="Profile" 
+              <img
+                src={user?.imageUrl}
+                alt="Profile"
+                loading="lazy"
                 className="w-24 h-24 rounded-full object-cover shadow-sm ring-1 ring-border"
               />
               <span className="text-xs text-text-muted text-center max-w-[120px]">

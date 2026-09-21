@@ -102,9 +102,10 @@ export function ProfileSetup() {
             <div className="text-sm font-medium text-text-muted self-start w-full text-center">
               Profile photo
             </div>
-            <img 
-              src={user?.imageUrl} 
-              alt="Your Profile" 
+            <img
+              src={user?.imageUrl}
+              alt="Your Profile"
+              loading="lazy"
               className="w-20 h-20 rounded-full ring-4 ring-background shadow-md object-cover"
             />
             <p className="text-xs text-text-muted">

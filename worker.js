@@ -37,7 +37,14 @@ export default {
 
     // Serve Frontend Static Assets with SPA Fallback
     if (env.ASSETS) {
-      return env.ASSETS.fetch(request);
+      const res = await env.ASSETS.fetch(request);
+      // Hashed assets (/assets/*) are immutable; everything else (index.html) must revalidate
+      const cacheControl = pathname.startsWith('/assets/')
+        ? 'public, max-age=31536000, immutable'
+        : 'public, max-age=0, must-revalidate';
+      const headers = new Headers(res.headers);
+      headers.set('Cache-Control', cacheControl);
+      return new Response(res.body, { status: res.status, headers });
     }
 
     return new Response('Not found', { status: 404 });

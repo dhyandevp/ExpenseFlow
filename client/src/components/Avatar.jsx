@@ -5,12 +5,13 @@ export default function Avatar({ member, size = 32, className = "" }) {
 
   if (member.photoURL) {
     return (
-      <img 
-        src={member.photoURL} 
-        alt={member.name || "Member"} 
-        width={size} 
-        height={size} 
-        className={`rounded-full object-cover ${className}`} 
+      <img
+        src={member.photoURL}
+        alt={member.name || "Member"}
+        width={size}
+        height={size}
+        loading="lazy"
+        className={`rounded-full object-cover ${className}`}
         style={{ width: size, height: size }}
       />
     );
