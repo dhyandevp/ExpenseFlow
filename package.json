@@ -7,7 +7,7 @@
     "dev": "node scripts/dev.js",
     "dev:api": "wrangler dev",
     "dev:client": "npm --prefix client run dev",
-    "build": "npm --prefix client ci && npm --prefix client run build",
+    "build": "npm run build --workspace=client",
     "preview": "npm run build && wrangler dev",
     "deploy": "npm run build && wrangler deploy",
     "install:all": "npm install && npm --prefix client install",
