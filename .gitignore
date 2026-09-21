@@ -33,3 +33,9 @@ ExpenseFlow Image/
 
 # Foglamp scan (contains edit token)
 .foglamp/
+
+# Claude Code
+.claude/
+
+# Personal notes
+notes and things that done in this project (obsidian)/
