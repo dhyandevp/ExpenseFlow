@@ -7,7 +7,6 @@ export default defineConfig({
   base: "/",
   server: {
     port: 5173,
-    hmr: false,
     proxy: {
       "/api": {
         target: "http://127.0.0.1:8787",
@@ -25,7 +24,7 @@ export default defineConfig({
           charts: ["recharts"],
           motion: ["framer-motion"],
           clerk: ["@clerk/clerk-react"],
-          firebase: ["firebase/app", "firebase/firestore", "firebase/auth", "firebase/storage"]
+          firebase: ["firebase/app", "firebase/firestore", "firebase/auth"]
         },
       },
     },

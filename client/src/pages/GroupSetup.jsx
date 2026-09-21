@@ -95,7 +95,7 @@ function GroupSetup() {
         members: validMembers,
         settlement_threshold: settlementThreshold,
         fairness_models: categories.map((c) => ({ category: c.name, model_type: c.split_model, iconName: c.iconName, is_default: c.is_default })),
-      });
+      }, user?.id);
       setCreatedGroup({ ...res.data, code: res.data.code });
       setCurrentGroup(res.data);
     } catch (err) {

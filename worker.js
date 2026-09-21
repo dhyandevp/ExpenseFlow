@@ -2,6 +2,8 @@ import handleHealth from './api/health.js';
 import handleJwtBridge from './api/auth/jwt-bridge.js';
 import handleClerkWebhook from './api/clerk-webhook.js';
 import handleDeleteGroup from './api/delete-group.js';
+import handleJoinGroup from './api/join-group.js';
+import { getCorsHeaders } from './api/_lib/cors.js';
 
 export default {
   async fetch(request, env, ctx) {
@@ -10,15 +12,9 @@ export default {
 
     // Global CORS preflight for all /api endpoints
     if (request.method === 'OPTIONS' && pathname.startsWith('/api/')) {
-      const origin = request.headers.get('Origin') || '*';
       return new Response(null, {
         status: 204,
-        headers: {
-          'Access-Control-Allow-Origin': origin,
-          'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
-          'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id',
-          'Access-Control-Allow-Credentials': 'true',
-        }
+        headers: getCorsHeaders(request.headers.get('Origin')),
       });
     }
 
@@ -34,6 +30,9 @@ export default {
     }
     if (pathname === '/api/delete-group') {
       return handleDeleteGroup(request, env, ctx);
+    }
+    if (pathname === '/api/join-group') {
+      return handleJoinGroup(request, env, ctx);
     }
 
     // Serve Frontend Static Assets with SPA Fallback

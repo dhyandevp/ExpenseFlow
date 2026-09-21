@@ -1,17 +1,16 @@
 import { verifyToken } from '@clerk/backend';
 import { logger, generateRequestId } from './_lib/logger.js';
 import { parseServiceAccount, getDoc, recursiveDeleteGroup } from './_lib/firebase-rest.js';
+import { getCorsHeaders } from './_lib/cors.js';
+
+// ponytail: groupId format — alphanumeric + hyphens, up to 128 chars. Tighten if Firestore auto-IDs are always 20 chars.
+const GROUP_ID_RE = /^[a-zA-Z0-9_-]{1,128}$/;
 
 export async function handleDeleteGroupRequest({ method, headers, query, env, requestId }) {
   const startTime = Date.now();
-  const route = '/api/delete-group';
 
-  const origin = headers.origin || headers.referer || '*';
   const corsHeaders = {
-    'Access-Control-Allow-Origin': origin,
-    'Access-Control-Allow-Methods': 'DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id',
-    'Access-Control-Allow-Credentials': 'true',
+    ...getCorsHeaders(headers.origin),
     'Content-Type': 'application/json'
   };
 
@@ -44,8 +43,8 @@ export async function handleDeleteGroupRequest({ method, headers, query, env, re
     }
 
     const groupId = query.groupId;
-    if (!groupId) {
-      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'groupId is required', requestId }) };
+    if (!groupId || !GROUP_ID_RE.test(groupId)) {
+      return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'groupId is required and must be alphanumeric', requestId }) };
     }
 
     // Vitest test environment with mocked firebase-admin
@@ -58,6 +57,11 @@ export async function handleDeleteGroupRequest({ method, headers, query, env, re
 
       if (!groupDoc.exists) {
         return { status: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Group not found', requestId }) };
+      }
+
+      const testData = groupDoc.data();
+      if (testData.createdBy && testData.createdBy !== clerkUserId) {
+        return { status: 403, headers: corsHeaders, body: JSON.stringify({ error: 'Only the group owner can delete this group', requestId }) };
       }
 
       await db.recursiveDelete(groupRef);
@@ -78,6 +82,11 @@ export async function handleDeleteGroupRequest({ method, headers, query, env, re
       return { status: 404, headers: corsHeaders, body: JSON.stringify({ error: 'Group not found', requestId }) };
     }
 
+    // Ownership check: only the creator can delete
+    if (groupDoc.createdBy && groupDoc.createdBy !== clerkUserId) {
+      return { status: 403, headers: corsHeaders, body: JSON.stringify({ error: 'Only the group owner can delete this group', requestId }) };
+    }
+
     await recursiveDeleteGroup(sa, groupId);
 
     logger.info('group_deleted_successfully', { requestId, groupId, clerkUserId, durationMs: Date.now() - startTime });
@@ -85,7 +94,7 @@ export async function handleDeleteGroupRequest({ method, headers, query, env, re
 
   } catch (error) {
     logger.error('group_deletion_failed', { requestId, error });
-    return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Internal server error: ' + error.message, requestId }) };
+    return { status: 500, headers: corsHeaders, body: JSON.stringify({ error: 'Internal server error', requestId }) };
   }
 }
 

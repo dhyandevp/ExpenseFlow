@@ -21,41 +21,51 @@ service cloud.firestore {
     }
 
     function canAccessGroup(groupId) {
-      return isClerkUser() || isGuestForGroup(groupId);
+      // Clerk users: must be in group's memberUserIds (or legacy group without the field)
+      // Guests: scoped to their assigned group
+      return (isClerkUser() && isMemberOfGroup(groupId)) || isGuestForGroup(groupId);
+    }
+
+    function isMemberOfGroup(groupId) {
+      let groupData = get(/databases/$(database)/documents/groups/$(groupId)).data;
+      return !('memberUserIds' in groupData) || request.auth.uid in groupData.memberUserIds;
     }
 
     // ── Groups ──────────────────────────────────────────────────────────
     match /groups/{groupId} {
       allow read: if canAccessGroup(groupId);
-      allow create: if isClerkUser();
+      allow create: if isClerkUser()
+                    && request.resource.data.createdBy == request.auth.uid;
       allow update: if isClerkUser()
                     && !request.resource.data.diff(resource.data).affectedKeys()
                         .hasAny(['currentBalances']);
-      allow delete: if isClerkUser();
+      // Owner-only delete (legacy groups without createdBy: allow any Clerk user)
+      allow delete: if isClerkUser()
+                    && (!('createdBy' in resource.data) || resource.data.createdBy == request.auth.uid);
 
       // Members
       match /members/{memberId} {
         allow read: if canAccessGroup(groupId);
-        allow write: if isClerkUser();
+        allow write: if canAccessGroup(groupId) && isClerkUser();
       }
 
       // Categories
       match /categories/{catId} {
         allow read: if canAccessGroup(groupId);
-        allow write: if isClerkUser();
+        allow write: if canAccessGroup(groupId) && isClerkUser();
       }
 
       // Expenses — guests can create but only Clerk users can edit/delete
       match /expenses/{expenseId} {
         allow read, create: if canAccessGroup(groupId);
-        allow update, delete: if isClerkUser();
+        allow update, delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
       // Settlements — append-only ledger, no edits or deletes for guests
       match /settlements/{settlementId} {
         allow read, create: if canAccessGroup(groupId);
         allow update: if false;
-        allow delete: if isClerkUser();
+        allow delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
       // Scenarios

@@ -29,7 +29,7 @@ function sanitizePayload(payload) {
           name: sanitized.error.name,
           message: sanitized.error.message,
           // Only include stack in development if needed, but for Vercel prod we probably want to omit or log separately
-          stack: process.env.NODE_ENV === 'development' ? sanitized.error.stack : undefined
+          stack: (typeof process !== 'undefined' && process.env?.NODE_ENV === 'development') ? sanitized.error.stack : undefined
       };
   }
   return sanitized;
@@ -40,7 +40,7 @@ function logEvent(level, event, payload = {}) {
     level,
     event,
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'production',
+    environment: (typeof process !== 'undefined' && process.env?.NODE_ENV) || 'production',
     ...sanitizePayload(payload)
   };
   

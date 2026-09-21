@@ -1,5 +1,6 @@
 import { verifyToken } from '@clerk/backend';
 import { logger, generateRequestId } from '../_lib/logger.js';
+import { getCorsHeaders } from '../_lib/cors.js';
 import {
   parseServiceAccount,
   createFirebaseCustomToken,
@@ -33,20 +34,8 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
 
   logger.info('request_received', { requestId, method, route });
 
-  const origin = headers.origin || headers.referer || '*';
-  const allowedOrigins = [
-    'https://expenseflow.site',
-    'https://expense-flow-two.vercel.app',
-    'http://localhost:5173',
-    'http://localhost:8787',
-    'http://localhost:3000'
-  ];
-
   const corsHeaders = {
-    'Access-Control-Allow-Origin': allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization, x-request-id',
-    'Access-Control-Allow-Credentials': 'true',
+    ...getCorsHeaders(headers.origin),
     'Content-Type': 'application/json'
   };
 
@@ -147,6 +136,17 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
         status: 400,
         headers: corsHeaders,
         body: JSON.stringify({ error: 'Code is required for guest access', requestId })
+      };
+    }
+
+    // Validate code format: 6 alphanumeric uppercase chars
+    const cleanedCode = code.trim().toUpperCase();
+    if (!/^[A-Z0-9]{4,8}$/.test(cleanedCode)) {
+      logger.warn('guest_auth_failure', { requestId, reason: 'invalid_code_format' });
+      return {
+        status: 400,
+        headers: corsHeaders,
+        body: JSON.stringify({ error: 'Invalid group code format', requestId })
       };
     }
 
@@ -313,7 +313,7 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
       return {
         status: 500,
         headers: corsHeaders,
-        body: JSON.stringify({ error: 'Internal database error: ' + fsErr.message, requestId })
+        body: JSON.stringify({ error: 'Internal server error', requestId })
       };
     }
   }
@@ -357,7 +357,7 @@ export default async function handler(reqOrRequest, resOrEnv, ctx) {
       return res.status(result.status).json(JSON.parse(result.body));
     } catch (err) {
       logger.error('request_failed', { requestId, error: err.message });
-      return res.status(500).json({ error: 'Internal server error: ' + err.message, requestId });
+      return res.status(500).json({ error: 'Internal server error', requestId });
     }
   }
 
@@ -382,7 +382,7 @@ export default async function handler(reqOrRequest, resOrEnv, ctx) {
     });
   } catch (err) {
     logger.error('request_failed', { requestId, error: err.message });
-    return new Response(JSON.stringify({ error: 'Internal server error: ' + err.message, requestId }), {
+    return new Response(JSON.stringify({ error: 'Internal server error', requestId }), {
       status: 500,
       headers: { 'Content-Type': 'application/json' }
     });

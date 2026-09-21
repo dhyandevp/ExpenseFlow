@@ -20,8 +20,11 @@ export function calculateBalances(members, expenses, settlements = []) {
   }
 
   // Aggregate expenses per expense instead of globally
+  const memberIds = new Set(members.map(m => m.id));
   for (const e of expenses) {
     const payer = e.paidBy;
+    // Skip ghost members (deleted members referenced by old expenses)
+    if (!memberIds.has(payer)) continue;
     paidMap[payer] = (paidMap[payer] || 0) + e.amount;
     totalExpenses += e.amount;
 
@@ -63,6 +66,14 @@ export function calculateBalances(members, expenses, settlements = []) {
       net_balance: Math.round(net * 100) / 100,
     };
   });
+
+  // Residual rounding adjustment: ensure sum(net_balance) === 0
+  const residual = balances.reduce((sum, b) => sum + b.net_balance, 0);
+  if (Math.abs(residual) > 0 && balances.length > 0) {
+    // Apply the rounding residual to the member with the largest absolute balance
+    const target = balances.reduce((max, b) => Math.abs(b.net_balance) > Math.abs(max.net_balance) ? b : max, balances[0]);
+    target.net_balance = Math.round((target.net_balance - residual) * 100) / 100;
+  }
 
   const settlement_suggestions = calculateSettlementSuggestions(balances);
 
@@ -177,7 +188,7 @@ export function calculateCategoryBreakdown(members, expenses) {
   return { breakdown, insights, members };
 }
 
-export function calculateFairnessScore(members, expenses) {
+export function calculateFairnessScore(members, expenses, { currency = '₹' } = {}) {
   const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
 
   const memberPaid = {};
@@ -221,10 +232,10 @@ export function calculateFairnessScore(members, expenses) {
       explanation = `${m.name} is contributing close to their fair share. Great balance!`;
     } else if (score >= 50) {
       status = "slightly_off";
-      explanation = `${m.name} is ${paid > fairShare ? "ahead by ₹" + Math.round((paid - fairShare) * 100) / 100 : "behind by ₹" + Math.round((fairShare - paid) * 100) / 100}. A small adjustment would balance things.`;
+      explanation = `${m.name} is ${paid > fairShare ? "ahead by " + currency + Math.round((paid - fairShare) * 100) / 100 : "behind by " + currency + Math.round((fairShare - paid) * 100) / 100}. A small adjustment would balance things.`;
     } else {
       status = "significantly_off";
-      explanation = `${m.name} is ${paid > fairShare ? "significantly ahead by ₹" + Math.round((paid - fairShare) * 100) / 100 : "significantly behind by ₹" + Math.round((fairShare - paid) * 100) / 100}. Consider settling some expenses.`;
+      explanation = `${m.name} is ${paid > fairShare ? "significantly ahead by " + currency + Math.round((paid - fairShare) * 100) / 100 : "significantly behind by " + currency + Math.round((fairShare - paid) * 100) / 100}. Consider settling some expenses.`;
     }
 
     return {

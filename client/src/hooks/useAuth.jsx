@@ -129,9 +129,8 @@ export function AuthProvider({ children }) {
             } catch (err) {
               frontLogger.error("profile_fetch_failed", { message: err.message });
               setUserProfile(null);
-              // For 404s, consider it missing. For other errors, it might be an error state.
-              // Assuming missing to allow them to create it if backend doesn't have it.
-              setProfileStatus("missing");
+              // Network/permission errors → error state (retryable); not "missing" which triggers onboarding
+              setProfileStatus("error");
             }
           } else {
             setAuthMode("none");
