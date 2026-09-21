@@ -135,4 +135,23 @@
       background-color: var(--background);
     }
   }
+
+  /* Skip to main content link */
+  .skip-to-main {
+    @apply absolute -top-10 left-4 z-[100] bg-primary text-background px-4 py-2 rounded-b-xl font-semibold text-sm;
+    transition: top 0.2s;
+  }
+  .skip-to-main:focus {
+    top: 0;
+  }
+}
+
+/* Respect prefers-reduced-motion globally */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

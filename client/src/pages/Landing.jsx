@@ -113,6 +113,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background font-sans overflow-x-hidden">
+      <a href="#main-content" className="skip-to-main">Skip to main content</a>
       <SignInModal isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
       <GuestJoinModal isOpen={isGuestJoinOpen} onClose={() => setIsGuestJoinOpen(false)} />
 
@@ -158,6 +159,7 @@ function Landing() {
       </motion.header>
 
       {/* Hero */}
+      <main id="main-content">
       <section className="px-6 pt-16 pb-20 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -690,6 +692,7 @@ function Landing() {
       </section>
 
       {/* Footer */}
+      </main>
       <footer className="px-6 pt-16 pb-24 md:pb-12 bg-white border-t border-border mt-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
@@ -731,6 +734,8 @@ function Landing() {
               <ul className="space-y-3 text-sm text-text-muted">
                 <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
                 <li><Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/cookie-policy" className="hover:text-primary transition-colors">Cookie Policy</Link></li>
+                <li><Link to="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</Link></li>
                 <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Support</Link></li>
               </ul>
             </div>

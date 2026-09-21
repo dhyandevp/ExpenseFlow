@@ -22,8 +22,8 @@ export function getFairnessStatus(score) {
  */
 export function getBalanceColor(netBalance) {
   if (netBalance > 0) return "text-success";
-  if (netBalance < 0) return "text-muted";
-  return "text-dark";
+  if (netBalance < 0) return "text-text-muted";
+  return "text-text-dark";
 }
 
 /**

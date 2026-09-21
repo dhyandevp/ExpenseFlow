@@ -191,6 +191,7 @@ export default function AddCategoryModal({ isOpen, onClose, onSave, existingName
                   <button
                     key={c}
                     type="button"
+                    aria-label={`Color ${c}`}
                     onClick={() => setColor(c)}
                     className={`w-8 h-8 rounded-full transition-all ${
                       color === c ? "ring-2 ring-primary ring-offset-2" : ""

@@ -2,6 +2,7 @@ import { Dialog, DialogPanel } from "@headlessui/react";
 import { X, LogIn, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSignIn, useSignUp } from "@clerk/clerk-react";
+import { Link } from "react-router-dom";
 
 export default function SignInModal({ isOpen, onClose }) {
   const { isLoaded: isSignInLoaded, signIn, setActive: setSignInActive } = useSignIn();
@@ -15,6 +16,7 @@ export default function SignInModal({ isOpen, onClose }) {
   const [loading, setLoading] = useState(false);
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState("");
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   const isSignUp = activeTab === "signup";
 
@@ -22,6 +24,7 @@ export default function SignInModal({ isOpen, onClose }) {
     setActiveTab(tab);
     setError("");
     setFieldErrors({});
+    setAgreedToTerms(false);
     setPendingVerification(false);
     setCode("");
   };
@@ -44,6 +47,7 @@ export default function SignInModal({ isOpen, onClose }) {
     const newErrors = {};
     if (!email.trim()) newErrors.email = "Email is required.";
     if (!password.trim()) newErrors.password = "Password is required.";
+    if (isSignUp && !agreedToTerms) newErrors.terms = "You must agree to the Terms and Privacy Policy.";
     if (Object.keys(newErrors).length > 0) {
       setFieldErrors(newErrors);
       return;
@@ -230,9 +234,11 @@ export default function SignInModal({ isOpen, onClose }) {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <input 
-                  type="email" 
-                  placeholder="Email Address" 
+                <label htmlFor="signin-email" className="block text-sm font-medium text-[#293E33] mb-1">Email Address</label>
+                <input
+                  id="signin-email"
+                  type="email"
+                  placeholder="you@example.com"
                   value={email}
                   onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(err => ({ ...err, email: null })); }}
                   required
@@ -241,9 +247,11 @@ export default function SignInModal({ isOpen, onClose }) {
                 {fieldErrors.email && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.email}</p>}
               </div>
               <div>
-                <input 
-                  type="password" 
-                  placeholder="Password" 
+                <label htmlFor="signin-password" className="block text-sm font-medium text-[#293E33] mb-1">Password</label>
+                <input
+                  id="signin-password"
+                  type="password"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(err => ({ ...err, password: null })); }}
                   required
@@ -251,7 +259,24 @@ export default function SignInModal({ isOpen, onClose }) {
                 />
                 {fieldErrors.password && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.password}</p>}
               </div>
-              
+
+              {isSignUp && (
+                <div>
+                  <label className="flex items-start gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={agreedToTerms}
+                      onChange={(e) => { setAgreedToTerms(e.target.checked); if (fieldErrors.terms) setFieldErrors(err => ({ ...err, terms: null })); }}
+                      className="mt-1 w-4 h-4 rounded border-[#C2CBC9] text-[#105D5E] focus:ring-[#105D5E]"
+                    />
+                    <span className="text-xs text-[#767F7D] leading-relaxed">
+                      I agree to the <Link to="/terms" className="text-[#105D5E] hover:underline" onClick={(e) => e.stopPropagation()}>Terms of Service</Link> and <Link to="/privacy" className="text-[#105D5E] hover:underline" onClick={(e) => e.stopPropagation()}>Privacy Policy</Link>.
+                    </span>
+                  </label>
+                  {fieldErrors.terms && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.terms}</p>}
+                </div>
+              )}
+
               {error && (
                 <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
                   {error}

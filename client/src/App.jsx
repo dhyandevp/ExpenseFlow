@@ -169,7 +169,6 @@ export default function App() {
         <AuthProvider>
           <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
             <Suspense fallback={<PageLoader />}>
-              <main>
               <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/terms" element={<Terms />} />
@@ -225,7 +224,6 @@ export default function App() {
             />
             <Route path="*" element={<NotFound />} />
           </Routes>
-              </main>
         </Suspense>
       </GroupContext.Provider>
       </AuthProvider>
