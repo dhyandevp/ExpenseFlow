@@ -27,11 +27,10 @@ import {
   Image as ImageIcon,
   LogIn
 } from "lucide-react";
-import SignInModal from "../components/auth/SignInModal";
-import GuestJoinModal from "../components/auth/GuestJoinModal";
 import { useAuth } from "../hooks/useAuth";
 import Logo from "../components/Logo";
 import ThemeToggle from "../components/ThemeToggle";
+import { getAppUrl } from "../lib/host";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
@@ -78,8 +77,6 @@ function Landing() {
   const { user, isLoaded, authMode, profileStatus } = useAuth();
   const { isLoaded: isClerkLoaded, user: clerkUser } = useUser();
   
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isGuestJoinOpen, setIsGuestJoinOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
 
   // If already authenticated, redirect
@@ -114,8 +111,6 @@ function Landing() {
   return (
     <div className="min-h-screen bg-background font-sans overflow-x-hidden">
       <a href="#main-content" className="skip-to-main">Skip to main content</a>
-      <SignInModal isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
-      <GuestJoinModal isOpen={isGuestJoinOpen} onClose={() => setIsGuestJoinOpen(false)} />
 
       {/* Header */}
       <motion.header
@@ -130,7 +125,7 @@ function Landing() {
               ExpenseFlow
             </span>
           </div>
-          
+
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-text-muted">
             <button onClick={() => scrollTo('features')} className="hover:text-text-dark transition-colors">Features</button>
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-text-dark transition-colors">How it works</button>
@@ -139,18 +134,18 @@ function Landing() {
 
           <div className="flex items-center gap-3">
             <ThemeToggle size="sm" />
-            <button
-              onClick={() => setIsSignInOpen(true)}
+            <a
+              href={getAppUrl('/login')}
               className="text-primary font-semibold hover:bg-highlight/30 px-4 py-2 rounded-xl transition-all duration-300 text-sm hidden sm:block"
             >
               Sign In
-            </button>
-            <button
-              onClick={() => setIsGuestJoinOpen(true)}
-              className="btn-primary text-sm"
+            </a>
+            <a
+              href={getAppUrl('/login')}
+              className="btn-primary text-sm inline-flex items-center justify-center"
             >
               Join with Code
-            </button>
+            </a>
           </div>
         </div>
       </motion.header>
@@ -186,17 +181,17 @@ function Landing() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <button onClick={() => setIsSignInOpen(true)} className="btn-primary text-base px-8 py-4">
+              <a href={getAppUrl('/signup')} className="btn-primary text-base px-8 py-4 inline-flex items-center justify-center gap-2">
                 Sign In to Create
                 <ArrowRight size={18} />
-              </button>
-              <button
-                onClick={() => setIsGuestJoinOpen(true)}
-                className="btn-secondary text-base px-8 py-4 bg-surface/70 hover:bg-surface border border-border/60"
+              </a>
+              <a
+                href={getAppUrl('/login')}
+                className="btn-secondary text-base px-8 py-4 bg-surface/70 hover:bg-surface border border-border/60 inline-flex items-center justify-center gap-2"
               >
                 <Users size={18} />
                 Join as Guest
-              </button>
+              </a>
             </motion.div>
           </div>
 
@@ -671,18 +666,18 @@ function Landing() {
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button
-                onClick={() => setIsSignInOpen(true)}
-                className="cta-btn-primary font-bold px-8 py-4 rounded-xl transition-all shadow-md"
+              <a
+                href={getAppUrl('/signup')}
+                className="cta-btn-primary font-bold px-8 py-4 rounded-xl transition-all shadow-md inline-flex items-center justify-center"
               >
                 Create a Group
-              </button>
-              <button
-                onClick={() => setIsGuestJoinOpen(true)}
-                className="cta-btn-secondary font-bold px-8 py-4 rounded-xl transition-all"
+              </a>
+              <a
+                href={getAppUrl('/login')}
+                className="cta-btn-secondary font-bold px-8 py-4 rounded-xl transition-all inline-flex items-center justify-center"
               >
                 Join with Code
-              </button>
+              </a>
             </div>
           </div>
         </motion.div>
@@ -704,7 +699,7 @@ function Landing() {
                 Fair sharing, clear minds. Designed to help groups track expenses and settle up without the awkwardness.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Product</h4>
               <ul className="space-y-3 text-sm text-text-muted">
@@ -713,15 +708,15 @@ function Landing() {
                 <li><button onClick={() => scrollTo('faq')} className="hover:text-primary transition-colors">FAQ</button></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Account</h4>
               <ul className="space-y-3 text-sm text-text-muted">
-                <li><button onClick={() => setIsSignInOpen(true)} className="hover:text-primary transition-colors">Sign In</button></li>
-                <li><button onClick={() => setIsGuestJoinOpen(true)} className="hover:text-primary transition-colors">Join with Code</button></li>
+                <li><a href={getAppUrl('/login')} className="hover:text-primary transition-colors">Sign In</a></li>
+                <li><a href={getAppUrl('/login')} className="hover:text-primary transition-colors">Join with Code</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Legal</h4>
               <ul className="space-y-3 text-sm text-text-muted">
@@ -733,7 +728,7 @@ function Landing() {
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-text-muted">
             <p>© {new Date().getFullYear()} ExpenseFlow. All rights reserved.</p>
             <p>Made for roommates, couples, and close friends.</p>
@@ -742,13 +737,13 @@ function Landing() {
       </footer>
 
       {/* Public FAB */}
-      <button
-        onClick={() => setIsGuestJoinOpen(true)}
+      <a
+        href={getAppUrl('/login')}
         className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center bg-primary text-background"
         aria-label="Join with Code"
       >
         <Users size={24} />
-      </button>
+      </a>
 
       {/* Public Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
@@ -767,13 +762,13 @@ function Landing() {
             <Star size={20} />
             <span className="text-[10px] font-medium">Features</span>
           </button>
-          <button
-            onClick={() => setIsSignInOpen(true)}
+          <a
+            href={getAppUrl('/login')}
             className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all text-text-muted hover:text-text-dark"
           >
             <LogIn size={20} />
             <span className="text-[10px] font-medium">Sign In</span>
-          </button>
+          </a>
         </div>
       </nav>
     </div>
