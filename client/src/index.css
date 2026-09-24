@@ -16,13 +16,58 @@
     --highlight-foreground: #293E33;
     --muted:             #C2CBC9;
     --muted-foreground:  #767F7D;
-    --accent:            #E8E300;
-    --accent-foreground: #293E33;
+    --accent:            #FF3B30;
+    --accent-foreground: #FFFFFF;
     --text-dark:         #293E33;
     --text-muted:        #767F7D;
     --border:            #C2CBC9;
     --ring:              #105D5E;
-    --radius:            0.75rem;
+    --radius:            0.875rem;
+  }
+
+  /* Dark mode — aurora forest at night */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --background:        #0F1A14;
+      --foreground:        #E2EDE6;
+      --surface:           #1A2E22;
+      --primary:           #4FD1C5;
+      --primary-hover:     #63E0D5;
+      --primary-foreground: #0F1A14;
+      --success:           #34D399;
+      --success-foreground: #0F1A14;
+      --highlight:         #243D2D;
+      --highlight-foreground: #E8F0EB;
+      --muted:             #3A5244;
+      --muted-foreground:  #A3B5A9;
+      --accent:            #FF7B73;
+      --accent-foreground: #FFFFFF;
+      --text-dark:         #ECF3EE;
+      --text-muted:        #A3B5A9;
+      --border:            #344E3C;
+      --ring:              #4FD1C5;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --background:        #0F1A14;
+    --foreground:        #ECF3EE;
+    --surface:           #1A2E22;
+    --primary:           #4FD1C5;
+    --primary-hover:     #63E0D5;
+    --primary-foreground: #0F1A14;
+    --success:           #34D399;
+    --success-foreground: #0F1A14;
+    --highlight:         #243D2D;
+    --highlight-foreground: #E8F0EB;
+    --muted:             #3A5244;
+    --muted-foreground:  #A3B5A9;
+    --accent:            #FF7B73;
+    --accent-foreground: #FFFFFF;
+    --text-dark:         #ECF3EE;
+    --text-muted:        #A3B5A9;
+    --border:            #344E3C;
+    --ring:              #4FD1C5;
   }
 
   body {
@@ -68,35 +113,53 @@
 
 @layer components {
   .card {
-    @apply bg-surface rounded-xl border border-border p-5;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    @apply bg-surface rounded-2xl border border-border p-5;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   }
 
   .card-hover {
-    @apply card transition-all duration-200 hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] hover:-translate-y-0.5;
+    @apply card transition-all duration-300 ease-out;
+  }
+  .card-hover:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+    transform: translateY(-1px);
+  }
+
+  /* Dark card hover — stronger shadow for contrast */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .card-hover:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
+  }
+  :root[data-theme="dark"] .card-hover:hover {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
-           bg-primary text-background font-semibold text-sm
-           transition-all duration-200
-           hover:brightness-90 active:scale-[0.97]
+           bg-primary font-semibold text-sm
+           transition-all duration-300 ease-out
+           hover:brightness-95 active:scale-[0.97] active:duration-100
            disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100;
+    color: var(--primary-foreground);
   }
 
   .btn-secondary {
     @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl
            bg-highlight text-text-dark font-semibold text-sm
-           transition-all duration-200
-           hover:bg-success hover:text-surface active:scale-[0.97]
+           transition-all duration-300 ease-out
+           hover:bg-highlight active:scale-[0.97] active:duration-100
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl
            border border-border text-text-dark font-medium text-sm
-           transition-all duration-200
-           hover:bg-background active:scale-[0.97];
+           transition-all duration-300 ease-out
+           active:scale-[0.97] active:duration-100;
+  }
+  .btn-ghost:hover {
+    background-color: color-mix(in srgb, var(--highlight) 30%, transparent);
   }
 
   .input-field {
@@ -111,21 +174,51 @@
     @apply animate-pulse bg-border bg-opacity-50 rounded-lg;
   }
 
-  /* Liquid Glass Utilities */
+  /* Glass Utilities — frosted-glass with clean neutral tint */
   .glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    background-color: rgba(255, 255, 255, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.8);
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background-color: rgba(255, 255, 255, 0.72);
+    border: 0.5px solid rgba(0, 0, 0, 0.06);
   }
 
   .glass-nav {
-    @apply glass border-b-0 border-r-0 border-l-0 shadow-[0_-4px_24px_rgba(0,0,0,0.05)];
+    @apply glass;
+    border-bottom: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: 0 -0.5px 0 rgba(0, 0, 0, 0.08);
   }
 
   .glass-header {
-    @apply glass border-t-0 border-l-0 border-r-0 shadow-[0_4px_24px_rgba(0,0,0,0.05)];
+    @apply glass;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    box-shadow: 0 0.5px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .glass {
+      background-color: rgba(15, 26, 20, 0.78);
+      border-color: rgba(255, 255, 255, 0.06);
+    }
+    :root:not([data-theme="light"]) .glass-nav {
+      box-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.08);
+    }
+    :root:not([data-theme="light"]) .glass-header {
+      box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.08);
+    }
+  }
+  :root[data-theme="dark"] .glass {
+    background-color: rgba(15, 26, 20, 0.78);
+    border-color: rgba(255, 255, 255, 0.06);
+  }
+  :root[data-theme="dark"] .glass-nav {
+    box-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.08);
+  }
+  :root[data-theme="dark"] .glass-header {
+    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.08);
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -144,14 +237,113 @@
   .skip-to-main:focus {
     top: 0;
   }
+
+  /* Landing CTA banner */
+  .cta-card {
+    background-color: #105D5E;
+    color: #FFFFFF;
+  }
+  .cta-card .cta-btn-primary {
+    background-color: #FFFFFF;
+    color: #105D5E;
+  }
+  .cta-card .cta-btn-primary:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+  }
+  .cta-card .cta-btn-secondary {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    color: #FFFFFF;
+  }
+  .cta-card .cta-btn-secondary:hover {
+    background-color: rgba(255, 255, 255, 0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .cta-card {
+      background: linear-gradient(145deg, #182C22 0%, #112018 100%);
+      border: 1px solid var(--border);
+      color: var(--text-dark);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    }
+    :root:not([data-theme="light"]) .cta-card .cta-btn-primary {
+      background-color: var(--primary);
+      color: var(--primary-foreground);
+    }
+    :root:not([data-theme="light"]) .cta-card .cta-btn-primary:hover {
+      filter: brightness(1.08);
+    }
+    :root:not([data-theme="light"]) .cta-card .cta-btn-secondary {
+      background-color: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text-dark);
+    }
+    :root:not([data-theme="light"]) .cta-card .cta-btn-secondary:hover {
+      background-color: var(--highlight);
+    }
+    :root:not([data-theme="light"]) .cta-card .cta-subtitle {
+      color: var(--text-muted);
+    }
+  }
+
+  :root[data-theme="dark"] .cta-card {
+    background: linear-gradient(145deg, #182C22 0%, #112018 100%);
+    border: 1px solid var(--border);
+    color: var(--text-dark);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+  }
+  :root[data-theme="dark"] .cta-card .cta-btn-primary {
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+  :root[data-theme="dark"] .cta-card .cta-btn-primary:hover {
+    filter: brightness(1.08);
+  }
+  :root[data-theme="dark"] .cta-card .cta-btn-secondary {
+    background-color: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text-dark);
+  }
+  :root[data-theme="dark"] .cta-card .cta-btn-secondary:hover {
+    background-color: var(--highlight);
+  }
+  :root[data-theme="dark"] .cta-card .cta-subtitle {
+    color: var(--text-muted);
+  }
 }
 
-/* Respect prefers-reduced-motion globally */
+/* Respect prefers-reduced-motion: remove vestibular motion, keep opacity/color */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* Strip transform-based motion but keep opacity fades and color transitions alive */
+  *:not(.skeleton) {
+    transition-property: opacity, color, background-color, border-color, box-shadow !important;
+    transition-duration: 200ms !important;
+  }
+
+  /* Keep skeleton pulse — loading indicator, not vestibular motion */
+  .skeleton {
+    animation-duration: 1.5s !important;
+  }
+}
+
+/* High contrast: solid backgrounds, stronger borders, better text contrast */
+@media (prefers-contrast: more) {
+  :root {
+    --background: #FFFFFF;
+    --surface: #FFFFFF;
+    --border: #8E8E93;
+    --text-muted: #4A524F;
+    --muted-foreground: #4A524F;
+  }
+
+  .glass, .glass-nav, .glass-header {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: var(--surface);
+    border-color: var(--border);
   }
 }

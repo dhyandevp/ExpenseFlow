@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 function RefundPolicy() {
   return (
     <main className="min-h-screen bg-background pt-24 pb-12 px-4">
-      <div className="max-w-4xl mx-auto bg-white/70 backdrop-blur-md border border-white/60 shadow-xl shadow-[#105D5E]/5 rounded-3xl p-8 md:p-12">
+      <div className="max-w-4xl mx-auto bg-surface/70 backdrop-blur-md border border-border shadow-xl rounded-3xl p-8 md:p-12">
         <h1 className="text-primary font-bold text-3xl mb-2">Refund Policy</h1>
         <p className="text-text-muted mb-8">Last Updated: September 2026</p>
 

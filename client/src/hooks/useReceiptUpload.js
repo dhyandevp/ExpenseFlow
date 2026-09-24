@@ -1,6 +1,8 @@
 import { useState } from "react";
+import { useAuth } from "./useAuth";
 
 export function useReceiptUpload() {
+  const { firebaseUser } = useAuth();
   const [isUploading, setIsUploading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
@@ -42,6 +44,11 @@ export function useReceiptUpload() {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("upload_preset", uploadPreset);
+      // ponytail: per-user folder isolation. Guests use shared folder.
+      const folder = firebaseUser?.uid
+        ? `expenseflow/users/${firebaseUser.uid}`
+        : "expenseflow/guest";
+      formData.append("folder", folder);
 
       xhr.upload.addEventListener("progress", (e) => {
         if (e.lengthComputable) {

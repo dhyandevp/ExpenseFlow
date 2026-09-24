@@ -3,8 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Settings as SettingsIcon,
-  Edit3,
   Trash2,
   Save,
   LogOut,
@@ -12,7 +10,6 @@ import {
   Copy,
   Check,
   Shield,
-  TriangleAlert,
   X,
   PieChart
 } from "lucide-react";
@@ -204,9 +201,9 @@ function SettingsPage() {
       </div>
 
       {authMode === 'guest' && (
-        <div className="p-6 bg-[#E8E300]/10 border border-[#E8E300]/20 rounded-2xl flex flex-col sm:flex-row items-start justify-between gap-4">
+        <div className="p-6 bg-accent/10 border border-accent/20 rounded-2xl flex flex-col sm:flex-row items-start justify-between gap-4">
           <div className="flex items-start gap-3">
-            <Shield className="text-[#E8E300] shrink-0 mt-0.5" size={20} />
+            <Shield className="text-accent shrink-0 mt-0.5" size={20} />
             <div>
               <h3 className="font-semibold text-text-dark text-sm">Guest Mode</h3>
               <p className="text-sm text-text-muted mt-1 max-w-lg">
@@ -228,7 +225,7 @@ function SettingsPage() {
       <>
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Group Profile</h2>
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-border space-y-4">
+        <div className="p-6 bg-surface rounded-2xl shadow-sm border border-border space-y-4">
           <div>
             <label className="block text-sm font-medium text-text-dark mb-1">
               Group Name
@@ -294,7 +291,7 @@ function SettingsPage() {
 
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Members</h2>
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-border space-y-3">
+        <div className="p-6 bg-surface rounded-2xl shadow-sm border border-border space-y-3">
           {members.map((m) => (
             <div
               key={m.id}
@@ -321,7 +318,7 @@ function SettingsPage() {
 
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Categories & Splitting</h2>
-        <div className="bg-white rounded-2xl shadow-sm border border-border divide-y divide-border">
+        <div className="bg-surface rounded-2xl shadow-sm border border-border divide-y divide-border">
           {getGroupCategories(currentGroup).map((cat) => {
             const model = fairnessModels.find((fm) => fm.category === cat.name);
             const currentSplitLabel = modelOptions.find((o) => o.value === model?.model_type)?.label ||
@@ -354,7 +351,7 @@ function SettingsPage() {
 
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Access & Security</h2>
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-border space-y-6">
+        <div className="p-6 bg-surface rounded-2xl shadow-sm border border-border space-y-6">
           <div>
             <label className="block text-sm font-medium text-text-dark mb-2">
               Invite Code
@@ -393,7 +390,7 @@ function SettingsPage() {
 
       <section>
         <h2 className="font-heading font-semibold text-text-dark mb-4 text-lg">Danger Zone</h2>
-        <div className="p-6 bg-white rounded-2xl shadow-sm border border-red-100 flex flex-col md:flex-row gap-8 justify-between items-start">
+        <div className="p-6 bg-surface rounded-2xl shadow-sm border border-red-100 flex flex-col md:flex-row gap-8 justify-between items-start">
           
           <div className="flex-1 space-y-2">
             <h3 className="font-heading font-semibold text-text-dark">Leave group</h3>

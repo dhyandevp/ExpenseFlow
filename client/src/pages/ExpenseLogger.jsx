@@ -5,43 +5,19 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
   Trash2,
-  Home,
-  Zap,
-  ShoppingCart,
-  Wrench,
-  PartyPopper,
-  Package,
   ReceiptText,
 } from "lucide-react";
 import { useGroup } from "../App";
-import { getExpenses, createExpense, deleteExpense } from "../api/client";
+import { getExpenses, createExpense, deleteExpense, getBalances } from "../api/client";
 import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import ExpenseForm from "../components/ExpenseForm";
 import BalanceChip from "../components/BalanceChip";
-import { getBalances } from "../api/client";
 import { ReceiptIndicator, ReceiptLightbox } from "../components/ReceiptUpload";
 import SettlementHistory from "../components/SettlementHistory";
-import { springScale } from "../utils/motion";
+import { springScale, projectMomentum, haptic } from "../utils/motion";
 import Avatar from "../components/Avatar";
 import { CategoryIcon } from "../utils/categoryIcons";
-
-const categoryIcons = {
-  Rent: Home,
-  Utilities: Zap,
-  Groceries: ShoppingCart,
-  Repairs: Wrench,
-  Outings: PartyPopper,
-  Other: Package,
-};
-
-const categoryColors = {
-  Rent: "#105D5E",
-  Utilities: "#E8E300",
-  Groceries: "#009A6E",
-  Repairs: "#767F7D",
-  Outings: "#B3EDA9",
-  Other: "#C2CBC9",
-};
+import { getCategoryColor } from "../../../shared/fairness";
 
 function ExpenseLogger() {
   const { currentGroup, setCurrentGroup } = useGroup();
@@ -57,6 +33,7 @@ function ExpenseLogger() {
   const [filterCategory, setFilterCategory] = useState("");
   const [filterMember, setFilterMember] = useState("");
   const [receiptView, setReceiptView] = useState(null);
+  const [undoToast, setUndoToast] = useState(null); // { id, timer }
 
   // On mount, if we came from join link, set group from navigation state
   useEffect(() => {
@@ -121,13 +98,27 @@ function ExpenseLogger() {
   };
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this expense?")) return;
-    try {
-      await deleteExpense(currentGroup.id, id);
-      loadData();
-    } catch (err) {
-      console.error("Failed to delete expense:", err);
-    }
+    // Optimistic delete with undo — no confirm() dialog
+    setExpenses(prev => prev.filter(e => e.id !== id));
+    if (undoToast?.timer) clearTimeout(undoToast.timer);
+    const timer = setTimeout(async () => {
+      try {
+        await deleteExpense(currentGroup.id, id);
+        loadData();
+      } catch (err) {
+        console.error("Failed to delete expense:", err);
+        loadData(); // Restore on failure
+      }
+      setUndoToast(null);
+    }, 5000);
+    setUndoToast({ id, timer });
+  };
+
+  const handleUndo = () => {
+    if (undoToast?.timer) clearTimeout(undoToast.timer);
+    setUndoToast(null);
+    haptic("success");
+    loadData(); // Restore the deleted item
   };
 
 
@@ -284,21 +275,24 @@ function ExpenseLogger() {
               const getExpenseCatColor = (cat) => {
                 const groupCat = currentGroup.categories?.find((c) => c.name === cat);
                 if (groupCat?.color) return groupCat.color;
-                return categoryColors[cat] || "#767F7D";
+                return getCategoryColor(cat);
               };
               const catColor = getExpenseCatColor(expense.category);
               const payer = members.find((m) => m.id === expense.paidBy);
 
               return (
-                <div key={expense.id} className="relative overflow-hidden rounded-xl mb-2 group">
-                  <div className="absolute inset-y-0 right-0 w-24 bg-accent flex items-center justify-end px-6 rounded-xl">
-                    <Trash2 size={20} className="text-text-dark" />
+                <div key={expense.id} className="relative overflow-hidden rounded-2xl mb-2 group">
+                  <div className="absolute inset-y-0 right-0 w-24 bg-accent flex items-center justify-end px-6 rounded-2xl">
+                    <Trash2 size={20} className="text-white" />
                   </div>
                   <motion.div
                     drag="x"
                     dragConstraints={{ left: -80, right: 0 }}
                     onDragEnd={(e, info) => {
-                      if (info.offset.x < -50) {
+                      // Momentum projection: project where the swipe would land
+                      const projected = projectMomentum(info.offset.x, info.velocity.x);
+                      if (projected < -60) {
+                        haptic("destructive");
                         handleDelete(expense.id);
                       }
                     }}
@@ -389,6 +383,29 @@ function ExpenseLogger() {
           onClose={() => setReceiptView(null)}
         />
       )}
+
+      {/* Undo Toast */}
+      <AnimatePresence>
+        {undoToast && (
+          <motion.div
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 40 }}
+            transition={{ type: "spring", bounce: 0, duration: 0.35 }}
+            className="fixed bottom-[120px] md:bottom-8 left-4 right-4 md:left-auto md:right-6 md:w-auto z-50"
+          >
+            <div className="bg-foreground text-background rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg text-sm font-medium">
+              <span>Expense deleted.</span>
+              <button
+                onClick={handleUndo}
+                className="font-bold text-highlight hover:text-white transition-colors"
+              >
+                Undo
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

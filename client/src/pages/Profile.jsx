@@ -1,8 +1,7 @@
 import SEO from "../components/SEO";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, LogOut, Check, Save } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, Check } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { updateUserProfile } from "../api/client";
 

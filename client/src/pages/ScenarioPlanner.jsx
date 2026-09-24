@@ -13,7 +13,6 @@ import {
 import { useGroup } from "../App";
 import { simulateScenario, saveScenario, getScenarios } from "../api/client";
 import { formatINR as formatCurrency } from "../utils/formatCurrency";
-import { getFairnessColor } from "../../../shared/fairness";
 import {
   BarChart,
   Bar,
@@ -177,8 +176,8 @@ function ScenarioPlanner() {
       </div>
 
       {error && (
-        <div className="mb-6 p-4 bg-[#E8E300]/10 border border-[#E8E300]/20 rounded-xl flex items-center justify-between">
-          <p className="text-[#E8E300] font-medium text-sm">{error}</p>
+        <div className="mb-6 p-4 bg-accent/10 border border-accent/20 rounded-xl flex items-center justify-between">
+          <p className="text-accent font-medium text-sm">{error}</p>
           <button onClick={loadScenarios} className="px-3 py-1 bg-surface rounded-lg text-xs font-semibold text-text-dark">Retry</button>
         </div>
       )}

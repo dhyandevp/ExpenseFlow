@@ -3,6 +3,9 @@ import { X, LogIn, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useSignIn, useSignUp } from "@clerk/clerk-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
+import Logo from "../Logo";
+import { modalSpring } from "../../utils/motion";
 
 export default function SignInModal({ isOpen, onClose }) {
   const { isLoaded: isSignInLoaded, signIn, setActive: setSignInActive } = useSignIn();
@@ -127,35 +130,38 @@ export default function SignInModal({ isOpen, onClose }) {
       <div className="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="mx-auto w-full max-w-md bg-white/70 backdrop-blur-xl border border-white/80 shadow-2xl shadow-[#105D5E]/10 rounded-3xl relative p-8">
-          
+        <DialogPanel
+          as={motion.div}
+          initial={modalSpring.initial}
+          animate={modalSpring.animate}
+          exit={modalSpring.exit}
+          transition={modalSpring.transition}
+          className="mx-auto w-full max-w-md bg-surface/70 backdrop-blur-xl border border-border shadow-2xl rounded-3xl relative p-8"
+        >
+
           {/* Close Button */}
-          <button 
+          <button
             aria-label="Close"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-[#767F7D] hover:text-[#293E33] rounded-xl hover:bg-white/50 transition-all"
+            className="absolute top-4 right-4 p-2 text-text-muted hover:text-text-dark rounded-xl hover:bg-surface/50 transition-all"
           >
             <X className="w-5 h-5" />
           </button>
 
           {/* Logo */}
           <div className="flex items-center justify-center gap-2 mb-6">
-            <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
-              <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-              <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
-            <span className="font-heading font-bold text-lg text-[#293E33] tracking-tight">ExpenseFlow</span>
+            <Logo size={24} />
+            <span className="font-heading font-bold text-lg text-text-dark tracking-tight">ExpenseFlow</span>
           </div>
-          
+
           {/* Dual Tab Switcher */}
-          <div className="flex bg-[#C2CBC9]/20 rounded-xl p-1 mb-6">
+          <div className="flex bg-muted/20 rounded-xl p-1 mb-6">
             <button
               onClick={() => handleTabSwitch("signin")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 activeTab === "signin"
-                  ? "bg-[#105D5E] text-white shadow-md shadow-[#105D5E]/20"
-                  : "text-[#767F7D] hover:text-[#293E33]"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-text-muted hover:text-text-dark"
               }`}
             >
               <LogIn size={15} />
@@ -165,8 +171,8 @@ export default function SignInModal({ isOpen, onClose }) {
               onClick={() => handleTabSwitch("signup")}
               className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
                 activeTab === "signup"
-                  ? "bg-[#105D5E] text-white shadow-md shadow-[#105D5E]/20"
-                  : "text-[#767F7D] hover:text-[#293E33]"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-text-muted hover:text-text-dark"
               }`}
             >
               <UserPlus size={15} />
@@ -175,9 +181,9 @@ export default function SignInModal({ isOpen, onClose }) {
           </div>
 
           {/* Google OAuth */}
-          <button 
+          <button
             onClick={() => handleOAuth("oauth_google")}
-            className="w-full flex items-center justify-center gap-3 bg-white hover:bg-gray-50 border border-[#C2CBC9] text-[#293E33] font-medium py-3 px-4 rounded-xl transition-all shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-surface hover:brightness-95 border border-border text-text-dark font-medium py-3 px-4 rounded-xl transition-all shadow-sm"
           >
             <svg width="20" height="20" viewBox="0 0 24 24">
               <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -190,43 +196,43 @@ export default function SignInModal({ isOpen, onClose }) {
 
           {/* Divider */}
           <div className="relative flex items-center gap-4 my-6">
-            <div className="h-px bg-[#C2CBC9]/50 flex-1"></div>
-            <span className="text-xs text-[#767F7D] font-medium">or continue with email</span>
-            <div className="h-px bg-[#C2CBC9]/50 flex-1"></div>
+            <div className="h-px bg-border flex-1"></div>
+            <span className="text-xs text-text-muted font-medium">or continue with email</span>
+            <div className="h-px bg-border flex-1"></div>
           </div>
           
           {/* Form */}
           {pendingVerification ? (
             <form onSubmit={handleVerify} className="space-y-4">
-              <p className="text-sm text-[#767F7D] text-center mb-4">
+              <p className="text-sm text-text-muted text-center mb-4">
                 We sent a verification code to {email}.
               </p>
               <div>
-                <input 
-                  type="text" 
-                  placeholder="Verification Code" 
+                <input
+                  type="text"
+                  placeholder="Verification Code"
                   value={code}
                   onChange={e => setCode(e.target.value)}
                   required
-                  className="w-full bg-white border border-[#C2CBC9] text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm text-center tracking-widest font-mono"
+                  className="input-field text-center tracking-widest font-mono"
                 />
               </div>
               {error && (
-                <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
+                <p className="text-sm font-medium text-accent bg-accent/10 px-3 py-2.5 rounded-xl border border-accent/20">
                   {error}
                 </p>
               )}
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
-                className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#105D5E]/20"
+                className="btn-primary w-full py-3"
               >
                 {loading ? "Verifying..." : "Verify Account"}
               </button>
-              <button 
+              <button
                 type="button"
                 onClick={() => setPendingVerification(false)}
-                className="w-full text-[#767F7D] hover:text-[#293E33] text-sm mt-2 transition-colors"
+                className="w-full text-text-muted hover:text-text-dark text-sm mt-2 transition-colors"
               >
                 Back to Sign Up
               </button>
@@ -234,7 +240,7 @@ export default function SignInModal({ isOpen, onClose }) {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label htmlFor="signin-email" className="block text-sm font-medium text-[#293E33] mb-1">Email Address</label>
+                <label htmlFor="signin-email" className="block text-sm font-medium text-text-dark mb-1">Email Address</label>
                 <input
                   id="signin-email"
                   type="email"
@@ -242,12 +248,12 @@ export default function SignInModal({ isOpen, onClose }) {
                   value={email}
                   onChange={e => { setEmail(e.target.value); if (fieldErrors.email) setFieldErrors(err => ({ ...err, email: null })); }}
                   required
-                  className={`w-full bg-white border ${fieldErrors.email ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
+                  className={`input-field ${fieldErrors.email ? 'border-accent ring-1 ring-accent' : ''}`}
                 />
-                {fieldErrors.email && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.email}</p>}
+                {fieldErrors.email && <p className="text-accent text-xs mt-1">{fieldErrors.email}</p>}
               </div>
               <div>
-                <label htmlFor="signin-password" className="block text-sm font-medium text-[#293E33] mb-1">Password</label>
+                <label htmlFor="signin-password" className="block text-sm font-medium text-text-dark mb-1">Password</label>
                 <input
                   id="signin-password"
                   type="password"
@@ -255,9 +261,9 @@ export default function SignInModal({ isOpen, onClose }) {
                   value={password}
                   onChange={e => { setPassword(e.target.value); if (fieldErrors.password) setFieldErrors(err => ({ ...err, password: null })); }}
                   required
-                  className={`w-full bg-white border ${fieldErrors.password ? 'border-[#E8E300] ring-1 ring-[#E8E300]' : 'border-[#C2CBC9]'} text-[#293E33] px-4 py-3 rounded-xl focus:outline-none focus:border-[#105D5E] focus:ring-1 focus:ring-[#105D5E] transition-all placeholder:text-[#767F7D] text-sm`}
+                  className={`input-field ${fieldErrors.password ? 'border-accent ring-1 ring-accent' : ''}`}
                 />
-                {fieldErrors.password && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.password}</p>}
+                {fieldErrors.password && <p className="text-accent text-xs mt-1">{fieldErrors.password}</p>}
               </div>
 
               {isSignUp && (
@@ -267,26 +273,26 @@ export default function SignInModal({ isOpen, onClose }) {
                       type="checkbox"
                       checked={agreedToTerms}
                       onChange={(e) => { setAgreedToTerms(e.target.checked); if (fieldErrors.terms) setFieldErrors(err => ({ ...err, terms: null })); }}
-                      className="mt-1 w-4 h-4 rounded border-[#C2CBC9] text-[#105D5E] focus:ring-[#105D5E]"
+                      className="mt-1 w-4 h-4 rounded border-border text-primary focus:ring-primary"
                     />
-                    <span className="text-xs text-[#767F7D] leading-relaxed">
-                      I agree to the <Link to="/terms" className="text-[#105D5E] hover:underline" onClick={(e) => e.stopPropagation()}>Terms of Service</Link> and <Link to="/privacy" className="text-[#105D5E] hover:underline" onClick={(e) => e.stopPropagation()}>Privacy Policy</Link>.
+                    <span className="text-xs text-text-muted leading-relaxed">
+                      I agree to the <Link to="/terms" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>Terms of Service</Link> and <Link to="/privacy" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>Privacy Policy</Link>.
                     </span>
                   </label>
-                  {fieldErrors.terms && <p className="text-[#E8E300] text-xs mt-1">{fieldErrors.terms}</p>}
+                  {fieldErrors.terms && <p className="text-accent text-xs mt-1">{fieldErrors.terms}</p>}
                 </div>
               )}
 
               {error && (
-                <p className="text-sm font-medium text-[#E8E300] bg-[#E8E300]/10 px-3 py-2.5 rounded-xl border border-[#E8E300]/20">
+                <p className="text-sm font-medium text-accent bg-accent/10 px-3 py-2.5 rounded-xl border border-accent/20">
                   {error}
                 </p>
               )}
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={loading}
-                className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed shadow-lg shadow-[#105D5E]/20"
+                className="btn-primary w-full py-3"
               >
                 {isSignUp ? <UserPlus size={18} /> : <LogIn size={18} />}
                 {loading ? "Please wait..." : isSignUp ? "Create Account" : "Sign In"}
@@ -295,11 +301,11 @@ export default function SignInModal({ isOpen, onClose }) {
           )}
 
           {/* Bottom toggle text */}
-          <p className="text-center text-sm text-[#767F7D] mt-6">
+          <p className="text-center text-sm text-text-muted mt-6">
             {isSignUp ? "Already have an account?" : "Don't have an account?"}
-            <button 
+            <button
               onClick={() => handleTabSwitch(isSignUp ? "signin" : "signup")}
-              className="ml-1 text-[#105D5E] hover:text-[#0D4A4B] font-semibold transition-colors"
+              className="ml-1 text-primary hover:text-primary-hover font-semibold transition-colors"
             >
               {isSignUp ? "Sign In" : "Sign Up"}
             </button>

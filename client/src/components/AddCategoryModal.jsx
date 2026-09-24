@@ -2,17 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Lock } from "lucide-react";
 
-import { CategoryIcon, ICON_GROUPS, availableIcons } from "../utils/categoryIcons";
-
-const COLOR_OPTIONS = ["#105D5E", "#009A6E", "#B3EDA9", "#293E33", "#767F7D", "#C2CBC9", "#E8E300", "#FFFFFF"];
-
-const SPLIT_OPTIONS = [
-  { value: "equal", label: "Equal split" },
-  { value: "pay_as_you_go", label: "Pay-as-you-go" },
-  { value: "room_size", label: "Room-weighted" },
-  { value: "income_weighted", label: "Income weighted" },
-  { value: "custom", label: "Custom percentages" },
-];
+import { ICON_GROUPS, availableIcons } from "../utils/categoryIcons";
+import { COLOR_OPTIONS, MODEL_OPTIONS as SPLIT_OPTIONS } from "../utils/groupHelpers";
 
 export default function AddCategoryModal({ isOpen, onClose, onSave, existingNames = [], initialData = null }) {
   const [name, setName] = useState("");

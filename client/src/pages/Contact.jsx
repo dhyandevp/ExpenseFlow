@@ -13,7 +13,7 @@ function Contact() {
           {/* Card 1: Email */}
           <a 
             href="mailto:dhyandevp@proton.me"
-            className="flex flex-col items-center justify-center p-8 bg-white/70 backdrop-blur-md border border-white/60 shadow-xl shadow-[#105D5E]/5 rounded-3xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-center group"
+            className="flex flex-col items-center justify-center p-8 bg-surface/70 backdrop-blur-md border border-border shadow-xl rounded-3xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-center group"
           >
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <Mail size={32} className="text-primary" />
@@ -30,7 +30,7 @@ function Contact() {
             href="https://linktr.ee/DhyandevRTX"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex flex-col items-center justify-center p-8 bg-white/70 backdrop-blur-md border border-white/60 shadow-xl shadow-[#105D5E]/5 rounded-3xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-center group"
+            className="flex flex-col items-center justify-center p-8 bg-surface/70 backdrop-blur-md border border-border shadow-xl rounded-3xl hover:-translate-y-1 hover:shadow-2xl transition-all duration-300 text-center group"
           >
             <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
               <ExternalLink size={32} className="text-primary" />

@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { pageTransition, springScale } from "../utils/motion";
 import {
-  ArrowLeft, Plus, X, Check, Users, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock, PartyPopper, Mail
+  ArrowLeft, Plus, X, Check, Shuffle, Loader2, GripVertical, Edit3, Trash2, Lock, PartyPopper, Mail
 } from "lucide-react";
 import { createGroup } from "../api/client";
 import { useGroup } from "../App";
@@ -12,24 +12,7 @@ import AddCategoryModal from "../components/AddCategoryModal";
 import { useAuth } from "../hooks/useAuth";
 import { CategoryIcon } from "../utils/categoryIcons";
 import Avatar from "../components/Avatar";
-
-const COLORS = ["#105D5E", "#009A6E", "#B3EDA9", "#E8E300", "#767F7D", "#C2CBC9", "#293E33", "#FFFFFF"];
-
-const DEFAULT_CATEGORIES = [
-  { name: "Rent", iconName: "House", color: "#105D5E", split_model: "equal", is_default: true },
-  { name: "Utilities", iconName: "Lightbulb", color: "#E8E300", split_model: "equal", is_default: true },
-  { name: "Groceries", iconName: "ShoppingCart", color: "#009A6E", split_model: "equal", is_default: true },
-  { name: "Repairs", iconName: "Wrench", color: "#767F7D", split_model: "equal", is_default: true },
-  { name: "Outings", iconName: "PartyPopper", color: "#B3EDA9", split_model: "pay_as_you_go", is_default: true },
-  { name: "Other", iconName: "Package", color: "#C2CBC9", split_model: "equal", is_default: true },
-];
-
-import { MODEL_OPTIONS } from "../utils/groupHelpers";
-
-const modelOptions = [
-  ...MODEL_OPTIONS,
-  { value: "custom", label: "Custom percentages" },
-];
+import { DEFAULT_CATEGORIES, COLOR_OPTIONS as COLORS, MODEL_OPTIONS as modelOptions } from "../utils/groupHelpers";
 
 function GroupSetup() {
 

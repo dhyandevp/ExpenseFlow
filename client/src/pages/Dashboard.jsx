@@ -19,50 +19,14 @@ import {
   Legend,
 } from "recharts";
 import { useGroup } from "../App";
-import {
-  getBalances,
-  getBreakdown,
-  getFairnessScore,
-} from "../api/client";
+import { getDashboardData } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
 import SettlementHistory from "../components/SettlementHistory";
 import Avatar from "../components/Avatar";
 import { CategoryIcon } from "../utils/categoryIcons";
-
-const timeFilters = [
-  { label: "All Time", value: "all" },
-  { label: "This Month", value: "month" },
-  { label: "3 Months", value: "3months" },
-  { label: "6 Months", value: "6months" },
-];
-
-function getDateRange(filter) {
-  const now = new Date();
-  switch (filter) {
-    case "month":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth(), 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    case "3months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 3, 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    case "6months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 6, 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    default:
-      return {};
-  }
-}
+import { getDateRange, PERIOD_OPTIONS as timeFilters } from "../utils/groupHelpers";
 
 function Dashboard() {
   const { currentGroup } = useGroup();
@@ -81,17 +45,13 @@ function Dashboard() {
     setLoading(true);
     setError(null);
     Promise.race([
-      Promise.all([
-        getBalances(currentGroup.id, period),
-        getBreakdown(currentGroup.id, period),
-        getFairnessScore(currentGroup.id, period),
-      ]),
+      getDashboardData(currentGroup.id, period, currentGroup.members),
       new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
     ])
-      .then(([balRes, breakRes, fairRes]) => {
-        setBalances(balRes.data);
-        setBreakdown(breakRes.data);
-        setFairness(fairRes.data);
+      .then((res) => {
+        setBalances(res.data.balances);
+        setBreakdown(res.data.breakdown);
+        setFairness(res.data.fairness);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));

@@ -3,12 +3,6 @@ import { useState, useEffect, createContext, useContext, lazy, Suspense } from "
 import { ClerkProvider, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { HelmetProvider } from "react-helmet-async";
-import NotFound from "./pages/NotFound";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
-import CookiePolicy from "./pages/CookiePolicy";
-import RefundPolicy from "./pages/RefundPolicy";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -25,6 +19,12 @@ const Settings = lazy(() => import("./pages/Settings"));
 const GroupsHome = lazy(() => import("./pages/GroupsHome"));
 const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Contact = lazy(() => import("./pages/Contact"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 export const GroupContext = createContext();
 

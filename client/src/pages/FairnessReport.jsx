@@ -5,53 +5,15 @@ import {
   FileText,
   Download,
   Share2,
-  Calendar,
   TrendingUp,
-  AlertCircle,
   ChartColumn,
 } from "lucide-react";
 import { useGroup } from "../App";
-import { getReport } from "../api/client";
+import { getReport, getExpenses, getMembers } from "../api/client";
 import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import { csvSafe } from "../../../shared/balanceMath";
 import Avatar from "../components/Avatar";
-// getCategoryColor not currently used in this component
-
-const periodOptions = [
-  { label: "All Time", value: "all" },
-  { label: "This Month", value: "month" },
-  { label: "Last 3 Months", value: "3months" },
-  { label: "Last 6 Months", value: "6months" },
-];
-
-function getDateRange(filter) {
-  const now = new Date();
-  switch (filter) {
-    case "month":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth(), 1)
-          .toISOString()
-          .split("T")[0],
-        end_date: now.toISOString().split("T")[0],
-      };
-    case "3months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 3, 1)
-          .toISOString()
-          .split("T")[0],
-        end_date: now.toISOString().split("T")[0],
-      };
-    case "6months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 6, 1)
-          .toISOString()
-          .split("T")[0],
-        end_date: now.toISOString().split("T")[0],
-      };
-    default:
-      return {};
-  }
-}
+import { getDateRange, PERIOD_OPTIONS as periodOptions } from "../utils/groupHelpers";
 
 function FairnessReport() {
   const { currentGroup } = useGroup();
@@ -82,14 +44,14 @@ function FairnessReport() {
 
   const handleExportCSV = async () => {
     try {
-      const { data: expenses } = await getReport(currentGroup.id, getDateRange(period));
-      // getReport was modified to return raw data, but wait, the Expenses are not returned in getReport!
-      // I should fetch expenses directly here to get descriptions and amounts for the CSV.
-      const { getExpenses } = await import("../api/client");
-      const { data: expenseData } = await getExpenses(currentGroup.id, getDateRange(period));
-      const { getMembers } = await import("../api/client");
-      const members = await getMembers(currentGroup.id);
-      const memberMap = Object.fromEntries(members.map(m => [m.id, m.name]));
+      const [expRes, members] = await Promise.all([
+        getExpenses(currentGroup.id, getDateRange(period)),
+        currentGroup.members && currentGroup.members.length > 0
+          ? Promise.resolve(currentGroup.members)
+          : getMembers(currentGroup.id),
+      ]);
+      const expenseData = expRes.data || [];
+      const memberMap = Object.fromEntries(members.map((m) => [m.id, m.name]));
 
       let csv = "Date,Category,Description,Amount,Paid By\n";
       for (const e of expenseData) {

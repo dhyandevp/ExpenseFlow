@@ -132,6 +132,28 @@ export const getGroupByCode = async (code) => {
   return { success: true, data };
 };
 
+export const joinGroupByCode = async (code, clerkToken) => {
+  if (clerkToken) {
+    const res = await fetch("/api/join-group", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${clerkToken}`,
+      },
+      body: JSON.stringify({ code }),
+    });
+    if (!res.ok) {
+      let errMessage = "Failed to join group";
+      try {
+        const data = await res.json();
+        errMessage = data.error || errMessage;
+      } catch (e) {}
+      throw new Error(errMessage);
+    }
+  }
+  return getGroupByCode(code);
+};
+
 export const getGroupById = async (id) => {
   const docSnap = await getDoc(doc(db, "groups", id));
   if (!docSnap.exists()) throw new Error("Group not found");
@@ -215,11 +237,13 @@ export const getExpenses = async (groupId, filters = {}) => {
   const snap = await getDocs(q);
   let expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  if (filters.startDate) {
-    expenses = expenses.filter(e => e.createdAt >= filters.startDate);
+  const startDate = filters.startDate || filters.start_date;
+  const endDate = filters.endDate || filters.end_date;
+  if (startDate) {
+    expenses = expenses.filter(e => e.createdAt >= startDate);
   }
-  if (filters.endDate) {
-    expenses = expenses.filter(e => e.createdAt <= filters.endDate);
+  if (endDate) {
+    expenses = expenses.filter(e => e.createdAt <= endDate);
   }
   if (filters.category) expenses = expenses.filter(e => e.category === filters.category);
   if (filters.member_id) expenses = expenses.filter(e => e.paidBy === filters.member_id);
@@ -233,11 +257,30 @@ export const deleteExpense = async (groupId, id) => {
 };
 
 // ── Balances & Math (Ponytail Ultra) ────────────────────────────────────
+export const getDashboardData = async (groupId, period = {}, cachedMembers = null) => {
+  const [members, { data: expenses }, { data: settlements }] = await Promise.all([
+    cachedMembers && cachedMembers.length > 0 ? Promise.resolve(cachedMembers) : getMembers(groupId),
+    getExpenses(groupId, period),
+    getSettlements(groupId),
+  ]);
+
+  return {
+    success: true,
+    data: {
+      balances: calculateBalances(members, expenses, settlements),
+      breakdown: calculateCategoryBreakdown(members, expenses),
+      fairness: calculateFairnessScore(members, expenses),
+      expenses,
+      members,
+    }
+  };
+};
+
 export const getBalances = async (groupId, period = {}) => {
   const members = await getMembers(groupId);
   const { data: expenses } = await getExpenses(groupId, period);
   const { data: settlements } = await getSettlements(groupId);
-  
+
   const result = calculateBalances(members, expenses, settlements);
   return { success: true, data: result };
 };

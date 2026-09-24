@@ -1,16 +1,12 @@
 import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { createUserProfile } from "../api/client";
 
 export function ProfileSetup() {
-  const { user, firebaseUser, authMode, refreshProfile, userProfile } = useAuth();
-  const navigate = useNavigate();
-
-// Removed explicit navigation, handled by ProtectedRoute
+  const { user, firebaseUser, authMode, refreshProfile } = useAuth();
 
 
   const [displayName, setDisplayName] = useState("");
