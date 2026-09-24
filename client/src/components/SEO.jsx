@@ -9,7 +9,7 @@ export default function SEO({ title, description, noindex = false }) {
     <Helmet>
       <title>{title ? `${title} | ${defaultTitle}` : defaultTitle}</title>
       <meta name="description" content={description || defaultDescription} />
-      <meta name="robots" content={noindex ? "noindex" : "index, follow"} />
+      <meta name="robots" content={noindex ? "noindex, nofollow" : "index, follow"} />
     </Helmet>
   );
 }
