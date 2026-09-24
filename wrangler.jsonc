@@ -5,6 +5,15 @@
   "compatibility_date": "2024-09-23",
   "compatibility_flags": ["nodejs_compat"],
   "workers_dev": true,
+  // Custom domain routes for unified worker dispatch:
+  // - Marketing: expenseflow.site, www.expenseflow.site
+  // - Product App: app.expenseflow.site
+  // Configure via Cloudflare Dashboard or Wrangler custom domains:
+  // "routes": [
+  //   { "pattern": "expenseflow.site/*", "custom_domain": true },
+  //   { "pattern": "www.expenseflow.site/*", "custom_domain": true },
+  //   { "pattern": "app.expenseflow.site/*", "custom_domain": true }
+  // ],
   "assets": {
     "directory": "./client/dist",
     "binding": "ASSETS",

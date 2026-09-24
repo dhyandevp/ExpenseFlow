@@ -12,7 +12,8 @@
     "deploy": "npm run build && wrangler deploy",
     "install:all": "npm install && npm --prefix client install",
     "test:rules": "npx --yes firebase-tools emulators:exec 'vitest run tests/firestore.rules.test.js'",
-    "test:unit": "vitest run client/src/utils/__tests__/"
+    "test:unit": "vitest run client/src/utils/__tests__/",
+    "test": "vitest run client/src/utils/__tests__/ tests/clerk-webhook.test.js tests/jwt-bridge.test.js tests/host.test.js tests/safeRedirect.test.js tests/worker-routing.test.js"
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
