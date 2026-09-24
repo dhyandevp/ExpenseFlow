@@ -25,7 +25,7 @@ export default function AccountMenu() {
   const handleSignOut = async () => {
     setIsOpen(false);
     await signOut();
-    navigate("/");
+    navigate("/login");
   };
 
   const displayName = userProfile?.displayName || user?.firstName || "User";

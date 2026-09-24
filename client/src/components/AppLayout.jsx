@@ -17,6 +17,7 @@ import { useGroup } from "../App";
 import Logo from "./Logo";
 import AccountMenu from "./AccountMenu";
 import { pageTransition } from "../utils/motion";
+import { getSiteUrl } from "../lib/host";
 
 const navItems = [
   { path: "", icon: PlusCircle, label: "Expenses" },
@@ -40,12 +41,13 @@ export default function AppLayout({ children }) {
   };
 
   useEffect(() => {
-    if (code && currentGroup && currentGroup.code !== code) {
+    if (code && (!currentGroup || currentGroup.code !== code)) {
       navigate(`/join/${code}`, { replace: true });
     }
   }, [code, currentGroup, navigate]);
 
   if (!currentGroup) {
+    if (code) return null;
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="bg-surface rounded-3xl p-8 max-w-sm w-full text-center shadow-sm border border-border">
@@ -90,6 +92,12 @@ export default function AppLayout({ children }) {
               <p className="text-xs text-text-muted font-mono">#{currentGroup.code}</p>
             </div>
           </div>
+          <a
+            href={getSiteUrl('/')}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-text-muted hover:text-text-dark transition-colors"
+          >
+            ← ExpenseFlow Showcase
+          </a>
         </div>
 
         {/* Group Switcher */}
@@ -235,6 +243,13 @@ export default function AppLayout({ children }) {
                 <Home size={20} />
                 Global Home
               </button>
+
+              <a
+                href={getSiteUrl('/')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-muted hover:bg-highlight hover:text-text-dark transition-all"
+              >
+                ← ExpenseFlow Website
+              </a>
             </div>
           </motion.div>
         )}
