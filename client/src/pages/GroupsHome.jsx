@@ -2,15 +2,15 @@ import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Plus, UserPlus, ArrowRight, UsersRound, Loader2, LogOut, User } from "lucide-react";
+import { Plus, UserPlus, ArrowRight, UsersRound, Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useRecentGroups } from "../App";
 import { getGroupById } from "../api/client";
-import GuestJoinModal from "../components/auth/GuestJoinModal";
 import AccountMenu from "../components/AccountMenu";
+import Logo from "../components/Logo";
 
 export function GroupsHome() {
-  const { user, isLoaded, authMode, signOut } = useAuth();
+  const { user, isLoaded, authMode } = useAuth();
   const { recentGroups } = useRecentGroups();
   const navigate = useNavigate();
 
@@ -81,11 +81,7 @@ export function GroupsHome() {
       {/* Global Header */}
       <header className="px-6 py-4 flex items-center justify-between max-w-6xl mx-auto w-full">
         <div className="flex items-center gap-2">
-          <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ExpenseFlow logo">
-            <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
-            <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-            <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
-          </svg>
+          <Logo size={24} />
           <span className="font-heading font-bold text-lg text-text-dark tracking-tight">
             ExpenseFlow
           </span>

@@ -9,7 +9,6 @@ import { getGroupById } from "../../api/client";
 
 export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [code, setCode] = useState(defaultCode);
-  const [isError, setIsError] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -18,13 +17,11 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (!code || !code.trim()) {
-      setIsError(true);
       setErrorMsg("Group Code is required.");
       return;
     }
-    
+
     setIsLoading(true);
-    setIsError(false);
     setErrorMsg("");
     
     try {
@@ -43,25 +40,23 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       const data = await res.json();
       
       if (!res.ok) {
-        setIsError(true);
         setErrorMsg(data.error || data.message || "Failed to join group");
         return;
       }
-      
+
       // Sign into Firebase with the custom token
       const auth = getAuth(app);
       await signInWithCustomToken(auth, data.firebaseToken);
-      
+
       // Fetch the group data and set it in context
       const groupRes = await getGroupById(data.groupId);
       setCurrentGroup(groupRes.data);
-      
+
       onClose(); // Successfully joined, close modal.
       navigate(`/group/${code.trim().toUpperCase()}/dashboard`);
-      
+
     } catch (err) {
       console.error(err);
-      setIsError(true);
       setErrorMsg("Network error. Please try again.");
     } finally {
       setIsLoading(false);
@@ -73,11 +68,11 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
       <div className="fixed inset-0 bg-primary/20 backdrop-blur-sm" aria-hidden="true" />
       
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <DialogPanel className="mx-auto w-full max-w-md bg-white/60 backdrop-blur-xl border border-white/80 rounded-2xl p-6 relative shadow-2xl shadow-[#105D5E]/10">
-          <button 
+        <DialogPanel className="mx-auto w-full max-w-md bg-surface/70 backdrop-blur-xl border border-border rounded-2xl p-6 relative shadow-2xl">
+          <button
             aria-label="Close"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-[#767F7D] hover:text-[#293E33] rounded-xl hover:bg-white/50 transition-all"
+            className="absolute top-4 right-4 p-2 text-text-muted hover:text-text-dark rounded-xl hover:bg-surface/50 transition-all"
           >
             <X className="w-6 h-6" />
           </button>
@@ -99,7 +94,7 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
                 placeholder="e.g. A1B2C3"
                 maxLength={6}
                 autoFocus
-                className="w-full bg-white border border-[#C2CBC9] text-text-dark rounded-lg px-4 py-3 font-mono text-center tracking-widest uppercase focus:outline-none focus:ring-2 focus:ring-primary"
+                className="input-field font-mono text-center tracking-widest uppercase"
               />
               {errorMsg && (
                 <p className="text-accent font-semibold text-sm text-center mt-3 flex items-center justify-center gap-1.5">

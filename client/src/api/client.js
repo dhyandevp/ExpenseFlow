@@ -7,6 +7,12 @@ import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore }
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
+function generateSecureCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // ponytail: no 0/O/1/I to avoid ambiguity
+  const arr = crypto.getRandomValues(new Uint8Array(6));
+  return Array.from(arr, b => chars[b % chars.length]).join('');
+}
+
 // ── Validation & Sanitization ─────────────────────────────────────────────
 export const cleanFirestoreData = (data) => {
   if (data === undefined) return null;
@@ -56,20 +62,21 @@ export const updateUserProfile = async (userId, data) => {
 };
 
 // ── Groups ──────────────────────────────────────────────────────────────
-export const createGroup = async (groupData) => {
+export const createGroup = async (groupData, userId) => {
   const { members, fairness_models, ...restData } = groupData;
   const batch = writeBatch(db);
   const groupRef = doc(collection(db, "groups"));
-  
-  const code = groupData.code || Math.random().toString(36).substring(2, 8).toUpperCase();
-  
+
+  const code = groupData.code || generateSecureCode();
+
   const newGroupData = cleanFirestoreData({
     name: groupData.name || "Untitled Group",
     code: code,
     currency: groupData.currency || "INR",
     settlementThreshold: groupData.settlement_threshold || 500,
     currentBalances: {},
-    createdAt: new Date().toISOString()
+    createdAt: new Date().toISOString(),
+    ...(userId ? { createdBy: userId, memberUserIds: [userId] } : {})
   });
   
   batch.set(groupRef, newGroupData);
@@ -117,12 +124,34 @@ export const getGroupByCode = async (code) => {
   const data = { id: groupDoc.id, ...groupDoc.data() };
 
   const membersSnap = await getDocs(collection(db, `groups/${groupDoc.id}/members`));
-  data.members = membersSnap.docs.map(d => d.data());
+  data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 
   const categoriesSnap = await getDocs(collection(db, `groups/${groupDoc.id}/categories`));
-  data.categories = categoriesSnap.docs.map(d => d.data());
+  data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   return { success: true, data };
+};
+
+export const joinGroupByCode = async (code, clerkToken) => {
+  if (clerkToken) {
+    const res = await fetch("/api/join-group", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${clerkToken}`,
+      },
+      body: JSON.stringify({ code }),
+    });
+    if (!res.ok) {
+      let errMessage = "Failed to join group";
+      try {
+        const data = await res.json();
+        errMessage = data.error || errMessage;
+      } catch (e) {}
+      throw new Error(errMessage);
+    }
+  }
+  return getGroupByCode(code);
 };
 
 export const getGroupById = async (id) => {
@@ -131,10 +160,10 @@ export const getGroupById = async (id) => {
   const data = { id: docSnap.id, ...docSnap.data() };
 
   const membersSnap = await getDocs(collection(db, `groups/${id}/members`));
-  data.members = membersSnap.docs.map(d => d.data());
+  data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 
   const categoriesSnap = await getDocs(collection(db, `groups/${id}/categories`));
-  data.categories = categoriesSnap.docs.map(d => d.data());
+  data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   return { success: true, data };
 };
@@ -163,7 +192,7 @@ export const deleteGroup = async (id, clerkToken) => {
 };
 
 export const regenerateCode = async (groupId) => {
-  const newCode = Math.random().toString(36).substring(2, 8).toUpperCase();
+  const newCode = generateSecureCode();
   await updateDoc(doc(db, "groups", groupId), { code: newCode });
   return { success: true, data: { code: newCode } };
 };
@@ -173,18 +202,28 @@ export const addMember = async (groupId, data) => {
   const docRef = await addDoc(collection(db, "groups", groupId, "members"), {
     ...data
   });
-  return { success: true, data: { id: docRef.id, ...data } };
+  return { success: true, data: { id: data.id || docRef.id, docId: docRef.id, ...data } };
 };
 
 export const removeMember = async (groupId, memberId) => {
-  await deleteDoc(doc(db, "groups", groupId, "members", memberId));
+  const memberDoc = doc(db, "groups", groupId, "members", String(memberId));
+  const snap = await getDoc(memberDoc);
+  if (snap.exists()) {
+    await deleteDoc(memberDoc);
+  } else {
+    const q = query(collection(db, "groups", groupId, "members"), where("id", "==", Number(memberId)));
+    const querySnap = await getDocs(q);
+    for (const d of querySnap.docs) {
+      await deleteDoc(d.ref);
+    }
+  }
   return { success: true };
 };
 
 export const getMembers = async (groupId) => {
   const q = query(collection(db, "groups", groupId, "members"));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 };
 
 export const createExpense = async (groupId, data) => {
@@ -201,19 +240,23 @@ export const createExpense = async (groupId, data) => {
 };
 
 export const getExpenses = async (groupId, filters = {}) => {
-  const q = query(collection(db, "groups", groupId, "expenses"), orderBy("createdAt", "desc"));
+  // ponytail: server-side limit only when explicitly requested. Balance calculations need all expenses.
+  const constraints = [orderBy("createdAt", "desc")];
+  if (filters.limit) constraints.push(firestoreLimit(filters.limit));
+  const q = query(collection(db, "groups", groupId, "expenses"), ...constraints);
   const snap = await getDocs(q);
   let expenses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
 
-  if (filters.startDate) {
-    expenses = expenses.filter(e => e.createdAt >= filters.startDate);
+  const startDate = filters.startDate || filters.start_date;
+  const endDate = filters.endDate || filters.end_date;
+  if (startDate) {
+    expenses = expenses.filter(e => e.createdAt >= startDate);
   }
-  if (filters.endDate) {
-    expenses = expenses.filter(e => e.createdAt <= filters.endDate);
+  if (endDate) {
+    expenses = expenses.filter(e => e.createdAt <= endDate);
   }
   if (filters.category) expenses = expenses.filter(e => e.category === filters.category);
   if (filters.member_id) expenses = expenses.filter(e => e.paidBy === filters.member_id);
-  if (filters.limit) expenses = expenses.slice(0, filters.limit);
   
   return { success: true, data: expenses };
 };
@@ -224,11 +267,30 @@ export const deleteExpense = async (groupId, id) => {
 };
 
 // ── Balances & Math (Ponytail Ultra) ────────────────────────────────────
+export const getDashboardData = async (groupId, period = {}, cachedMembers = null) => {
+  const [members, { data: expenses }, { data: settlements }] = await Promise.all([
+    cachedMembers && cachedMembers.length > 0 ? Promise.resolve(cachedMembers) : getMembers(groupId),
+    getExpenses(groupId, period),
+    getSettlements(groupId),
+  ]);
+
+  return {
+    success: true,
+    data: {
+      balances: calculateBalances(members, expenses, settlements),
+      breakdown: calculateCategoryBreakdown(members, expenses),
+      fairness: calculateFairnessScore(members, expenses),
+      expenses,
+      members,
+    }
+  };
+};
+
 export const getBalances = async (groupId, period = {}) => {
   const members = await getMembers(groupId);
   const { data: expenses } = await getExpenses(groupId, period);
   const { data: settlements } = await getSettlements(groupId);
-  
+
   const result = calculateBalances(members, expenses, settlements);
   return { success: true, data: result };
 };
@@ -286,9 +348,9 @@ export const simulateScenario = async (groupId, data) => {
     success: true,
     data: {
       projectedBalances: result.balances,
-      average_fairness_score: score.overall_score || 0,
+      average_fairness_score: score.group_score ?? 0,
       total_expenses: result.total_expenses,
-      verdict: (score.overall_score || 0) >= 90 ? "Very fair" : (score.overall_score || 0) >= 70 ? "Reasonably fair" : "Needs rebalancing",
+      verdict: (score.group_score ?? 0) >= 90 ? "Very fair" : (score.group_score ?? 0) >= 70 ? "Reasonably fair" : "Needs rebalancing",
       settlement_suggestions: result.settlement_suggestions,
     },
   };
@@ -303,12 +365,12 @@ export const getReport = async (groupId, period = {}) => {
   
   const result = calculateCategoryBreakdown(members, expenses);
   const bal = calculateBalances(members, expenses, settlementsSnap.docs.map(d => d.data()));
-  const fairness = calculateFairnessScore(members, expenses);
+  const fairness = calculateFairnessScore(members, expenses, { currency: group.currency || '₹' });
 
   // Build narrative summary
   const topPayer = bal.balances.reduce((max, b) => b.total_paid > (max?.total_paid || 0) ? b : max, null);
   const narrative = bal.total_expenses > 0
-    ? `${group.name} has tracked ${formatReportCurrency(bal.total_expenses)} in total expenses across ${Object.keys(result.breakdown).length} categories. ${topPayer ? `${topPayer.name} has contributed the most (${formatReportCurrency(topPayer.total_paid)}).` : ''} Group fairness score: ${fairness.group_score}/100.`
+    ? `${group.name} has tracked ${formatReportCurrency(bal.total_expenses, group.currency)} in total expenses across ${Object.keys(result.breakdown).length} categories. ${topPayer ? `${topPayer.name} has contributed the most (${formatReportCurrency(topPayer.total_paid, group.currency)}).` : ''} Group fairness score: ${fairness.group_score}/100.`
     : `No expenses recorded yet for ${group.name}.`;
 
   return { success: true, data: {
@@ -322,8 +384,8 @@ export const getReport = async (groupId, period = {}) => {
   }};
 };
 
-function formatReportCurrency(amount) {
-  return `₹${Math.round(amount).toLocaleString('en-IN')}`;
+function formatReportCurrency(amount, currency = '₹') {
+  return `${currency}${Math.round(amount).toLocaleString('en-IN')}`;
 }
 
 // ── Categories ──────────────────────────────────────────────────────────

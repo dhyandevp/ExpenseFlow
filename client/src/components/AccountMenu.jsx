@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogOut, Settings, UsersRound, Home } from "lucide-react";
+import { User, LogOut, Home } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 
 export default function AccountMenu() {
@@ -24,7 +24,7 @@ export default function AccountMenu() {
   const handleSignOut = async () => {
     setIsOpen(false);
     await signOut();
-    navigate("/");
+    navigate("/login");
   };
 
   const displayName = userProfile?.displayName || user?.firstName || "User";
@@ -49,6 +49,7 @@ export default function AccountMenu() {
           <img
             src={user.imageUrl}
             alt={displayName}
+            loading="lazy"
             className="w-8 h-8 rounded-full object-cover ring-2 ring-background"
           />
         ) : (

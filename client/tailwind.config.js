@@ -29,11 +29,11 @@ export default {
         mono: ['"DM Mono"', "monospace"],
       },
       fontSize: {
-        h1: ["28px", { lineHeight: "1.2", fontWeight: "700" }],
-        h2: ["22px", { lineHeight: "1.3", fontWeight: "600" }],
-        h3: ["18px", { lineHeight: "1.4", fontWeight: "600" }],
-        body: ["15px", { lineHeight: "1.5", fontWeight: "400" }],
-        caption: ["13px", { lineHeight: "1.4", fontWeight: "400" }],
+        h1: ["1.75rem", { lineHeight: "1.2", fontWeight: "700", letterSpacing: "-0.02em" }],
+        h2: ["1.375rem", { lineHeight: "1.3", fontWeight: "600", letterSpacing: "-0.01em" }],
+        h3: ["1.125rem", { lineHeight: "1.4", fontWeight: "600" }],
+        body: ["0.9375rem", { lineHeight: "1.5", fontWeight: "400" }],
+        caption: ["0.8125rem", { lineHeight: "1.4", fontWeight: "400" }],
       },
       borderRadius: {
         xl: "16px",

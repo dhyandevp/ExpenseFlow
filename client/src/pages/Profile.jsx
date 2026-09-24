@@ -1,8 +1,7 @@
 import SEO from "../components/SEO";
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Loader2, LogOut, Check, Save } from "lucide-react";
+import { ArrowLeft, Loader2, LogOut, Check } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { updateUserProfile } from "../api/client";
 
@@ -74,9 +73,10 @@ export function Profile() {
           
           <div className="flex flex-col sm:flex-row gap-8 items-start">
             <div className="flex flex-col items-center gap-3 shrink-0">
-              <img 
-                src={user?.imageUrl} 
-                alt="Profile" 
+              <img
+                src={user?.imageUrl}
+                alt="Profile"
+                loading="lazy"
                 className="w-24 h-24 rounded-full object-cover shadow-sm ring-1 ring-border"
               />
               <span className="text-xs text-text-muted text-center max-w-[120px]">

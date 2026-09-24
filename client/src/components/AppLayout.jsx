@@ -6,7 +6,6 @@ import {
   TrendingUp,
   FileText,
   Settings,
-  LogOut,
   Menu,
   X,
   ChevronDown,
@@ -15,9 +14,10 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGroup } from "../App";
-import { useAuth } from "../hooks/useAuth";
 import Logo from "./Logo";
 import AccountMenu from "./AccountMenu";
+import { pageTransition } from "../utils/motion";
+import { getSiteUrl } from "../lib/host";
 
 const navItems = [
   { path: "", icon: PlusCircle, label: "Expenses" },
@@ -32,14 +32,8 @@ export default function AppLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentGroup, setCurrentGroup, recentGroups } = useGroup();
-  const { authMode } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [groupSwitcherOpen, setGroupSwitcherOpen] = useState(false);
-
-  const handleLeave = () => {
-    setCurrentGroup(null);
-    navigate("/home");
-  };
 
   const handleSwitchGroup = (group) => {
     setGroupSwitcherOpen(false);
@@ -47,23 +41,24 @@ export default function AppLayout({ children }) {
   };
 
   useEffect(() => {
-    if (code && currentGroup && currentGroup.code !== code) {
+    if (code && (!currentGroup || currentGroup.code !== code)) {
       navigate(`/join/${code}`, { replace: true });
     }
   }, [code, currentGroup, navigate]);
 
   if (!currentGroup) {
+    if (code) return null;
     return (
-      <div className="min-h-screen bg-[#F0F2F5] flex flex-col items-center justify-center p-6">
-        <div className="bg-white rounded-3xl p-8 max-w-sm w-full text-center shadow-xl border border-black/5">
-          <div className="w-16 h-16 bg-[#105D5E]/10 text-[#105D5E] rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
+        <div className="bg-surface rounded-3xl p-8 max-w-sm w-full text-center shadow-sm border border-border">
+          <div className="w-16 h-16 bg-highlight text-primary rounded-full flex items-center justify-center mx-auto mb-6">
             <Users size={32} />
           </div>
-          <h2 className="text-xl font-bold text-[#293E33] mb-3">No Group Selected</h2>
-          <p className="text-[#767F7D] mb-8">Please select a group from your home screen or join a new one.</p>
-          <button 
+          <h2 className="text-xl font-bold text-text-dark mb-3">No Group Selected</h2>
+          <p className="text-text-muted mb-8">Please select a group from your home screen or join a new one.</p>
+          <button
             onClick={() => navigate('/home')}
-            className="w-full bg-[#105D5E] hover:bg-[#0D4A4B] text-white font-semibold py-3 px-4 rounded-xl transition-all"
+            className="btn-primary w-full py-3"
           >
             Go to Home
           </button>
@@ -97,6 +92,12 @@ export default function AppLayout({ children }) {
               <p className="text-xs text-text-muted font-mono">#{currentGroup.code}</p>
             </div>
           </div>
+          <a
+            href={getSiteUrl('/')}
+            className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-text-muted hover:text-text-dark transition-colors"
+          >
+            ← ExpenseFlow Showcase
+          </a>
         </div>
 
         {/* Group Switcher */}
@@ -116,9 +117,11 @@ export default function AppLayout({ children }) {
             <AnimatePresence>
               {groupSwitcherOpen && (
                 <motion.div
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -4 }}
+                  initial={{ opacity: 0, scale: 0.95, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -4 }}
+                  transition={{ type: "spring", bounce: 0, duration: 0.2 }}
+                  style={{ transformOrigin: "top" }}
                   className="absolute left-3 right-3 top-full mt-1 bg-surface rounded-xl border border-border shadow-lg z-20 overflow-hidden"
                 >
                   {otherGroups.map((g) => (
@@ -157,10 +160,10 @@ export default function AppLayout({ children }) {
               <Link
                 key={item.label}
                 to={itemPath}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-300 ${
                   isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-text-muted hover:bg-background hover:text-text-dark"
+                    ? "bg-primary/8 text-primary font-semibold"
+                    : "text-text-muted hover:bg-highlight/30 hover:text-text-dark"
                 }`}
               >
                 <item.icon size={20} />
@@ -240,6 +243,13 @@ export default function AppLayout({ children }) {
                 <Home size={20} />
                 Global Home
               </button>
+
+              <a
+                href={getSiteUrl('/')}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-muted hover:bg-highlight hover:text-text-dark transition-all"
+              >
+                ← ExpenseFlow Website
+              </a>
             </div>
           </motion.div>
         )}
@@ -250,10 +260,10 @@ export default function AppLayout({ children }) {
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={pageTransition.initial}
+            animate={pageTransition.animate}
             exit={{ opacity: 0, transition: { duration: 0.15 } }}
-            transition={{ duration: 0.3, ease: "easeOut" }}
+            transition={pageTransition.transition}
             className="max-w-7xl mx-auto px-4 py-6 h-full"
           >
             {children}
@@ -265,7 +275,7 @@ export default function AppLayout({ children }) {
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
-        <div className="flex items-center justify-around py-2">
+        <div className="flex items-center justify-around py-1.5">
           {navItems.map((item) => {
             const basePath = `/group/${code}`;
             const itemPath = `${basePath}${item.path}`;
@@ -274,12 +284,13 @@ export default function AppLayout({ children }) {
               <Link
                 key={item.label}
                 to={itemPath}
-                className={`flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all ${
+                className={`flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all duration-300 active:scale-95 active:opacity-80 active:duration-100 ${
                   isActive ? "text-primary" : "text-text-muted"
                 }`}
               >
-                <item.icon size={20} />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <item.icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
+                <span className={`text-[10px] ${isActive ? "font-semibold" : "font-medium"}`}>{item.label}</span>
+                {isActive && <div className="w-1 h-1 rounded-full bg-primary mt-0.5" />}
               </Link>
             );
           })}

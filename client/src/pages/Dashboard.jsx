@@ -19,50 +19,14 @@ import {
   Legend,
 } from "recharts";
 import { useGroup } from "../App";
-import {
-  getBalances,
-  getBreakdown,
-  getFairnessScore,
-} from "../api/client";
+import { getDashboardData } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
 import { getFairnessColor, getCategoryColor } from "../../../shared/fairness";
 import SettlementHistory from "../components/SettlementHistory";
 import Avatar from "../components/Avatar";
 import { CategoryIcon } from "../utils/categoryIcons";
-
-const timeFilters = [
-  { label: "All Time", value: "all" },
-  { label: "This Month", value: "month" },
-  { label: "3 Months", value: "3months" },
-  { label: "6 Months", value: "6months" },
-];
-
-function getDateRange(filter) {
-  const now = new Date();
-  switch (filter) {
-    case "month":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth(), 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    case "3months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 3, 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    case "6months":
-      return {
-        start_date: new Date(now.getFullYear(), now.getMonth() - 6, 1)
-          .toISOString()
-          .split("T")[0],
-      };
-    default:
-      return {};
-  }
-}
+import { getDateRange, PERIOD_OPTIONS as timeFilters } from "../utils/groupHelpers";
 
 function Dashboard() {
   const { currentGroup } = useGroup();
@@ -81,17 +45,13 @@ function Dashboard() {
     setLoading(true);
     setError(null);
     Promise.race([
-      Promise.all([
-        getBalances(currentGroup.id, period),
-        getBreakdown(currentGroup.id, period),
-        getFairnessScore(currentGroup.id, period),
-      ]),
+      getDashboardData(currentGroup.id, period, currentGroup.members),
       new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
     ])
-      .then(([balRes, breakRes, fairRes]) => {
-        setBalances(balRes.data);
-        setBreakdown(breakRes.data);
-        setFairness(fairRes.data);
+      .then((res) => {
+        setBalances(res.data.balances);
+        setBreakdown(res.data.breakdown);
+        setFairness(res.data.fairness);
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
@@ -100,6 +60,8 @@ function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
   const currency = currentGroup.currency || "₹";
@@ -281,21 +243,22 @@ function Dashboard() {
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#C2CBC9" vertical={false} />
-                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#7E908C" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: "#7E908C" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
                         <Tooltip
                           contentStyle={{
                             borderRadius: 12,
                             border: "1px solid var(--border)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                             backgroundColor: "var(--surface)",
+                            color: "var(--text-dark)",
                           }}
                           formatter={(value) => formatINR(value, currency)}
                         />
                         <Legend wrapperStyle={{ paddingTop: "20px" }} />
                         <Bar dataKey="paid" name="Paid" fill="#105D5E" radius={[4, 4, 0, 0]} maxBarSize={50} />
-                        <Bar dataKey="share" name="Fair Share" fill="#009A6E" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                        <Bar dataKey="share" name="Fair Share" fill="#30D158" radius={[4, 4, 0, 0]} maxBarSize={50} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -312,15 +275,16 @@ function Dashboard() {
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={catStackData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#C2CBC9" vertical={false} />
-                        <XAxis dataKey="category" tick={{ fontSize: 11, fill: "#7E908C" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "#7E908C" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                        <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
                         <Tooltip
                           contentStyle={{
                             borderRadius: 12,
                             border: "1px solid var(--border)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                             backgroundColor: "var(--surface)",
+                            color: "var(--text-dark)",
                           }}
                           formatter={(value) => formatINR(value, currency)}
                         />

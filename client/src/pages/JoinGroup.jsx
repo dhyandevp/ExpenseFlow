@@ -3,12 +3,14 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, CircleAlert } from "lucide-react";
+import { useSession } from "@clerk/clerk-react";
 import { useGroup } from "../App";
-import { getGroupByCode } from "../api/client";
+import { joinGroupByCode } from "../api/client";
 
 function JoinGroup() {
   const { code } = useParams();
   const navigate = useNavigate();
+  const { session } = useSession();
   const { setCurrentGroup } = useGroup();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -25,8 +27,9 @@ function JoinGroup() {
       try {
         setLoading(true);
         setError("");
+        const token = session ? await session.getToken() : null;
         const res = await Promise.race([
-          getGroupByCode(code.toUpperCase()),
+          joinGroupByCode(code.toUpperCase(), token),
           new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
         ]);
         if (!isMounted) return;
@@ -51,7 +54,7 @@ function JoinGroup() {
     return () => {
       isMounted = false;
     };
-  }, [code, navigate, setCurrentGroup]);
+  }, [code, navigate, setCurrentGroup, session]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

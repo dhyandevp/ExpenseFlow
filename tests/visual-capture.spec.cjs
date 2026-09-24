@@ -2,6 +2,8 @@
 const { test, expect } = require("@playwright/test");
 const path = require("path");
 
+const BASE_URL = process.env.BASE_URL || "http://localhost:5173";
+
 const VISUAL_DIR = path.resolve(__dirname, "..", "visual-audit");
 
 // Mock group data to inject into localStorage for protected routes
@@ -41,7 +43,7 @@ test.describe("Visual Capture — Full App Screenshots", () => {
         // Inject localStorage for protected routes before navigating
         if (route.needsGroup) {
           // Navigate to base first to set localStorage on correct origin
-          await page.goto("http://localhost:5174/", {
+          await page.goto(`${BASE_URL}/`, {
             waitUntil: "domcontentloaded",
           });
           await page.evaluate((groupData) => {
@@ -56,7 +58,7 @@ test.describe("Visual Capture — Full App Screenshots", () => {
         // Navigate to the target route
         // Use domcontentloaded instead of networkidle — Clerk SDK keeps
         // long-polling connections alive which prevents networkidle from firing
-        await page.goto(`http://localhost:5174${route.path}`, {
+        await page.goto(`${BASE_URL}${route.path}`, {
           waitUntil: "domcontentloaded",
           timeout: 15000,
         });

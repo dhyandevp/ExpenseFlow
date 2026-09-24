@@ -133,7 +133,9 @@ export default function SettlementHistory() {
                   Amount
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs">₹</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-xs">
+                    {currentGroup?.currency || "₹"}
+                  </span>
                   <input
                     type="number"
                     value={form.amount}
@@ -191,7 +193,7 @@ export default function SettlementHistory() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono font-bold text-success text-sm">
-                    {formatINR(s.amount)}
+                    {formatINR(s.amount, currentGroup?.currency)}
                   </span>
                   <button
                     onClick={() => handleDelete(s.id)}

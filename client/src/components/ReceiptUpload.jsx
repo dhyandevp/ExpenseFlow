@@ -50,6 +50,7 @@ export default function ReceiptUpload({ value, onChange }) {
             <img
               src={preview}
               alt="Receipt"
+              loading="lazy"
               className="w-20 h-20 object-cover rounded-xl border border-border"
             />
             <button
@@ -152,6 +153,7 @@ export function ReceiptLightbox({ receiptUrl, onClose }) {
           <img
             src={receiptUrl}
             alt="Receipt"
+            loading="lazy"
             className="rounded-2xl shadow-xl max-h-[80vh] object-contain"
           />
           <button

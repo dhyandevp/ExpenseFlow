@@ -9,28 +9,11 @@ export function formatINR(amount, currency = "₹") {
   const absAmount = Math.abs(amount);
   const sign = amount < 0 ? "-" : "";
 
-  // Indian numbering system
-  let formatted;
-  if (absAmount >= 10000000) {
-    // Crores
-    const crores = Math.floor(absAmount / 10000000);
-    const remainder = absAmount % 10000000;
-    if (remainder > 0) {
-      formatted = `${crores.toLocaleString("en-IN")},${Math.round(remainder).toLocaleString("en-IN", { minimumIntegerDigits: 2 })}`;
-    } else {
-      formatted = crores.toLocaleString("en-IN");
-    }
-  } else {
-    formatted = Math.round(absAmount).toLocaleString("en-IN");
-  }
-
-  // Handle decimals
-  if (absAmount % 1 !== 0) {
-    formatted = absAmount.toLocaleString("en-IN", {
-      maximumFractionDigits: 2,
-      minimumFractionDigits: 0,
-    });
-  }
+  // toLocaleString("en-IN") handles Indian grouping (lakhs/crores) natively
+  const formatted = absAmount.toLocaleString("en-IN", {
+    maximumFractionDigits: 2,
+    minimumFractionDigits: 0,
+  });
 
   return `${sign}${currency}${formatted}`;
 }

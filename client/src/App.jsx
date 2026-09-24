@@ -1,17 +1,17 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
 import { ClerkProvider, AuthenticateWithRedirectCallback } from "@clerk/clerk-react";
 import { AuthProvider, useAuth } from "./hooks/useAuth";
 import { HelmetProvider } from "react-helmet-async";
-import NotFound from "./pages/NotFound";
-import Terms from "./pages/Terms";
-import Privacy from "./pages/Privacy";
-import Contact from "./pages/Contact";
+import SEO from "./components/SEO";
+import { isAppHost, getAppUrl } from "./lib/host";
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
 // Lazy-load app pages for route-level code splitting
 const Landing = lazy(() => import("./pages/Landing"));
+const Login = lazy(() => import("./pages/Login"));
+const Signup = lazy(() => import("./pages/Signup"));
 const GroupSetup = lazy(() => import("./pages/GroupSetup"));
 const JoinGroup = lazy(() => import("./pages/JoinGroup"));
 const AppLayout = lazy(() => import("./components/AppLayout"));
@@ -23,6 +23,12 @@ const Settings = lazy(() => import("./pages/Settings"));
 const GroupsHome = lazy(() => import("./pages/GroupsHome"));
 const ProfileSetup = lazy(() => import("./pages/ProfileSetup"));
 const Profile = lazy(() => import("./pages/Profile"));
+const Terms = lazy(() => import("./pages/Terms"));
+const Privacy = lazy(() => import("./pages/Privacy"));
+const Contact = lazy(() => import("./pages/Contact"));
+const CookiePolicy = lazy(() => import("./pages/CookiePolicy"));
+const RefundPolicy = lazy(() => import("./pages/RefundPolicy"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 export const GroupContext = createContext();
 
@@ -96,7 +102,8 @@ function PageLoader() {
 
 function ProtectedRoute({ children, requireProfile = true }) {
   const { user, isLoaded, userProfile, authMode, firebaseAuthError, profileStatus } = useAuth();
-  
+  const location = useLocation();
+
   if (firebaseAuthError) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background text-text-dark px-4 text-center">
@@ -107,8 +114,8 @@ function ProtectedRoute({ children, requireProfile = true }) {
         </div>
         <h2 className="text-2xl font-bold mb-2">Session Error</h2>
         <p className="text-text-muted mb-6 max-w-sm">We couldn't finish setting up your session. Please try again.</p>
-        <button 
-          onClick={() => window.location.reload()} 
+        <button
+          onClick={() => window.location.reload()}
           className="btn-primary"
         >
           Try again
@@ -126,26 +133,45 @@ function ProtectedRoute({ children, requireProfile = true }) {
       </div>
     );
   }
-  
-  if (!user) return <Navigate to="/" replace />;
-  
+
+  if (!user) {
+    const currentPath = location.pathname + location.search;
+    return <Navigate to={`/login?returnUrl=${encodeURIComponent(currentPath)}`} replace />;
+  }
+
   if (authMode === 'clerk') {
     if (requireProfile && profileStatus === 'missing') {
       return <Navigate to="/profile-setup" replace />;
     }
-    
+
     // If the route doesn't require a profile (like ProfileSetup itself) but the profile IS complete, redirect home
     if (!requireProfile && profileStatus === 'complete') {
       return <Navigate to="/home" replace />;
     }
   }
-  
+
   return children;
+}
+
+function ExternalAppRedirect() {
+  const location = useLocation();
+  useEffect(() => {
+    window.location.replace(getAppUrl(location.pathname + location.search));
+  }, [location]);
+  return <PageLoader />;
+}
+
+function AppRootRedirect() {
+  const { user, isLoaded } = useAuth();
+  if (!isLoaded) return <PageLoader />;
+  if (user) return <Navigate to="/home" replace />;
+  return <Navigate to="/login" replace />;
 }
 
 export default function App() {
   const [currentGroup, setCurrentGroupRaw] = useState(getStoredGroup);
   const { recentGroups, updateRecent } = useRecentGroups();
+  const isApp = isAppHost();
 
   // Wrap setCurrentGroup to also push to recent groups
   const setCurrentGroup = (group) => {
@@ -166,63 +192,93 @@ export default function App() {
       <ClerkProvider publishableKey={PUBLISHABLE_KEY} navigate={(to) => window.location.href = to}>
         <AuthProvider>
           <GroupContext.Provider value={{ currentGroup, setCurrentGroup, recentGroups }}>
+            {isApp && <SEO noindex={true} />}
             <Suspense fallback={<PageLoader />}>
-              <Routes>
-                <Route path="/" element={<Landing />} />
-                <Route path="/terms" element={<Terms />} />
-                <Route path="/privacy" element={<Privacy />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
-                <Route path="/home" element={<ProtectedRoute><GroupsHome /></ProtectedRoute>} />
-                <Route path="/profile-setup" element={<ProtectedRoute requireProfile={false}><ProfileSetup /></ProtectedRoute>} />
-                <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/setup" element={<ProtectedRoute><GroupSetup /></ProtectedRoute>} />
-                <Route path="/join/:code" element={<JoinGroup />} />
-            <Route
-              path="/group/:code"
-              element={
-                <AppLayout>
-                  <ExpenseLogger />
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/group/:code/dashboard"
-              element={
-                <AppLayout>
-                  <Dashboard />
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/group/:code/scenarios"
-              element={
-                <AppLayout>
-                  <ScenarioPlanner />
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/group/:code/report"
-              element={
-                <AppLayout>
-                  <FairnessReport />
-                </AppLayout>
-              }
-            />
-            <Route
-              path="/group/:code/settings"
-              element={
-                <AppLayout>
-                  <Settings />
-                </AppLayout>
-              }
-            />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </Suspense>
-      </GroupContext.Provider>
-      </AuthProvider>
+              {isApp ? (
+                <Routes>
+                  <Route path="/" element={<AppRootRedirect />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/signup" element={<Signup />} />
+                  <Route path="/sso-callback" element={<AuthenticateWithRedirectCallback />} />
+                  <Route path="/home" element={<ProtectedRoute><GroupsHome /></ProtectedRoute>} />
+                  <Route path="/profile-setup" element={<ProtectedRoute requireProfile={false}><ProfileSetup /></ProtectedRoute>} />
+                  <Route path="/account" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                  <Route path="/setup" element={<ProtectedRoute><GroupSetup /></ProtectedRoute>} />
+                  <Route path="/join/:code" element={<JoinGroup />} />
+                  <Route
+                    path="/group/:code"
+                    element={
+                      <AppLayout>
+                        <ExpenseLogger />
+                      </AppLayout>
+                    }
+                  />
+                  <Route
+                    path="/group/:code/dashboard"
+                    element={
+                      <AppLayout>
+                        <Dashboard />
+                      </AppLayout>
+                    }
+                  />
+                  <Route
+                    path="/group/:code/scenarios"
+                    element={
+                      <AppLayout>
+                        <ScenarioPlanner />
+                      </AppLayout>
+                    }
+                  />
+                  <Route
+                    path="/group/:code/report"
+                    element={
+                      <AppLayout>
+                        <FairnessReport />
+                      </AppLayout>
+                    }
+                  />
+                  <Route
+                    path="/group/:code/settings"
+                    element={
+                      <AppLayout>
+                        <Settings />
+                      </AppLayout>
+                    }
+                  />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              ) : (
+                <Routes>
+                  <Route path="/" element={<Landing />} />
+                  <Route path="/terms" element={<Terms />} />
+                  <Route path="/privacy" element={<Privacy />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/cookie-policy" element={<CookiePolicy />} />
+                  <Route path="/refund-policy" element={<RefundPolicy />} />
+
+                  {/* Cross-Surface Client Redirects for Marketing -> App */}
+                  <Route path="/login" element={<ExternalAppRedirect />} />
+                  <Route path="/signup" element={<ExternalAppRedirect />} />
+                  <Route path="/sso-callback" element={<ExternalAppRedirect />} />
+                  <Route path="/home" element={<ExternalAppRedirect />} />
+                  <Route path="/setup" element={<ExternalAppRedirect />} />
+                  <Route path="/profile-setup" element={<ExternalAppRedirect />} />
+                  <Route path="/account" element={<ExternalAppRedirect />} />
+                  <Route path="/join/*" element={<ExternalAppRedirect />} />
+                  <Route path="/group/*" element={<ExternalAppRedirect />} />
+                  <Route path="/dashboard" element={<ExternalAppRedirect />} />
+
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              )}
+            </Suspense>
+          </GroupContext.Provider>
+        </AuthProvider>
       </ClerkProvider>
     </HelmetProvider>
   );

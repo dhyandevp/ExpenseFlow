@@ -1,16 +1,12 @@
 import SEO from "../components/SEO";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { createUserProfile } from "../api/client";
 
 export function ProfileSetup() {
-  const { user, firebaseUser, authMode, refreshProfile, userProfile } = useAuth();
-  const navigate = useNavigate();
-
-// Removed explicit navigation, handled by ProtectedRoute
+  const { user, firebaseUser, authMode, refreshProfile } = useAuth();
 
 
   const [displayName, setDisplayName] = useState("");
@@ -102,9 +98,10 @@ export function ProfileSetup() {
             <div className="text-sm font-medium text-text-muted self-start w-full text-center">
               Profile photo
             </div>
-            <img 
-              src={user?.imageUrl} 
-              alt="Your Profile" 
+            <img
+              src={user?.imageUrl}
+              alt="Your Profile"
+              loading="lazy"
               className="w-20 h-20 rounded-full ring-4 ring-background shadow-md object-cover"
             />
             <p className="text-xs text-text-muted">

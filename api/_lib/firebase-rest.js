@@ -4,8 +4,10 @@
  * Zero external Node-only dependencies (no grpc, no http2, no firebase-admin).
  */
 
+// ponytail: single-slot cache keyed by client_email. Upgrade to Map if multi-project needed.
 let cachedAccessToken = null;
 let cachedTokenExpiry = 0;
+let cachedTokenEmail = null;
 let cachedCryptoKey = null;
 let cachedPrivateKeyPem = null;
 
@@ -120,7 +122,7 @@ export async function createFirebaseCustomToken(sa, uid, claims = {}) {
  */
 export async function getGoogleAccessToken(sa) {
   const now = Math.floor(Date.now() / 1000);
-  if (cachedAccessToken && cachedTokenExpiry > now + 60) {
+  if (cachedAccessToken && cachedTokenExpiry > now + 60 && cachedTokenEmail === sa.client_email) {
     return cachedAccessToken;
   }
 
@@ -152,6 +154,7 @@ export async function getGoogleAccessToken(sa) {
   const tokenData = await res.json();
   cachedAccessToken = tokenData.access_token;
   cachedTokenExpiry = now + (tokenData.expires_in || 3600);
+  cachedTokenEmail = sa.client_email;
   return cachedAccessToken;
 }
 
@@ -324,9 +327,50 @@ export async function findGroupByCode(sa, code) {
 export async function listCollectionDocs(sa, collectionPath) {
   const res = await firestoreRequest(sa, collectionPath, { method: 'GET' });
   if (res.status === 404) return [];
-  if (!res.ok) return [];
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Firestore list ${collectionPath} failed ${res.status}: ${errText}`);
+  }
   const data = await res.json();
   return data.documents || [];
+}
+
+/**
+ * Appends a userId to a group's memberUserIds array if not already present.
+ * Uses Firestore REST commit with arrayUnion transform.
+ */
+export async function addMemberUserId(sa, groupId, userId) {
+  const token = await getGoogleAccessToken(sa);
+  const url = `${BASE_URL}/projects/${sa.project_id}/databases/(default)/documents:commit`;
+
+  const body = {
+    writes: [{
+      transform: {
+        document: `projects/${sa.project_id}/databases/(default)/documents/groups/${groupId}`,
+        fieldTransforms: [{
+          fieldPath: 'memberUserIds',
+          appendMissingElements: {
+            values: [{ stringValue: userId }]
+          }
+        }]
+      }
+    }]
+  };
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`Firestore addMemberUserId error ${res.status}: ${errText}`);
+  }
+  return true;
 }
 
 /**

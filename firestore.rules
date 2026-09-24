@@ -17,45 +17,64 @@ service cloud.firestore {
     }
 
     function isGuestForGroup(groupId) {
-      return isAuthenticated() && ('guestGroupId' in request.auth.token) && request.auth.token.guestGroupId == groupId;
+      return isAuthenticated()
+        && ('guestGroupId' in request.auth.token)
+        && request.auth.token.guestGroupId == groupId;
+    }
+
+    function isMemberOfGroup(groupId) {
+      let groupData = get(/databases/$(database)/documents/groups/$(groupId)).data;
+      return !('memberUserIds' in groupData) || request.auth.uid in groupData.memberUserIds;
     }
 
     function canAccessGroup(groupId) {
-      return isClerkUser() || isGuestForGroup(groupId);
+      return (isClerkUser() && isMemberOfGroup(groupId)) || isGuestForGroup(groupId);
     }
 
     // ── Groups ──────────────────────────────────────────────────────────
     match /groups/{groupId} {
       allow read: if canAccessGroup(groupId);
-      allow create: if isClerkUser();
-      allow update: if isClerkUser()
+
+      // Create: clerk user must set themselves as creator and include self in memberUserIds
+      allow create: if isClerkUser()
+                    && request.resource.data.createdBy == request.auth.uid
+                    && request.auth.uid in request.resource.data.memberUserIds;
+
+      // Update: only group members (clerk), cannot touch currentBalances
+      allow update: if canAccessGroup(groupId) && isClerkUser()
                     && !request.resource.data.diff(resource.data).affectedKeys()
                         .hasAny(['currentBalances']);
-      allow delete: if isClerkUser();
 
-      // Members
+      // Delete: owner only (legacy groups without createdBy: any clerk member)
+      allow delete: if isClerkUser()
+                    && (!('createdBy' in resource.data) || resource.data.createdBy == request.auth.uid);
+
+      // Members — allow create for any clerk user (covers writeBatch where
+      // the parent group doc isn't readable via get() yet)
       match /members/{memberId} {
         allow read: if canAccessGroup(groupId);
-        allow write: if isClerkUser();
+        allow create: if isClerkUser();
+        allow update, delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
-      // Categories
+      // Categories — same batch-create allowance as members
       match /categories/{catId} {
         allow read: if canAccessGroup(groupId);
-        allow write: if isClerkUser();
+        allow create: if isClerkUser();
+        allow update, delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
-      // Expenses — guests can create but only Clerk users can edit/delete
+      // Expenses — guests can create, only clerk users can edit/delete
       match /expenses/{expenseId} {
         allow read, create: if canAccessGroup(groupId);
-        allow update, delete: if isClerkUser();
+        allow update, delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
-      // Settlements — append-only ledger, no edits or deletes for guests
+      // Settlements — append-only ledger
       match /settlements/{settlementId} {
         allow read, create: if canAccessGroup(groupId);
         allow update: if false;
-        allow delete: if isClerkUser();
+        allow delete: if canAccessGroup(groupId) && isClerkUser();
       }
 
       // Scenarios

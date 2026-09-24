@@ -8,7 +8,7 @@ module.exports = defineConfig({
   retries: 0,
   workers: 1,
   use: {
-    baseURL: "http://localhost:5174",
+    baseURL: process.env.BASE_URL || "http://localhost:5173",
     headless: true,
     screenshot: "off",
     video: "off",

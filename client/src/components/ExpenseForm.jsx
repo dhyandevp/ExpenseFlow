@@ -211,24 +211,6 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
                 </div>
               </div>
 
-              {/* Split Type */}
-              <div>
-                <label className="block text-sm font-medium text-text-dark mb-1">
-                  Split type
-                </label>
-                <select
-                  value={form.split_type}
-                  onChange={(e) =>
-                    setForm((f) => ({ ...f, split_type: e.target.value }))
-                  }
-                  className="input-field"
-                >
-                  <option value="equal">Equal split</option>
-                  <option value="custom_amounts">Custom amounts</option>
-                  <option value="custom_percentages">Custom percentages</option>
-                </select>
-              </div>
-
               {/* Split Members */}
               <div>
                 <label className="block text-sm font-medium text-text-dark mb-1">

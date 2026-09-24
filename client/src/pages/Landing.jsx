@@ -11,7 +11,6 @@ import {
   Users,
   Home,
   Star,
-  LogIn,
   CheckCircle2,
   PieChart,
   Calculator,
@@ -22,23 +21,22 @@ import {
   ChevronDown,
   UserPlus,
   ArrowDownUp,
-  Check,
   Building2,
   Plane,
   Heart,
-  Settings,
-  Image as ImageIcon
+  Image as ImageIcon,
+  LogIn
 } from "lucide-react";
-import SignInModal from "../components/auth/SignInModal";
-import GuestJoinModal from "../components/auth/GuestJoinModal";
 import { useAuth } from "../hooks/useAuth";
+import Logo from "../components/Logo";
+import { getAppUrl } from "../lib/host";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 20 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.1, duration: 0.5, ease: "easeOut" },
+    transition: { delay: i * 0.1, type: "spring", bounce: 0, duration: 0.5 },
   }),
 };
 
@@ -78,8 +76,6 @@ function Landing() {
   const { user, isLoaded, authMode, profileStatus } = useAuth();
   const { isLoaded: isClerkLoaded, user: clerkUser } = useUser();
   
-  const [isSignInOpen, setIsSignInOpen] = useState(false);
-  const [isGuestJoinOpen, setIsGuestJoinOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState(0);
 
   // If already authenticated, redirect
@@ -113,8 +109,7 @@ function Landing() {
 
   return (
     <div className="min-h-screen bg-background font-sans overflow-x-hidden">
-      <SignInModal isOpen={isSignInOpen} onClose={() => setIsSignInOpen(false)} />
-      <GuestJoinModal isOpen={isGuestJoinOpen} onClose={() => setIsGuestJoinOpen(false)} />
+      <a href="#main-content" className="skip-to-main">Skip to main content</a>
 
       {/* Header */}
       <motion.header
@@ -124,16 +119,12 @@ function Landing() {
       >
         <div className="flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           <div className="flex items-center gap-2">
-            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="ExpenseFlow logo">
-              <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
-              <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-              <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
-            </svg>
+            <Logo size={28} />
             <span className="font-heading font-bold text-xl text-text-dark tracking-tight">
               ExpenseFlow
             </span>
           </div>
-          
+
           <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-text-muted">
             <button onClick={() => scrollTo('features')} className="hover:text-text-dark transition-colors">Features</button>
             <button onClick={() => scrollTo('how-it-works')} className="hover:text-text-dark transition-colors">How it works</button>
@@ -141,23 +132,24 @@ function Landing() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <button
-              onClick={() => setIsSignInOpen(true)}
-              className="text-[#105D5E] font-semibold hover:bg-white/50 px-4 py-2 rounded-xl transition-all text-sm hidden sm:block"
+            <a
+              href={getAppUrl('/login')}
+              className="text-primary font-semibold hover:bg-highlight/30 px-4 py-2 rounded-xl transition-all duration-300 text-sm hidden sm:block"
             >
               Sign In
-            </button>
-            <button
-              onClick={() => setIsGuestJoinOpen(true)}
-              className="btn-primary text-sm"
+            </a>
+            <a
+              href={getAppUrl('/login')}
+              className="btn-primary text-sm inline-flex items-center justify-center"
             >
               Join with Code
-            </button>
+            </a>
           </div>
         </div>
       </motion.header>
 
       {/* Hero */}
+      <main id="main-content">
       <section className="px-6 pt-16 pb-20 max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
@@ -170,7 +162,7 @@ function Landing() {
                 <Shield size={14} />
                 Fair sharing, clear minds.
               </span>
-              <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-text-dark leading-tight mb-6">
+              <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-text-dark leading-tight tracking-tight mb-6">
                 Stop arguing about
                 <span className="text-primary"> who paid what</span>.
               </h1>
@@ -187,17 +179,17 @@ function Landing() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="flex flex-col sm:flex-row gap-4"
             >
-              <button onClick={() => setIsSignInOpen(true)} className="btn-primary text-base px-8 py-4">
+              <a href={getAppUrl('/signup')} className="btn-primary text-base px-8 py-4 inline-flex items-center justify-center gap-2">
                 Sign In to Create
                 <ArrowRight size={18} />
-              </button>
-              <button
-                onClick={() => setIsGuestJoinOpen(true)}
-                className="btn-secondary text-base px-8 py-4 bg-white/60 hover:bg-white border border-border"
+              </a>
+              <a
+                href={getAppUrl('/login')}
+                className="btn-secondary text-base px-8 py-4 bg-surface/70 hover:bg-surface border border-border/60 inline-flex items-center justify-center gap-2"
               >
                 <Users size={18} />
                 Join as Guest
-              </button>
+              </a>
             </motion.div>
           </div>
 
@@ -208,7 +200,7 @@ function Landing() {
             transition={{ delay: 0.3, duration: 0.7 }}
             className="hidden lg:flex items-center justify-center relative"
           >
-            <div className="relative z-10 w-80 rounded-[2rem] glass p-6 shadow-2xl" style={{ border: '1px solid rgba(255,255,255,0.8)' }}>
+            <div className="relative z-10 w-80 rounded-[2rem] glass p-6 shadow-2xl" style={{ border: '1px solid var(--border)' }}>
               <div className="space-y-4">
                 <div className="pb-2 border-b border-border/50 flex justify-between items-end">
                   <div>
@@ -231,7 +223,7 @@ function Landing() {
                 ].map((p, i) => (
                   <div
                     key={i}
-                    className="flex items-center justify-between bg-white rounded-xl px-4 py-3 shadow-sm border border-border/30"
+                    className="flex items-center justify-between bg-surface rounded-xl px-4 py-3 shadow-sm border border-border/30"
                   >
                     <span className="text-sm font-medium text-text-dark flex items-center gap-2">
                       <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center text-[10px] font-bold text-primary">
@@ -269,7 +261,7 @@ function Landing() {
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeUp}
         >
-          <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark mb-6">
+          <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark tracking-tight mb-6">
             More than just "who owes whom"
           </h2>
           <p className="text-lg text-text-muted leading-relaxed mb-16 max-w-2xl mx-auto">
@@ -304,7 +296,7 @@ function Landing() {
               viewport={{ once: true, margin: "-50px" }}
               className="flex flex-col items-center"
             >
-              <div className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-border flex items-center justify-center mb-6 text-primary">
+              <div className="w-16 h-16 bg-surface rounded-2xl shadow-sm border border-border flex items-center justify-center mb-6 text-primary">
                 <item.icon size={28} />
               </div>
               <h3 className="font-heading font-bold text-xl text-text-dark mb-3">{item.title}</h3>
@@ -315,10 +307,10 @@ function Landing() {
       </section>
 
       {/* How it Works */}
-      <section id="how-it-works" className="px-6 py-24 bg-white/50 border-y border-border/50">
+      <section id="how-it-works" className="px-6 py-24 bg-surface/50 border-y border-border/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark mb-4">
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark tracking-tight mb-4">
               How ExpenseFlow works
             </h2>
             <p className="text-text-muted text-lg max-w-xl mx-auto">
@@ -346,7 +338,7 @@ function Landing() {
                 <div className="relative z-10 flex flex-col items-start bg-surface/50 p-6 rounded-3xl border border-border h-full">
                   <div className="flex items-center justify-between w-full mb-6">
                     <span className="font-mono text-4xl font-black text-primary/10">{step.num}</span>
-                    <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-primary">
+                    <div className="w-12 h-12 bg-surface rounded-xl shadow-sm flex items-center justify-center text-primary">
                       <step.icon size={24} />
                     </div>
                   </div>
@@ -362,7 +354,7 @@ function Landing() {
       {/* Core Features */}
       <section id="features" className="px-6 py-24 max-w-6xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark mb-4">
+          <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark tracking-tight mb-4">
             Everything you need. Nothing you don't.
           </h2>
           <p className="text-text-muted text-lg max-w-2xl mx-auto">
@@ -445,7 +437,7 @@ function Landing() {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            <h2 className="font-heading font-bold text-3xl md:text-4xl text-white mb-6">
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-white tracking-tight mb-6">
               See the big picture instantly
             </h2>
             <p className="text-white/70 text-lg leading-relaxed mb-8">
@@ -511,10 +503,10 @@ function Landing() {
       </section>
 
       {/* Who is it for? */}
-      <section className="px-6 py-24 bg-white/50 border-b border-border/50">
+      <section className="px-6 py-24 bg-surface/50 border-b border-border/50">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark mb-4">
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark tracking-tight mb-4">
               Built for shared expenses
             </h2>
             <p className="text-text-muted text-lg">
@@ -536,7 +528,7 @@ function Landing() {
                 whileInView="visible"
                 viewport={{ once: true }}
                 custom={i}
-                className="bg-white p-6 rounded-2xl shadow-sm border border-border"
+                className="bg-surface p-6 rounded-2xl shadow-sm border border-border"
               >
                 <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center text-text-dark mb-4">
                   <audience.icon size={20} />
@@ -573,15 +565,15 @@ function Landing() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" className="px-6 py-24 bg-white/50 border-y border-border/50">
+      <section id="faq" className="px-6 py-24 bg-surface/50 border-y border-border/50">
         <div className="max-w-3xl mx-auto">
           <div className="text-center mb-12">
-            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark mb-4">
+            <h2 className="font-heading font-bold text-3xl md:text-4xl text-text-dark tracking-tight mb-4">
               Frequently Asked Questions
             </h2>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-border px-6 py-2">
+          <div className="bg-surface rounded-2xl shadow-sm border border-border px-6 py-2">
             {[
               {
                 q: "What is ExpenseFlow?",
@@ -659,47 +651,44 @@ function Landing() {
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
-          className="max-w-3xl mx-auto bg-primary text-white rounded-[2.5rem] p-10 md:p-16 shadow-2xl relative overflow-hidden"
+          className="max-w-3xl mx-auto cta-card rounded-[2.5rem] p-10 md:p-16 shadow-2xl relative overflow-hidden"
         >
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjE5KSIvPjwvc3ZnPg==')] opacity-20"></div>
-          
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMjAiIGN5PSIyMCIgcj0iMSIgZmlsbD0icmdiYSgyNTUsMjU1LDI1NSwwLjE5KSIvPjwvc3ZnPg==')] opacity-15"></div>
+
           <div className="relative z-10">
             <h2 className="font-heading font-bold text-3xl md:text-5xl mb-6 leading-tight">
               Ready to make shared expenses simpler?
             </h2>
-            <p className="text-white/80 text-lg md:text-xl mb-10 max-w-xl mx-auto">
+            <p className="cta-subtitle text-white/80 text-lg md:text-xl mb-10 max-w-xl mx-auto transition-colors">
               Create a group, invite your people, and start tracking.
             </p>
-            
+
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <button 
-                onClick={() => setIsSignInOpen(true)}
-                className="bg-white text-primary font-bold px-8 py-4 rounded-xl hover:bg-white/90 transition-colors"
+              <a
+                href={getAppUrl('/signup')}
+                className="cta-btn-primary font-bold px-8 py-4 rounded-xl transition-all shadow-md inline-flex items-center justify-center"
               >
                 Create a Group
-              </button>
-              <button 
-                onClick={() => setIsGuestJoinOpen(true)}
-                className="bg-primary-dark/30 border border-white/20 text-white font-bold px-8 py-4 rounded-xl hover:bg-primary-dark/50 transition-colors"
+              </a>
+              <a
+                href={getAppUrl('/login')}
+                className="cta-btn-secondary font-bold px-8 py-4 rounded-xl transition-all inline-flex items-center justify-center"
               >
                 Join with Code
-              </button>
+              </a>
             </div>
           </div>
         </motion.div>
       </section>
 
       {/* Footer */}
-      <footer className="px-6 pt-16 pb-24 md:pb-12 bg-white border-t border-border mt-10">
+      </main>
+      <footer className="px-6 pt-16 pb-24 md:pb-12 bg-surface border-t border-border mt-10">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-8 mb-12">
             <div className="col-span-2 lg:col-span-2">
               <div className="flex items-center gap-2 mb-4">
-                <svg width="24" height="24" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M6 22C6 22 10 18 16 18C22 18 26 22 26 22" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.35" />
-                  <path d="M4 17C4 17 9 12 16 12C23 12 28 17 28 17" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" opacity="0.6" />
-                  <path d="M2 12C2 12 8 6 16 6C24 6 30 12 30 12" stroke="#105D5E" strokeWidth="2.5" strokeLinecap="round" />
-                </svg>
+                <Logo size={24} />
                 <span className="font-heading font-bold text-lg text-text-dark tracking-tight">
                   ExpenseFlow
                 </span>
@@ -708,7 +697,7 @@ function Landing() {
                 Fair sharing, clear minds. Designed to help groups track expenses and settle up without the awkwardness.
               </p>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Product</h4>
               <ul className="space-y-3 text-sm text-text-muted">
@@ -717,25 +706,27 @@ function Landing() {
                 <li><button onClick={() => scrollTo('faq')} className="hover:text-primary transition-colors">FAQ</button></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Account</h4>
               <ul className="space-y-3 text-sm text-text-muted">
-                <li><button onClick={() => setIsSignInOpen(true)} className="hover:text-primary transition-colors">Sign In</button></li>
-                <li><button onClick={() => setIsGuestJoinOpen(true)} className="hover:text-primary transition-colors">Join with Code</button></li>
+                <li><a href={getAppUrl('/login')} className="hover:text-primary transition-colors">Sign In</a></li>
+                <li><a href={getAppUrl('/login')} className="hover:text-primary transition-colors">Join with Code</a></li>
               </ul>
             </div>
-            
+
             <div>
               <h4 className="font-bold text-text-dark mb-4">Legal</h4>
               <ul className="space-y-3 text-sm text-text-muted">
                 <li><Link to="/terms" className="hover:text-primary transition-colors">Terms of Service</Link></li>
                 <li><Link to="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/cookie-policy" className="hover:text-primary transition-colors">Cookie Policy</Link></li>
+                <li><Link to="/refund-policy" className="hover:text-primary transition-colors">Refund Policy</Link></li>
                 <li><Link to="/contact" className="hover:text-primary transition-colors">Contact Support</Link></li>
               </ul>
             </div>
           </div>
-          
+
           <div className="pt-8 border-t border-border flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-text-muted">
             <p>© {new Date().getFullYear()} ExpenseFlow. All rights reserved.</p>
             <p>Made for roommates, couples, and close friends.</p>
@@ -744,13 +735,13 @@ function Landing() {
       </footer>
 
       {/* Public FAB */}
-      <button
-        onClick={() => setIsGuestJoinOpen(true)}
+      <a
+        href={getAppUrl('/login')}
         className="md:hidden fixed bottom-20 right-4 z-40 btn-primary shadow-lg rounded-full w-14 h-14 p-0 flex items-center justify-center bg-primary text-background"
         aria-label="Join with Code"
       >
         <Users size={24} />
-      </button>
+      </a>
 
       {/* Public Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 glass-nav safe-area-bottom">
@@ -769,13 +760,13 @@ function Landing() {
             <Star size={20} />
             <span className="text-[10px] font-medium">Features</span>
           </button>
-          <button
-            onClick={() => setIsSignInOpen(true)}
+          <a
+            href={getAppUrl('/login')}
             className="flex flex-col items-center justify-center gap-0.5 min-h-[44px] min-w-[44px] px-3 py-1 rounded-xl transition-all text-text-muted hover:text-text-dark"
           >
             <LogIn size={20} />
             <span className="text-[10px] font-medium">Sign In</span>
-          </button>
+          </a>
         </div>
       </nav>
     </div>
