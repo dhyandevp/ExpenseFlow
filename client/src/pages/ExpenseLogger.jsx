@@ -1,6 +1,6 @@
 import SEO from "../components/SEO";
 import { useState, useEffect, useCallback } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Plus,
@@ -23,6 +23,7 @@ function ExpenseLogger() {
   const { currentGroup, setCurrentGroup } = useGroup();
   const location = useLocation();
   const navigate = useNavigate();
+  const { code } = useParams();
 
   const [expenses, setExpenses] = useState([]);
   const [balances, setBalances] = useState(null);
@@ -43,12 +44,16 @@ function ExpenseLogger() {
     }
   }, [location.state]);
 
-  // Redirect to landing if no group
+  // Redirect to join or landing if no group
   useEffect(() => {
     if (!currentGroup) {
-      navigate("/", { replace: true });
+      if (code) {
+        navigate(`/join/${code.toUpperCase()}`, { replace: true });
+      } else {
+        navigate("/", { replace: true });
+      }
     }
-  }, [currentGroup]);
+  }, [currentGroup, code, navigate]);
 
   const loadData = useCallback(async () => {
     if (!currentGroup) return;

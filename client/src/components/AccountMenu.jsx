@@ -3,7 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { User, LogOut, Home } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
-import ThemeToggle from "./ThemeToggle";
 
 export default function AccountMenu() {
   const { user, userProfile, authMode, signOut } = useAuth();
@@ -98,13 +97,6 @@ export default function AccountMenu() {
                 <Home size={16} />
                 Global Home
               </Link>
-            </div>
-
-            <div className="py-1.5 border-t border-border">
-              <div className="flex items-center justify-between px-4 py-2.5">
-                <span className="text-sm text-text-muted">Theme</span>
-                <ThemeToggle size="sm" />
-              </div>
             </div>
 
             <div className="py-1.5 border-t border-border">

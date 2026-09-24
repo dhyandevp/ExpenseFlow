@@ -11,14 +11,15 @@ import {
   Check,
   Shield,
   X,
-  PieChart
+  PieChart,
+  Plus
 } from "lucide-react";
 import { useGroup } from "../App";
-import { updateGroup, removeMember, regenerateCode, deleteGroup } from "../api/client";
+import { updateGroup, removeMember, addMember, regenerateCode, deleteGroup } from "../api/client";
 import { useAuth } from "../hooks/useAuth";
 import { useSession } from "@clerk/clerk-react";
 
-import { getGroupCategories, MODEL_OPTIONS as modelOptions } from "../utils/groupHelpers";
+import { getGroupCategories, MODEL_OPTIONS as modelOptions, COLOR_OPTIONS as COLORS } from "../utils/groupHelpers";
 import Avatar from "../components/Avatar";
 import { CategoryIcon } from "../utils/categoryIcons";
 
@@ -89,6 +90,8 @@ function SettingsPage() {
   // Security: invite code
   const [regenerating, setRegenerating] = useState(false);
   const [codeCopied, setCodeCopied] = useState(false);
+  const [newMemberName, setNewMemberName] = useState("");
+  const [addingMember, setAddingMember] = useState(false);
 
   // Danger Zone Dialogs
   const [isLeaveDialogOpen, setIsLeaveDialogOpen] = useState(false);
@@ -105,6 +108,8 @@ function SettingsPage() {
       setThreshold(currentGroup.settlement_threshold || 0);
     }
   }, [currentGroup]);
+
+  if (!currentGroup) return null;
 
   const members = currentGroup.members || [];
   const fairnessModels = currentGroup.fairness_models || [];
@@ -127,12 +132,32 @@ function SettingsPage() {
     }
   };
 
-  const handleRemoveMember = async (memberId) => {
-    if (!confirm("Remove this member? Their expenses will be reassigned."))
+  const handleAddMember = async (e) => {
+    e.preventDefault();
+    const name = newMemberName.trim();
+    if (!name) return;
+    setAddingMember(true);
+    try {
+      const nextId = members.length > 0 ? Math.max(...members.map((m) => Number(m.id) || 0)) + 1 : 1;
+      const color = COLORS[members.length % COLORS.length];
+      const memberData = { id: nextId, name, color };
+      const res = await addMember(currentGroup.id, memberData);
+      const created = { ...memberData, docId: res.data?.docId || res.data?.id, id: nextId };
+      setCurrentGroup({ ...currentGroup, members: [...members, created] });
+      setNewMemberName("");
+    } catch (err) {
+      alert("Failed to add member: " + err.message);
+    } finally {
+      setAddingMember(false);
+    }
+  };
+
+  const handleRemoveMember = async (member) => {
+    if (!confirm(`Remove ${member.name}? Their expenses will remain recorded.`))
       return;
     try {
-      await removeMember(currentGroup.id, memberId);
-      const updatedMembers = members.filter((m) => m.id !== memberId);
+      await removeMember(currentGroup.id, member.docId || member.id);
+      const updatedMembers = members.filter((m) => m.id !== member.id);
       setCurrentGroup({ ...currentGroup, members: updatedMembers });
     } catch (err) {
       alert(err.message);
@@ -304,7 +329,7 @@ function SettingsPage() {
                 </div>
               </div>
               <button
-                onClick={() => handleRemoveMember(m.id)}
+                onClick={() => handleRemoveMember(m)}
                 className="p-2 rounded-lg text-text-muted hover:bg-red-50 hover:text-red-600 transition-colors"
                 title="Remove member"
                 aria-label={`Remove ${m.name}`}
@@ -313,6 +338,26 @@ function SettingsPage() {
               </button>
             </div>
           ))}
+
+          {/* Add Member Form */}
+          <form onSubmit={handleAddMember} className="flex gap-2 pt-2">
+            <input
+              type="text"
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+              placeholder="New member name..."
+              className="input-field text-sm flex-1"
+              maxLength={30}
+            />
+            <button
+              type="submit"
+              disabled={addingMember || !newMemberName.trim()}
+              className="btn-primary text-sm shrink-0"
+            >
+              <Plus size={16} />
+              {addingMember ? "Adding..." : "Add"}
+            </button>
+          </form>
         </div>
       </section>
 

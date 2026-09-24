@@ -163,7 +163,7 @@ function GroupSetup() {
           </div>
           <p className="text-xs text-text-muted mb-6">
             Or share this link:<br />
-            <span className="text-primary font-mono text-sm">{window.location.origin}/group/{createdGroup.code}</span>
+            <span className="text-primary font-mono text-sm">{window.location.origin}/join/{createdGroup.code}</span>
           </p>
           <motion.button {...springScale} onClick={goToGroup} className="btn-primary w-full">Go to Group →</motion.button>
         </motion.div>

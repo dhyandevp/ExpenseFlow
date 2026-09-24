@@ -152,7 +152,6 @@ function ScenarioPlanner() {
     simulation?.projectedBalances.map((b) => ({
       name: b.name,
       balance: b.net_balance,
-      score: b.fairness_score,
     })) || [];
 
   return (

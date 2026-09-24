@@ -25,49 +25,28 @@
     --radius:            0.875rem;
   }
 
-  /* Dark mode — aurora forest at night */
+  /* Dark mode — Apple HIG Deep Space & Neutral Surfaces */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) {
-      --background:        #0F1A14;
-      --foreground:        #E2EDE6;
-      --surface:           #1A2E22;
-      --primary:           #4FD1C5;
-      --primary-hover:     #63E0D5;
-      --primary-foreground: #0F1A14;
-      --success:           #34D399;
-      --success-foreground: #0F1A14;
-      --highlight:         #243D2D;
-      --highlight-foreground: #E8F0EB;
-      --muted:             #3A5244;
-      --muted-foreground:  #A3B5A9;
-      --accent:            #FF7B73;
+    :root {
+      --background:        #000000;
+      --foreground:        #F5F5F7;
+      --surface:           #1C1C1E;
+      --primary:           #30D158;
+      --primary-hover:     #34D864;
+      --primary-foreground: #000000;
+      --success:           #30D158;
+      --success-foreground: #000000;
+      --highlight:         #2C2C2E;
+      --highlight-foreground: #FFFFFF;
+      --muted:             #2C2C2E;
+      --muted-foreground:  #8E8E93;
+      --accent:            #FF453A;
       --accent-foreground: #FFFFFF;
-      --text-dark:         #ECF3EE;
-      --text-muted:        #A3B5A9;
-      --border:            #344E3C;
-      --ring:              #4FD1C5;
+      --text-dark:         #FFFFFF;
+      --text-muted:        #8E8E93;
+      --border:            rgba(255, 255, 255, 0.12);
+      --ring:              #30D158;
     }
-  }
-
-  :root[data-theme="dark"] {
-    --background:        #0F1A14;
-    --foreground:        #ECF3EE;
-    --surface:           #1A2E22;
-    --primary:           #4FD1C5;
-    --primary-hover:     #63E0D5;
-    --primary-foreground: #0F1A14;
-    --success:           #34D399;
-    --success-foreground: #0F1A14;
-    --highlight:         #243D2D;
-    --highlight-foreground: #E8F0EB;
-    --muted:             #3A5244;
-    --muted-foreground:  #A3B5A9;
-    --accent:            #FF7B73;
-    --accent-foreground: #FFFFFF;
-    --text-dark:         #ECF3EE;
-    --text-muted:        #A3B5A9;
-    --border:            #344E3C;
-    --ring:              #4FD1C5;
   }
 
   body {
@@ -125,14 +104,12 @@
     transform: translateY(-1px);
   }
 
-  /* Dark card hover — stronger shadow for contrast */
+  /* Dark card hover — Apple elevation and subtle border glow */
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .card-hover:hover {
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    .card-hover:hover {
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.6);
+      border-color: rgba(255, 255, 255, 0.2);
     }
-  }
-  :root[data-theme="dark"] .card-hover:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
   }
 
   .btn-primary {
@@ -199,26 +176,16 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .glass {
-      background-color: rgba(15, 26, 20, 0.78);
-      border-color: rgba(255, 255, 255, 0.06);
+    .glass {
+      background-color: rgba(28, 28, 30, 0.78);
+      border-color: rgba(255, 255, 255, 0.1);
     }
-    :root:not([data-theme="light"]) .glass-nav {
-      box-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.08);
+    .glass-nav {
+      box-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.1);
     }
-    :root:not([data-theme="light"]) .glass-header {
-      box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.08);
+    .glass-header {
+      box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.1);
     }
-  }
-  :root[data-theme="dark"] .glass {
-    background-color: rgba(15, 26, 20, 0.78);
-    border-color: rgba(255, 255, 255, 0.06);
-  }
-  :root[data-theme="dark"] .glass-nav {
-    box-shadow: 0 -0.5px 0 rgba(255, 255, 255, 0.08);
-  }
-  :root[data-theme="dark"] .glass-header {
-    box-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.08);
   }
 
   @media (prefers-reduced-transparency: reduce) {
@@ -260,55 +227,30 @@
   }
 
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) .cta-card {
-      background: linear-gradient(145deg, #182C22 0%, #112018 100%);
-      border: 1px solid var(--border);
-      color: var(--text-dark);
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
+    .cta-card {
+      background: radial-gradient(120% 120% at 50% 0%, rgba(48, 209, 88, 0.12) 0%, rgba(28, 28, 30, 0.98) 60%, rgba(18, 18, 20, 1) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      color: #FFFFFF;
+      box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.8);
     }
-    :root:not([data-theme="light"]) .cta-card .cta-btn-primary {
+    .cta-card .cta-btn-primary {
       background-color: var(--primary);
       color: var(--primary-foreground);
     }
-    :root:not([data-theme="light"]) .cta-card .cta-btn-primary:hover {
+    .cta-card .cta-btn-primary:hover {
       filter: brightness(1.08);
     }
-    :root:not([data-theme="light"]) .cta-card .cta-btn-secondary {
-      background-color: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text-dark);
+    .cta-card .cta-btn-secondary {
+      background-color: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
     }
-    :root:not([data-theme="light"]) .cta-card .cta-btn-secondary:hover {
-      background-color: var(--highlight);
+    .cta-card .cta-btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.18);
     }
-    :root:not([data-theme="light"]) .cta-card .cta-subtitle {
+    .cta-card .cta-subtitle {
       color: var(--text-muted);
     }
-  }
-
-  :root[data-theme="dark"] .cta-card {
-    background: linear-gradient(145deg, #182C22 0%, #112018 100%);
-    border: 1px solid var(--border);
-    color: var(--text-dark);
-    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.5);
-  }
-  :root[data-theme="dark"] .cta-card .cta-btn-primary {
-    background-color: var(--primary);
-    color: var(--primary-foreground);
-  }
-  :root[data-theme="dark"] .cta-card .cta-btn-primary:hover {
-    filter: brightness(1.08);
-  }
-  :root[data-theme="dark"] .cta-card .cta-btn-secondary {
-    background-color: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--text-dark);
-  }
-  :root[data-theme="dark"] .cta-card .cta-btn-secondary:hover {
-    background-color: var(--highlight);
-  }
-  :root[data-theme="dark"] .cta-card .cta-subtitle {
-    color: var(--text-muted);
   }
 }
 

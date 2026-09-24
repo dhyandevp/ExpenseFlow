@@ -124,7 +124,7 @@ export const getGroupByCode = async (code) => {
   const data = { id: groupDoc.id, ...groupDoc.data() };
 
   const membersSnap = await getDocs(collection(db, `groups/${groupDoc.id}/members`));
-  data.members = membersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 
   const categoriesSnap = await getDocs(collection(db, `groups/${groupDoc.id}/categories`));
   data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -160,7 +160,7 @@ export const getGroupById = async (id) => {
   const data = { id: docSnap.id, ...docSnap.data() };
 
   const membersSnap = await getDocs(collection(db, `groups/${id}/members`));
-  data.members = membersSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+  data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 
   const categoriesSnap = await getDocs(collection(db, `groups/${id}/categories`));
   data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -202,18 +202,28 @@ export const addMember = async (groupId, data) => {
   const docRef = await addDoc(collection(db, "groups", groupId, "members"), {
     ...data
   });
-  return { success: true, data: { id: docRef.id, ...data } };
+  return { success: true, data: { id: data.id || docRef.id, docId: docRef.id, ...data } };
 };
 
 export const removeMember = async (groupId, memberId) => {
-  await deleteDoc(doc(db, "groups", groupId, "members", memberId));
+  const memberDoc = doc(db, "groups", groupId, "members", String(memberId));
+  const snap = await getDoc(memberDoc);
+  if (snap.exists()) {
+    await deleteDoc(memberDoc);
+  } else {
+    const q = query(collection(db, "groups", groupId, "members"), where("id", "==", Number(memberId)));
+    const querySnap = await getDocs(q);
+    for (const d of querySnap.docs) {
+      await deleteDoc(d.ref);
+    }
+  }
   return { success: true };
 };
 
 export const getMembers = async (groupId) => {
   const q = query(collection(db, "groups", groupId, "members"));
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
 };
 
 export const createExpense = async (groupId, data) => {
@@ -338,9 +348,9 @@ export const simulateScenario = async (groupId, data) => {
     success: true,
     data: {
       projectedBalances: result.balances,
-      average_fairness_score: score.overall_score || 0,
+      average_fairness_score: score.group_score ?? 0,
       total_expenses: result.total_expenses,
-      verdict: (score.overall_score || 0) >= 90 ? "Very fair" : (score.overall_score || 0) >= 70 ? "Reasonably fair" : "Needs rebalancing",
+      verdict: (score.group_score ?? 0) >= 90 ? "Very fair" : (score.group_score ?? 0) >= 70 ? "Reasonably fair" : "Needs rebalancing",
       settlement_suggestions: result.settlement_suggestions,
     },
   };

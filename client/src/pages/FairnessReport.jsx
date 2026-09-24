@@ -98,6 +98,8 @@ function FairnessReport() {
     }
   };
 
+  if (!currentGroup) return null;
+
   const categories = report?.category_list || [];
 
   const gridColumns = ["Member", ...categories, "Total"];

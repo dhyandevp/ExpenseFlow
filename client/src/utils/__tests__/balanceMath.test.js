@@ -114,9 +114,61 @@ describe('balanceMath.js', () => {
       // Bob owes Alice 50. Settlement pays it. Net balance should be 0.
       
       const { balances } = calculateBalances(members, expenses, settlements);
-      
+
       expect(balances[0].net_balance).toBe(0);
       expect(balances[1].net_balance).toBe(0);
+    });
+
+    it('enforces exact zero-sum balance with 3-way floating point split', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+        { id: 3, name: 'Charlie' }
+      ];
+      const expenses = [
+        { paidBy: 1, amount: 10 } // 10 / 3 = 3.3333333333...
+      ];
+
+      const { balances } = calculateBalances(members, expenses);
+      const sum = balances.reduce((s, b) => s + b.net_balance, 0);
+      expect(Math.abs(sum)).toBeLessThanOrEqual(0.0001);
+    });
+
+    it('gracefully skips ghost members (deleted members)', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 999, amount: 50 }, // 999 is deleted member
+        { paidBy: 1, amount: 100 }
+      ];
+
+      const { balances, total_expenses } = calculateBalances(members, expenses);
+      expect(total_expenses).toBe(100);
+      expect(balances.length).toBe(2);
+    });
+
+    it('handles custom split_members subset correctly', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' },
+        { id: 3, name: 'Charlie' }
+      ];
+      // Alice pays 100 split only between Alice and Bob
+      const expenses = [
+        { paidBy: 1, amount: 100, split_members: [1, 2] }
+      ];
+
+      const { balances } = calculateBalances(members, expenses);
+      const alice = balances.find(b => b.member_id === 1);
+      const bob = balances.find(b => b.member_id === 2);
+      const charlie = balances.find(b => b.member_id === 3);
+
+      expect(alice.net_balance).toBe(50);
+      expect(bob.net_balance).toBe(-50);
+      expect(charlie.net_balance).toBe(0);
+      expect(charlie.total_share).toBe(0);
     });
   });
 
@@ -126,6 +178,8 @@ describe('balanceMath.js', () => {
       expect(csvSafe('+12345')).toBe("'+12345");
       expect(csvSafe('-100')).toBe("'-100");
       expect(csvSafe('@hack')).toBe("'@hack");
+      expect(csvSafe('\tcmd')).toBe("'\tcmd");
+      expect(csvSafe('\rcmd')).toBe("'\rcmd");
     });
 
     it('leaves normal strings unchanged', () => {

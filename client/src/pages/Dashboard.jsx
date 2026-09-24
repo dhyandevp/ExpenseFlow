@@ -61,6 +61,8 @@ function Dashboard() {
     fetchData();
   }, [fetchData]);
 
+  if (!currentGroup) return null;
+
   const members = currentGroup.members || [];
   const currency = currentGroup.currency || "₹";
 
@@ -241,21 +243,22 @@ function Dashboard() {
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={chartData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#C2CBC9" vertical={false} />
-                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: "#7E908C" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 12, fill: "#7E908C" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                        <XAxis dataKey="name" tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 12, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
                         <Tooltip
                           contentStyle={{
                             borderRadius: 12,
                             border: "1px solid var(--border)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                             backgroundColor: "var(--surface)",
+                            color: "var(--text-dark)",
                           }}
                           formatter={(value) => formatINR(value, currency)}
                         />
                         <Legend wrapperStyle={{ paddingTop: "20px" }} />
                         <Bar dataKey="paid" name="Paid" fill="#105D5E" radius={[4, 4, 0, 0]} maxBarSize={50} />
-                        <Bar dataKey="share" name="Fair Share" fill="#009A6E" radius={[4, 4, 0, 0]} maxBarSize={50} />
+                        <Bar dataKey="share" name="Fair Share" fill="#30D158" radius={[4, 4, 0, 0]} maxBarSize={50} />
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
@@ -272,15 +275,16 @@ function Dashboard() {
                   <div className="h-72">
                     <ResponsiveContainer width="100%" height="100%">
                       <BarChart data={catStackData}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#C2CBC9" vertical={false} />
-                        <XAxis dataKey="category" tick={{ fontSize: 11, fill: "#7E908C" }} axisLine={false} tickLine={false} />
-                        <YAxis tick={{ fontSize: 11, fill: "#7E908C" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+                        <XAxis dataKey="category" tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} />
+                        <YAxis tick={{ fontSize: 11, fill: "var(--text-muted)" }} axisLine={false} tickLine={false} tickFormatter={(value) => formatINR(value, currency)} />
                         <Tooltip
                           contentStyle={{
                             borderRadius: 12,
                             border: "1px solid var(--border)",
-                            boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
                             backgroundColor: "var(--surface)",
+                            color: "var(--text-dark)",
                           }}
                           formatter={(value) => formatINR(value, currency)}
                         />

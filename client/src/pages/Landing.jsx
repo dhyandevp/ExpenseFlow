@@ -29,7 +29,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import Logo from "../components/Logo";
-import ThemeToggle from "../components/ThemeToggle";
 import { getAppUrl } from "../lib/host";
 
 const fadeUp = {
@@ -133,7 +132,6 @@ function Landing() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <ThemeToggle size="sm" />
             <a
               href={getAppUrl('/login')}
               className="text-primary font-semibold hover:bg-highlight/30 px-4 py-2 rounded-xl transition-all duration-300 text-sm hidden sm:block"
