@@ -5,8 +5,11 @@
 
 const ALLOWED_ORIGINS = [
   'https://expenseflow.site',
+  'https://app.expenseflow.site',
   'http://localhost:5173',
+  'http://app.localhost:5173',
   'http://localhost:8787',
+  'http://app.localhost:8787',
   'http://localhost:3000',
 ];
 
