@@ -78,8 +78,8 @@ describe('jwt-bridge function', () => {
       client_email: 'test@example.com',
       private_key: privateKey
     })).toString('base64');
-    process.env.CLERK_SECRET_KEY = 'sk_test_mock';
-    
+    process.env.CLERK_SECRET_KEY = 'test_mock_clerk_secret';
+
     mockWhere.mockReturnValue({ limit: mockLimit });
     mockLimit.mockReturnValue({ get: mockGet });
   });
@@ -95,12 +95,12 @@ describe('jwt-bridge function', () => {
     };
 
     const response = await handler(event);
-    
+
     expect(response.statusCode).toBe(200);
     const body = JSON.parse(response.body);
     expect(body.firebaseToken).toBeDefined();
     expect(typeof body.firebaseToken).toBe('string');
-    expect(verifyToken).toHaveBeenCalledWith('clerk_token_here', { secretKey: 'sk_test_mock' });
+    expect(verifyToken).toHaveBeenCalledWith('clerk_token_here', { secretKey: 'test_mock_clerk_secret' });
   });
 
   it('Mode B: Successfully authenticates guest with group code only (no PIN)', async () => {

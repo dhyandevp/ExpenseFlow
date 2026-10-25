@@ -1,8 +1,8 @@
 export function generateRequestId() {
-  if (typeof globalThis.crypto !== 'undefined' && globalThis.crypto.randomUUID) {
+  if (typeof globalThis.crypto !== 'undefined' && typeof globalThis.crypto.randomUUID === 'function') {
     return globalThis.crypto.randomUUID();
   }
-  return 'req_' + Math.random().toString(36).substring(2, 11);
+  return 'req_' + Array.from(globalThis.crypto.getRandomValues(new Uint8Array(8)), b => b.toString(16).padStart(2, '0')).join('');
 }
 
 function sanitizePayload(payload) {

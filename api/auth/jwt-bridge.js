@@ -210,7 +210,7 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
       const groupId = groupDoc.id;
       await rateLimitRef.set({ attempts, blockUntil: 0 });
 
-      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)).replace(/-/g, '');
+      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : crypto.randomUUID()).replace(/-/g, '');
       const firebaseToken = await createFirebaseCustomToken(sa, guestUid, {
         guestGroupId: groupId,
         mode: 'guest'
@@ -295,7 +295,7 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
         await setDoc(sa, rateLimitPath, { attempts, blockUntil: 0 });
       } catch (e) {}
 
-      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)).replace(/-/g, '');
+      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : crypto.randomUUID()).replace(/-/g, '');
       const firebaseToken = await createFirebaseCustomToken(sa, guestUid, {
         guestGroupId: groupId,
         mode: 'guest'
