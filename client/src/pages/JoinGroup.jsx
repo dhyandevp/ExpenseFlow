@@ -15,7 +15,14 @@ function JoinGroup() {
   const { isLoaded: isAuthLoaded, firebaseUser } = useAuth();
   const { currentGroup, setCurrentGroup } = useGroup();
   const [error, setError] = useState("");
+  const isMountedRef = useRef(true);
   const joiningRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const cleanCode = (code || "").trim().toUpperCase();
 
@@ -35,9 +42,8 @@ function JoinGroup() {
     if (joiningRef.current === cleanCode) return;
     joiningRef.current = cleanCode;
 
-    let isCurrent = true;
-    let timeoutId;
     let redirectTimer;
+    let timeoutId;
 
     const timeoutPromise = new Promise((_, reject) => {
       timeoutId = setTimeout(() => reject(new Error("Request timed out")), 8000);
@@ -52,19 +58,20 @@ function JoinGroup() {
           timeoutPromise
         ]);
         clearTimeout(timeoutId);
-        if (!isCurrent) return;
+        joiningRef.current = null;
+        if (!isMountedRef.current) return;
         setCurrentGroup(res.data);
         navigate(`/group/${cleanCode}/dashboard`, { replace: true });
       } catch (err) {
         clearTimeout(timeoutId);
         joiningRef.current = null;
-        if (!isCurrent) return;
+        if (!isMountedRef.current) return;
         if (err.message === "Request timed out") {
           setError("Request timed out. Please try again.");
         } else {
           setError(err.message || "Group not found. Check your code and try again.");
           redirectTimer = setTimeout(() => {
-            if (isCurrent) navigate("/", { replace: true });
+            if (isMountedRef.current) navigate("/", { replace: true });
           }, 2500);
         }
       }
@@ -73,11 +80,10 @@ function JoinGroup() {
     fetchGroup();
 
     return () => {
-      isCurrent = false;
       clearTimeout(timeoutId);
       clearTimeout(redirectTimer);
     };
-  }, [cleanCode, isSessionLoaded, isAuthLoaded, navigate, setCurrentGroup, session, currentGroup, firebaseUser]);
+  }, [cleanCode, isSessionLoaded, isAuthLoaded]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
