@@ -71,7 +71,7 @@ describe('clerk-webhook function', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.FIREBASE_SERVICE_ACCOUNT_B64 = Buffer.from(JSON.stringify({ project_id: 'test' })).toString('base64');
-    process.env.CLERK_WEBHOOK_SECRET = 'whsec_test123';
+    process.env.CLERK_WEBHOOK_SECRET = 'test_mock_webhook_secret';
   });
 
   it('Rejects non-POST requests', async () => {

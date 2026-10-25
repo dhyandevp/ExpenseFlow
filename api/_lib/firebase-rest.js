@@ -4,6 +4,8 @@
  * Zero external Node-only dependencies (no grpc, no http2, no firebase-admin).
  */
 
+import { logger } from './logger.js';
+
 // ponytail: single-slot cache keyed by client_email. Upgrade to Map if multi-project needed.
 let cachedAccessToken = null;
 let cachedTokenExpiry = 0;
@@ -47,7 +49,7 @@ export function parseServiceAccount(saInput) {
       return JSON.parse(raw);
     }
   } catch (err) {
-    console.error('Failed to parse service account JSON/B64', err);
+    logger.error('service_account_parse_failed', { error: err?.message || 'Failed to parse service account JSON/B64' });
     return null;
   }
 }
@@ -387,7 +389,7 @@ export async function recursiveDeleteGroup(sa, groupId) {
         await deleteDoc(sa, `groups/${groupId}/${sub}/${docId}`);
       }
     } catch (e) {
-      console.warn(`Error clearing subcollection ${sub} for group ${groupId}:`, e.message);
+      logger.warn('subcollection_clear_failed', { sub, groupId, error: e?.message });
     }
   }
 
