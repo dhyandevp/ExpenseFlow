@@ -1,11 +1,9 @@
 import { useState } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
-import { getAuth, signInWithCustomToken } from "firebase/auth";
-import { app } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import { useGroup } from "../../App";
-import { getGroupById } from "../../api/client";
+import { joinGroupByCode } from "../../api/client";
 
 export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
   const [code, setCode] = useState(defaultCode);
@@ -16,48 +14,33 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
 
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
-    if (!code || !code.trim()) {
+    const cleanCode = (code || "").trim().toUpperCase();
+    if (!cleanCode) {
       setErrorMsg("Group Code is required.");
       return;
     }
 
     setIsLoading(true);
     setErrorMsg("");
-    
+
+    let timeoutId;
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error("Request timed out")), 8000);
+    });
+
     try {
       const res = await Promise.race([
-        fetch("/api/auth/jwt-bridge", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type: "guest",
-            code: code.trim().toUpperCase()
-          })
-        }),
-        new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
+        joinGroupByCode(cleanCode),
+        timeoutPromise
       ]);
-      
-      const data = await res.json();
-      
-      if (!res.ok) {
-        setErrorMsg(data.error || data.message || "Failed to join group");
-        return;
-      }
+      clearTimeout(timeoutId);
 
-      // Sign into Firebase with the custom token
-      const auth = getAuth(app);
-      await signInWithCustomToken(auth, data.firebaseToken);
-
-      // Fetch the group data and set it in context
-      const groupRes = await getGroupById(data.groupId);
-      setCurrentGroup(groupRes.data);
-
-      onClose(); // Successfully joined, close modal.
-      navigate(`/group/${code.trim().toUpperCase()}/dashboard`);
-
+      setCurrentGroup(res.data);
+      onClose();
+      navigate(`/group/${cleanCode}/dashboard`);
     } catch (err) {
-      console.error(err);
-      setErrorMsg("Network error. Please try again.");
+      clearTimeout(timeoutId);
+      setErrorMsg(err.message || "Failed to join group");
     } finally {
       setIsLoading(false);
     }

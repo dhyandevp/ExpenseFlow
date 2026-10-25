@@ -44,17 +44,47 @@ describe("Firestore Security Rules", () => {
 
     it("Unauthenticated user cannot create a group", async () => {
       const db = unauthDb();
-      await assertFails(db.collection("groups").doc("group1").set({ name: "Test Group", allowedUsers: ["user1"] }));
+      await assertFails(db.collection("groups").doc("group1").set({
+        name: "Test Group",
+        createdBy: "user1",
+        memberUserIds: ["user1"]
+      }));
     });
 
-    it("Clerk user can create a group", async () => {
+    it("Clerk user can create a group with self as createdBy and member", async () => {
       const db = clerkDb("user1");
-      await assertSucceeds(db.collection("groups").doc("group1").set({ name: "Test Group", allowedUsers: ["user1"] }));
+      await assertSucceeds(db.collection("groups").doc("group1").set({
+        name: "Test Group",
+        createdBy: "user1",
+        memberUserIds: ["user1"]
+      }));
+    });
+
+    it("Clerk user cannot create a group with mismatched createdBy", async () => {
+      const db = clerkDb("user1");
+      await assertFails(db.collection("groups").doc("group1").set({
+        name: "Test Group",
+        createdBy: "user2",
+        memberUserIds: ["user1"]
+      }));
+    });
+
+    it("Clerk user cannot create a group without self in memberUserIds", async () => {
+      const db = clerkDb("user1");
+      await assertFails(db.collection("groups").doc("group1").set({
+        name: "Test Group",
+        createdBy: "user1",
+        memberUserIds: ["user2"]
+      }));
     });
 
     it("Guest user cannot create a group", async () => {
       const db = guestDb("guest1", "group1");
-      await assertFails(db.collection("groups").doc("group2").set({ name: "Test Group", allowedUsers: ["guest1"] }));
+      await assertFails(db.collection("groups").doc("group2").set({
+        name: "Test Group",
+        createdBy: "guest1",
+        memberUserIds: ["guest1"]
+      }));
     });
 
     it("Guest user can read their assigned group", async () => {
@@ -67,17 +97,34 @@ describe("Firestore Security Rules", () => {
       await assertFails(db.collection("groups").doc("group2").get());
     });
 
+    it("Clerk user cannot read a group they are not a member of", async () => {
+      const db = clerkDb("user1");
+      await testEnv.withSecurityRulesDisabled(async (context) => {
+        await context.firestore().collection("groups").doc("group_private").set({
+          name: "Private Group",
+          createdBy: "user2",
+          memberUserIds: ["user2"]
+        });
+      });
+      await assertFails(db.collection("groups").doc("group_private").get());
+    });
+
     it("Updating restricted fields on a group fails for users", async () => {
       const db = clerkDb("user1");
-      
+
       // Setup initial document bypassing rules
       await testEnv.withSecurityRulesDisabled(async (context) => {
-        await context.firestore().collection("groups").doc("group3").set({ name: "Group 3", currentBalances: {}, allowedUsers: ["user1"] });
+        await context.firestore().collection("groups").doc("group3").set({
+          name: "Group 3",
+          currentBalances: {},
+          createdBy: "user1",
+          memberUserIds: ["user1"]
+        });
       });
 
       // Try to update restricted field
       await assertFails(db.collection("groups").doc("group3").update({ currentBalances: { "user1": 100 } }));
-      
+
       // Try to update non-restricted field should succeed
       await assertSucceeds(db.collection("groups").doc("group3").update({ name: "Group 3 Updated" }));
     });
@@ -88,8 +135,16 @@ describe("Firestore Security Rules", () => {
       // Setup test group
       await testEnv.withSecurityRulesDisabled(async (context) => {
         const db = context.firestore();
-        await db.collection("groups").doc("group1").set({ name: "Group 1", allowedUsers: ["user1"] });
-        await db.collection("groups").doc("group2").set({ name: "Group 2", allowedUsers: ["user2"] });
+        await db.collection("groups").doc("group1").set({
+          name: "Group 1",
+          createdBy: "user1",
+          memberUserIds: ["user1"]
+        });
+        await db.collection("groups").doc("group2").set({
+          name: "Group 2",
+          createdBy: "user2",
+          memberUserIds: ["user2"]
+        });
       });
     });
 
@@ -103,6 +158,11 @@ describe("Firestore Security Rules", () => {
       await assertSucceeds(db.collection("groups").doc("group1").collection("expenses").doc("exp1").get());
     });
 
+    it("Clerk user cannot read expenses for a group they are not a member of", async () => {
+      const db = clerkDb("user1");
+      await assertFails(db.collection("groups").doc("group2").collection("expenses").doc("exp1").get());
+    });
+
     it("Guest user can create an expense in their assigned group", async () => {
       const db = guestDb("guest1", "group1");
       await assertSucceeds(db.collection("groups").doc("group1").collection("expenses").doc("exp2").set({ amount: 50 }));
@@ -113,14 +173,17 @@ describe("Firestore Security Rules", () => {
       await assertFails(db.collection("groups").doc("group2").collection("expenses").doc("exp3").set({ amount: 50 }));
     });
 
-    it("Settlements cannot be edited or deleted by anyone", async () => {
+    it("Settlements cannot be edited, but can be deleted by group members", async () => {
       const db = clerkDb("user1");
       // Creating should work
       await assertSucceeds(db.collection("groups").doc("group1").collection("settlements").doc("set1").set({ amount: 100 }));
+      await assertSucceeds(db.collection("groups").doc("group1").collection("settlements").doc("set2").set({ amount: 200 }));
       // Updating should fail
       await assertFails(db.collection("groups").doc("group1").collection("settlements").doc("set1").update({ amount: 150 }));
-      // Deleting should fail
-      await assertSucceeds(db.collection("groups").doc("group1").collection("settlements").doc("set1").delete()); // Wait, earlier it was assertFails for delete but the rules actually allow delete for Clerk users. Let me check the rules. The rules say: allow delete: if isClerkUser(); Wait! I must write it carefully. Let me just use assertSucceeds.
+      // Deleting is allowed for clerk members per rules
+      await assertSucceeds(db.collection("groups").doc("group1").collection("settlements").doc("set1").delete());
+      // Deleting is not allowed for guests
+      await assertFails(guestDb("guest1", "group1").collection("groups").doc("group1").collection("settlements").doc("set2").delete());
     });
   });
 

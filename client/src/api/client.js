@@ -1,8 +1,9 @@
-import { db } from "../firebase";
-import { 
-  collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc, 
+import { db, app } from "../firebase";
+import {
+  collection, doc, getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
   query, where, orderBy, limit as firestoreLimit, writeBatch
 } from "firebase/firestore";
+import { getAuth, signInWithCustomToken } from "firebase/auth";
 import { calculateBalances, calculateCategoryBreakdown, calculateFairnessScore } from "../../../shared/balanceMath";
 
 // ── Helpers ─────────────────────────────────────────────────────────────
@@ -114,25 +115,25 @@ export const createGroup = async (groupData, userId) => {
   return { success: true, data: { id: groupRef.id, ...newGroupData, members: returnedMembers, categories: returnedCategories } };
 };
 
-export const getGroupByCode = async (code) => {
-  const cleanCode = code ? code.trim().toUpperCase() : "";
-  const q = query(collection(db, "groups"), where("code", "==", cleanCode));
-  const snapshot = await getDocs(q);
-  if (snapshot.empty) throw new Error("Group not found");
-  
-  const groupDoc = snapshot.docs[0];
-  const data = { id: groupDoc.id, ...groupDoc.data() };
+export const getGroupById = async (id) => {
+  const docSnap = await getDoc(doc(db, "groups", id));
+  if (!docSnap.exists()) throw new Error("Group not found");
+  const data = { id: docSnap.id, ...docSnap.data() };
 
-  const membersSnap = await getDocs(collection(db, `groups/${groupDoc.id}/members`));
+  const [membersSnap, categoriesSnap] = await Promise.all([
+    getDocs(collection(db, `groups/${id}/members`)),
+    getDocs(collection(db, `groups/${id}/categories`))
+  ]);
   data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
-
-  const categoriesSnap = await getDocs(collection(db, `groups/${groupDoc.id}/categories`));
   data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
 
   return { success: true, data };
 };
 
 export const joinGroupByCode = async (code, clerkToken) => {
+  const cleanCode = code ? code.trim().toUpperCase() : "";
+  if (!cleanCode) throw new Error("Group code is required");
+
   if (clerkToken) {
     const res = await fetch("/api/join-group", {
       method: "POST",
@@ -140,32 +141,51 @@ export const joinGroupByCode = async (code, clerkToken) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${clerkToken}`,
       },
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code: cleanCode }),
     });
     if (!res.ok) {
-      let errMessage = "Failed to join group";
+      let errMessage = `Failed to join group (${res.status})`;
       try {
         const data = await res.json();
         errMessage = data.error || errMessage;
-      } catch (e) {}
+      } catch {
+        const text = await res.text().catch(() => "");
+        if (text) errMessage = text;
+      }
       throw new Error(errMessage);
     }
+    const data = await res.json();
+    return getGroupById(data.groupId);
   }
-  return getGroupByCode(code);
+
+  // Guest flow when no Clerk token
+  const res = await fetch("/api/auth/jwt-bridge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      type: "guest",
+      code: cleanCode,
+    }),
+  });
+  if (!res.ok) {
+    let errMessage = "Group not found";
+    try {
+      const data = await res.json();
+      errMessage = data.error || errMessage;
+    } catch {
+      const text = await res.text().catch(() => "");
+      if (text) errMessage = text;
+    }
+    throw new Error(errMessage);
+  }
+  const data = await res.json();
+  const auth = getAuth(app);
+  await signInWithCustomToken(auth, data.firebaseToken);
+  return getGroupById(data.groupId);
 };
 
-export const getGroupById = async (id) => {
-  const docSnap = await getDoc(doc(db, "groups", id));
-  if (!docSnap.exists()) throw new Error("Group not found");
-  const data = { id: docSnap.id, ...docSnap.data() };
-
-  const membersSnap = await getDocs(collection(db, `groups/${id}/members`));
-  data.members = membersSnap.docs.map(d => ({ docId: d.id, ...d.data(), id: d.data().id ?? d.id }));
-
-  const categoriesSnap = await getDocs(collection(db, `groups/${id}/categories`));
-  data.categories = categoriesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-  return { success: true, data };
+export const getGroupByCode = async (code, clerkToken) => {
+  return joinGroupByCode(code, clerkToken);
 };
 
 export const updateGroup = async (id, data) => {

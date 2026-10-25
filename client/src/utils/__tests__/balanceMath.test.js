@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { calculateFairnessScore, calculateBalances, csvSafe } from '../../../../shared/balanceMath';
+import { calculateFairnessScore, calculateBalances, calculateCategoryBreakdown, csvSafe } from '../../../../shared/balanceMath';
 
 describe('balanceMath.js', () => {
   describe('calculateFairnessScore', () => {
@@ -44,9 +44,25 @@ describe('balanceMath.js', () => {
         { id: 2, name: 'Bob' }
       ];
       const result = calculateFairnessScore(members, []);
-      
+
       expect(result.group_score).toBe(100); // Defaults to fair
       expect(result.scores[0].score).toBe(100);
+    });
+
+    it('gracefully skips ghost members (deleted members)', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 999, amount: 50 }, // 999 is deleted member
+        { paidBy: 1, amount: 100 }
+      ];
+      const result = calculateFairnessScore(members, expenses);
+      expect(result.total_expenses).toBe(100);
+      expect(result.scores.length).toBe(2);
+      expect(result.scores.find(s => s.member_id === 1).paid).toBe(100);
+      expect(result.scores.find(s => s.member_id === 2).paid).toBe(0);
     });
   });
 
@@ -169,6 +185,96 @@ describe('balanceMath.js', () => {
       expect(bob.net_balance).toBe(-50);
       expect(charlie.net_balance).toBe(0);
       expect(charlie.total_share).toBe(0);
+    });
+
+    it('handles ghost members in split_members without corrupting balances', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 1, amount: 100, split_members: [1, 999] } // 999 is deleted member
+      ];
+
+      const { balances, total_expenses } = calculateBalances(members, expenses);
+      expect(total_expenses).toBe(100);
+      const alice = balances.find(b => b.member_id === 1);
+      expect(alice.total_share).toBe(100);
+      expect(alice.net_balance).toBe(0);
+    });
+
+    it('skips settlements referencing deleted members', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 1, amount: 100 }
+      ];
+      const settlements = [
+        { from_member: 999, to_member: 1, amount: 50 }, // ghost settlement
+        { from_member: 2, to_member: 1, amount: 50 }
+      ];
+
+      const { balances } = calculateBalances(members, expenses, settlements);
+      expect(balances[0].net_balance).toBe(0);
+      expect(balances[1].net_balance).toBe(0);
+    });
+
+    it('correctly aggregates settlements with string member IDs', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 1, amount: 100 }
+      ];
+      // HTML form selects produce string IDs
+      const settlements = [
+        { from_member: '2', to_member: '1', amount: 50 }
+      ];
+
+      const { balances } = calculateBalances(members, expenses, settlements);
+      expect(balances[0].net_balance).toBe(0);
+      expect(balances[1].net_balance).toBe(0);
+    });
+
+    it('allocates expense only to payer when all split_members are deleted', () => {
+      const members = [
+        { id: 1, name: 'Alice' },
+        { id: 2, name: 'Bob' }
+      ];
+      const expenses = [
+        { paidBy: 1, amount: 100, split_members: [999] } // 999 is deleted member
+      ];
+
+      const { balances, total_expenses } = calculateBalances(members, expenses);
+      expect(total_expenses).toBe(100);
+      const alice = balances.find(b => b.member_id === 1);
+      const bob = balances.find(b => b.member_id === 2);
+      expect(alice.total_share).toBe(100);
+      expect(alice.net_balance).toBe(0);
+      expect(bob.total_share).toBe(0);
+      expect(bob.net_balance).toBe(0);
+    });
+  });
+
+  describe('calculateCategoryBreakdown', () => {
+    it('calculates category breakdown and skips ghost members', () => {
+      const members = [
+        { id: 1, name: 'Alice', color: '#105D5E' },
+        { id: 2, name: 'Bob', color: '#009A6E' }
+      ];
+      const expenses = [
+        { category: 'Groceries', paidBy: 1, amount: 100 },
+        { category: 'Groceries', paidBy: 999, amount: 50 } // ghost member
+      ];
+
+      const { breakdown } = calculateCategoryBreakdown(members, expenses);
+      expect(breakdown.Groceries.total).toBe(100);
+      expect(breakdown.Groceries.members[1].amount).toBe(100);
+      expect(breakdown.Groceries.members[1].percentage).toBe(100);
+      expect(breakdown.Groceries.members[2].amount).toBe(0);
     });
   });
 
