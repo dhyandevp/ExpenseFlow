@@ -288,15 +288,15 @@ function GroupSetup() {
                       </span>
 
                       {/* Name + badge */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0 mr-1">
+                        <div className="flex items-center gap-1.5">
                           <span className="text-sm font-medium text-text-dark truncate">{cat.name}</span>
                           {cat.is_default ? (
-                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] bg-highlight/30 text-text-dark" title="Default category — name is locked">
-                              <Lock size={10} /> Default
+                            <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] bg-highlight/30 text-text-dark shrink-0" title="Default category — name is locked">
+                              <Lock size={10} /> <span className="hidden sm:inline">Default</span>
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-highlight text-text-dark font-medium">Custom</span>
+                            <span className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] bg-highlight text-text-dark font-medium shrink-0">Custom</span>
                           )}
                         </div>
                       </div>
@@ -305,7 +305,7 @@ function GroupSetup() {
                       <select
                         value={cat.split_model}
                         onChange={(e) => updateSplitModel(idx, e.target.value)}
-                        className="text-xs border border-border rounded-lg px-2 py-1.5 bg-surface focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        className="text-xs border border-border rounded-lg px-2 py-1.5 bg-surface text-text-dark shrink-0 max-w-[125px] sm:max-w-none focus:outline-none focus:ring-2 focus:ring-primary/20"
                       >
                         {modelOptions.map((opt) => (
                           <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -313,13 +313,13 @@ function GroupSetup() {
                       </select>
 
                       {/* Edit */}
-                      <button onClick={() => handleEditCategory(cat)} className="p-1.5 rounded-lg hover:bg-background text-text-muted hover:text-primary transition-colors">
+                      <button onClick={() => handleEditCategory(cat)} className="p-1.5 rounded-lg hover:bg-background text-text-muted hover:text-primary transition-colors shrink-0">
                         <Edit3 size={14} />
                       </button>
 
                       {/* Delete (only for custom) */}
                       {!cat.is_default && (
-                        <button onClick={() => handleDeleteCategory(cat)} className="p-1.5 rounded-lg hover:bg-accent/10 text-text-muted hover:text-accent transition-colors">
+                        <button onClick={() => handleDeleteCategory(cat)} className="p-1.5 rounded-lg hover:bg-accent/10 text-text-muted hover:text-accent transition-colors shrink-0">
                           <Trash2 size={14} />
                         </button>
                       )}
