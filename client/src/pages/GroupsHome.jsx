@@ -20,6 +20,10 @@ export function GroupsHome() {
   const [isFetchingGroups, setIsFetchingGroups] = useState(false);
 
   useEffect(() => {
+    if (!isLoaded || authMode === "none") {
+      setPopulatedGroups([]);
+      return;
+    }
     if (!recentGroups || recentGroups.length === 0) {
       setPopulatedGroups([]);
       return;
@@ -51,7 +55,7 @@ export function GroupsHome() {
     };
     fetchGroups();
     return () => { isMounted = false; };
-  }, [recentGroups]);
+  }, [recentGroups, isLoaded, authMode]);
 
   if (!isLoaded) {
     return (

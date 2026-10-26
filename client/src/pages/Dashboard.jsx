@@ -19,6 +19,7 @@ import {
   Legend,
 } from "recharts";
 import { useGroup } from "../App";
+import { useAuth } from "../hooks/useAuth";
 import { getDashboardData } from "../api/client";
 import { formatINR } from "../utils/formatCurrency";
 import { expandingCard, staggerContainer } from "../utils/motion";
@@ -30,6 +31,7 @@ import { getDateRange, PERIOD_OPTIONS as timeFilters } from "../utils/groupHelpe
 
 function Dashboard() {
   const { currentGroup } = useGroup();
+  const { isLoaded: isAuthLoaded, firebaseUser } = useAuth();
   const [timeFilter, setTimeFilter] = useState("all");
 
   const [balances, setBalances] = useState(null);
@@ -39,7 +41,7 @@ function Dashboard() {
   const [error, setError] = useState(null);
 
   const fetchData = useCallback(() => {
-    if (!currentGroup) return;
+    if (!currentGroup || !firebaseUser) return;
     const period = getDateRange(timeFilter);
 
     setLoading(true);
@@ -55,11 +57,13 @@ function Dashboard() {
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [currentGroup, timeFilter]);
+  }, [currentGroup, firebaseUser, timeFilter]);
 
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    if (isAuthLoaded && firebaseUser && currentGroup) {
+      fetchData();
+    }
+  }, [fetchData, isAuthLoaded, firebaseUser, currentGroup]);
 
   if (!currentGroup) return null;
 

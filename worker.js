@@ -41,28 +41,26 @@ function getAppRedirectUrl(url, targetHost) {
   return `${protocol}//${appHost}${url.pathname}${url.search}`;
 }
 
-export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    const pathname = url.pathname;
-    const hostname = url.hostname;
-    const isApp = isAppHostname(hostname);
-    const isMarketing = isMarketingHostname(hostname);
+function applySecurityHeaders(response) {
+  if (!response) return response;
+  const headers = new Headers(response.headers);
+  headers.set('X-Content-Type-Options', 'nosniff');
+  headers.set('X-Frame-Options', 'DENY');
+  headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  return new Response(response.body, { status: response.status, headers });
+}
 
-    // 1. Robots.txt & Sitemap Host Dispatch
-    if (pathname === '/robots.txt') {
-      if (isApp) {
-        return new Response('User-agent: *\nDisallow: /\n', {
-          status: 200,
-          headers: {
-            'Content-Type': 'text/plain',
-            'Cache-Control': 'public, max-age=3600',
-          },
-        });
-      }
-      // On marketing, serve public marketing robots referencing sitemap
-      const marketingRobots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: https://expenseflow.site/sitemap.xml\n`;
-      return new Response(marketingRobots, {
+async function handleRequest(request, env, ctx) {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  const hostname = url.hostname;
+  const isApp = isAppHostname(hostname);
+  const isMarketing = isMarketingHostname(hostname);
+
+  // 1. Robots.txt & Sitemap Host Dispatch
+  if (pathname === '/robots.txt') {
+    if (isApp) {
+      return new Response('User-agent: *\nDisallow: /\n', {
         status: 200,
         headers: {
           'Content-Type': 'text/plain',
@@ -70,65 +68,81 @@ export default {
         },
       });
     }
+    // On marketing, serve public marketing robots referencing sitemap
+    const marketingRobots = `User-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: https://expenseflow.site/sitemap.xml\n`;
+    return new Response(marketingRobots, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/plain',
+        'Cache-Control': 'public, max-age=3600',
+      },
+    });
+  }
 
-    if (pathname === '/sitemap.xml' && isApp) {
-      return new Response('Not found', { status: 404 });
-    }
-
-    // 2. Global CORS preflight for all /api endpoints
-    if (request.method === 'OPTIONS' && pathname.startsWith('/api/')) {
-      return new Response(null, {
-        status: 204,
-        headers: getCorsHeaders(request.headers.get('Origin')),
-      });
-    }
-
-    // 3. API Routing (available to both surfaces)
-    if (pathname === '/api/health') {
-      return handleHealth(request, env, ctx);
-    }
-    if (pathname === '/api/auth/jwt-bridge') {
-      return handleJwtBridge(request, env, ctx);
-    }
-    if (pathname === '/api/clerk-webhook') {
-      return handleClerkWebhook(request, env, ctx);
-    }
-    if (pathname === '/api/delete-group') {
-      return handleDeleteGroup(request, env, ctx);
-    }
-    if (pathname === '/api/join-group') {
-      return handleJoinGroup(request, env, ctx);
-    }
-    if (pathname === '/api/cloudinary/sign-upload') {
-      return handleSignUpload(request, env, ctx);
-    }
-    if (pathname === '/api/cloudinary/receipt') {
-      return handleDeleteReceipt(request, env, ctx);
-    }
-
-    // 4. Edge Redirect: Marketing host accessing product route -> redirect to app domain
-    if (isMarketing && !isApp) {
-      const isProductPath = PRODUCT_ROUTE_PREFIXES.some(prefix =>
-        pathname === prefix || pathname.startsWith(`${prefix}/`)
-      );
-      if (isProductPath) {
-        const destination = getAppRedirectUrl(url, hostname);
-        return Response.redirect(destination, 302);
-      }
-    }
-
-    // 5. Serve Frontend Static Assets with SPA Fallback
-    if (env.ASSETS) {
-      const res = await env.ASSETS.fetch(request);
-      // Hashed assets (/assets/*) are immutable; everything else (index.html) must revalidate
-      const cacheControl = pathname.startsWith('/assets/')
-        ? 'public, max-age=31536000, immutable'
-        : 'public, max-age=0, must-revalidate';
-      const headers = new Headers(res.headers);
-      headers.set('Cache-Control', cacheControl);
-      return new Response(res.body, { status: res.status, headers });
-    }
-
+  if (pathname === '/sitemap.xml' && isApp) {
     return new Response('Not found', { status: 404 });
+  }
+
+  // 2. Global CORS preflight for all /api endpoints
+  if (request.method === 'OPTIONS' && pathname.startsWith('/api/')) {
+    return new Response(null, {
+      status: 204,
+      headers: getCorsHeaders(request.headers.get('Origin')),
+    });
+  }
+
+  // 3. API Routing (available to both surfaces)
+  if (pathname === '/api/health') {
+    return handleHealth(request, env, ctx);
+  }
+  if (pathname === '/api/auth/jwt-bridge') {
+    return handleJwtBridge(request, env, ctx);
+  }
+  if (pathname === '/api/clerk-webhook') {
+    return handleClerkWebhook(request, env, ctx);
+  }
+  if (pathname === '/api/delete-group') {
+    return handleDeleteGroup(request, env, ctx);
+  }
+  if (pathname === '/api/join-group') {
+    return handleJoinGroup(request, env, ctx);
+  }
+  if (pathname === '/api/cloudinary/sign-upload') {
+    return handleSignUpload(request, env, ctx);
+  }
+  if (pathname === '/api/cloudinary/receipt') {
+    return handleDeleteReceipt(request, env, ctx);
+  }
+
+  // 4. Edge Redirect: Marketing host accessing product route -> redirect to app domain
+  if (isMarketing && !isApp) {
+    const isProductPath = PRODUCT_ROUTE_PREFIXES.some(prefix =>
+      pathname === prefix || pathname.startsWith(`${prefix}/`)
+    );
+    if (isProductPath) {
+      const destination = getAppRedirectUrl(url, hostname);
+      return Response.redirect(destination, 302);
+    }
+  }
+
+  // 5. Serve Frontend Static Assets with SPA Fallback
+  if (env.ASSETS) {
+    const res = await env.ASSETS.fetch(request);
+    // Hashed assets (/assets/*) are immutable; everything else (index.html) must revalidate
+    const cacheControl = pathname.startsWith('/assets/')
+      ? 'public, max-age=31536000, immutable'
+      : 'public, max-age=0, must-revalidate';
+    const headers = new Headers(res.headers);
+    headers.set('Cache-Control', cacheControl);
+    return new Response(res.body, { status: res.status, headers });
+  }
+
+  return new Response('Not found', { status: 404 });
+}
+
+export default {
+  async fetch(request, env, ctx) {
+    const response = await handleRequest(request, env, ctx);
+    return applySecurityHeaders(response);
   }
 };

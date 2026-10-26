@@ -11,9 +11,11 @@ import {
   ChevronDown,
   Users,
   Home,
+  Loader2,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useGroup } from "../App";
+import { useAuth } from "../hooks/useAuth";
 import Logo from "./Logo";
 import AccountMenu from "./AccountMenu";
 import { pageTransition } from "../utils/motion";
@@ -32,8 +34,11 @@ export default function AppLayout({ children }) {
   const location = useLocation();
   const navigate = useNavigate();
   const { currentGroup, setCurrentGroup, recentGroups } = useGroup();
+  const { isLoaded, firebaseUser } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [groupSwitcherOpen, setGroupSwitcherOpen] = useState(false);
+
+  const cleanCode = (code || "").trim().toUpperCase();
 
   const handleSwitchGroup = (group) => {
     setGroupSwitcherOpen(false);
@@ -41,13 +46,26 @@ export default function AppLayout({ children }) {
   };
 
   useEffect(() => {
-    if (code && (!currentGroup || currentGroup.code !== code)) {
-      navigate(`/join/${code}`, { replace: true });
+    if (!isLoaded) return;
+    if (cleanCode && (!currentGroup || currentGroup.code !== cleanCode || !firebaseUser)) {
+      const returnUrl = location.pathname + location.search;
+      navigate(`/join/${cleanCode}?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
     }
-  }, [code, currentGroup, navigate]);
+  }, [cleanCode, currentGroup, firebaseUser, isLoaded, location, navigate]);
 
-  if (!currentGroup) {
-    if (code) return null;
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4 text-primary">
+          <Loader2 size={32} className="animate-spin" />
+          <p className="text-sm font-medium">Loading group...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!currentGroup || !firebaseUser) {
+    if (cleanCode) return null;
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6">
         <div className="bg-surface rounded-3xl p-8 max-w-sm w-full text-center shadow-sm border border-border">
@@ -67,7 +85,7 @@ export default function AppLayout({ children }) {
     );
   }
 
-  if (code && currentGroup && currentGroup.code !== code) {
+  if (cleanCode && currentGroup && currentGroup.code !== cleanCode) {
     return null;
   }
 

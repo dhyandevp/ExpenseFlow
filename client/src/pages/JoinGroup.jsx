@@ -1,49 +1,82 @@
 import SEO from "../components/SEO";
-import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, CircleAlert } from "lucide-react";
 import { useSession } from "@clerk/clerk-react";
+import { useAuth } from "../hooks/useAuth";
 import { useGroup } from "../App";
 import { joinGroupByCode } from "../api/client";
 
 function JoinGroup() {
   const { code } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { session } = useSession();
-  const { setCurrentGroup } = useGroup();
+  const { session, isLoaded: isSessionLoaded } = useSession();
+  const { isLoaded: isAuthLoaded, firebaseUser } = useAuth();
+  const { currentGroup, setCurrentGroup } = useGroup();
   const [error, setError] = useState("");
-  const [loading, setLoading] = useState(true);
+  const isMountedRef = useRef(true);
+  const joiningRef = useRef(null);
 
   useEffect(() => {
-    if (!code) {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  const cleanCode = (code || "").trim().toUpperCase();
+
+  useEffect(() => {
+    if (!isSessionLoaded || !isAuthLoaded) return;
+    if (!cleanCode) {
       navigate("/", { replace: true });
       return;
     }
 
-    let isMounted = true;
+    // Only skip join if the user already has this group loaded AND has an active Firebase session
+    if (currentGroup && currentGroup.code === cleanCode && firebaseUser) {
+      navigate(`/group/${cleanCode}/dashboard`, { replace: true });
+      return;
+    }
+
+    if (joiningRef.current === cleanCode) return;
+    joiningRef.current = cleanCode;
+
+    let redirectTimer;
+    let timeoutId;
+
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => reject(new Error("Request timed out")), 8000);
+    });
 
     const fetchGroup = async () => {
       try {
-        setLoading(true);
         setError("");
         const token = session ? await session.getToken() : null;
         const res = await Promise.race([
-          joinGroupByCode(code.toUpperCase(), token),
-          new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out")), 8000))
+          joinGroupByCode(cleanCode, token),
+          timeoutPromise
         ]);
-        if (!isMounted) return;
+        clearTimeout(timeoutId);
+        joiningRef.current = null;
+        if (!isMountedRef.current) return;
         setCurrentGroup(res.data);
-        navigate(`/group/${code.toUpperCase()}/dashboard`, { replace: true });
+        const returnUrl = searchParams.get("returnUrl");
+        const safeTarget = returnUrl && returnUrl.startsWith(`/group/${cleanCode}`)
+          ? returnUrl
+          : `/group/${cleanCode}/dashboard`;
+        navigate(safeTarget, { replace: true });
       } catch (err) {
-        if (!isMounted) return;
-        setLoading(false);
+        clearTimeout(timeoutId);
+        joiningRef.current = null;
+        if (!isMountedRef.current) return;
         if (err.message === "Request timed out") {
           setError("Request timed out. Please try again.");
         } else {
-          setError("Group not found. Check your code and try again.");
-          setTimeout(() => {
-            if (isMounted) navigate("/", { replace: true });
+          setError(err.message || "Group not found. Check your code and try again.");
+          redirectTimer = setTimeout(() => {
+            if (isMountedRef.current) navigate("/", { replace: true });
           }, 2500);
         }
       }
@@ -52,9 +85,10 @@ function JoinGroup() {
     fetchGroup();
 
     return () => {
-      isMounted = false;
+      clearTimeout(timeoutId);
+      clearTimeout(redirectTimer);
     };
-  }, [code, navigate, setCurrentGroup, session]);
+  }, [cleanCode, isSessionLoaded, isAuthLoaded, searchParams]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

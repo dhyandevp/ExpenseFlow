@@ -1,25 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('firebase-admin/app', () => ({
-  initializeApp: vi.fn(),
-  cert: vi.fn(),
-  getApps: vi.fn(() => []),
-}));
-
 const mockDocSet = vi.fn();
-vi.mock('firebase-admin/firestore', () => ({
-  getFirestore: vi.fn(() => ({
-    collection: vi.fn((collName) => {
-      if (collName === 'users') {
-        return {
-          doc: vi.fn(() => ({
-            set: mockDocSet,
-          })),
-        };
-      }
-    }),
-  })),
-}));
+vi.mock('../api/_lib/firebase-rest.js', async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    setDoc: (...args) => mockDocSet(...args),
+  };
+});
 
 // Mock Svix
 const mockVerify = vi.fn();
@@ -71,7 +59,7 @@ describe('clerk-webhook function', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     process.env.FIREBASE_SERVICE_ACCOUNT_B64 = Buffer.from(JSON.stringify({ project_id: 'test' })).toString('base64');
-    process.env.CLERK_WEBHOOK_SECRET = 'whsec_test123';
+    process.env.CLERK_WEBHOOK_SECRET = 'test_mock_webhook_secret';
   });
 
   it('Rejects non-POST requests', async () => {
@@ -140,12 +128,17 @@ describe('clerk-webhook function', () => {
     expect(response.statusCode).toBe(200);
     expect(JSON.parse(response.body).message).toBe('User created in Firestore');
     
-    expect(mockDocSet).toHaveBeenCalledWith(expect.objectContaining({
-      email: 'john@example.com',
-      firstName: 'John',
-      lastName: 'Doe',
-      createdAt: expect.any(String)
-    }));
+    expect(mockDocSet).toHaveBeenCalledWith(
+      expect.anything(),
+      'users/user_2Nne',
+      expect.objectContaining({
+        email: 'john@example.com',
+        firstName: 'John',
+        lastName: 'Doe',
+        createdAt: expect.any(String)
+      }),
+      { merge: true }
+    );
   });
 
   it('Ignores unhandled event types', async () => {
