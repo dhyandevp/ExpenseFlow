@@ -51,7 +51,7 @@ export default function AppLayout({ children }) {
       const returnUrl = location.pathname + location.search;
       navigate(`/join/${cleanCode}?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
     }
-  }, [cleanCode, currentGroup, firebaseUser, isLoaded, location, navigate]);
+  }, [cleanCode, currentGroup, firebaseUser, isLoaded, location.pathname, location.search, navigate]);
 
   if (!isLoaded) {
     return (
