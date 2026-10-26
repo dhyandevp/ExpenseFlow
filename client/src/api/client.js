@@ -286,10 +286,13 @@ export const getDashboardData = async (groupId, period = {}, cachedMembers = nul
   };
 };
 
-export const getBalances = async (groupId, period = {}) => {
-  const members = await getMembers(groupId);
-  const { data: expenses } = await getExpenses(groupId, period);
-  const { data: settlements } = await getSettlements(groupId);
+export const getBalances = async (groupId, period = {}, cachedMembers = null) => {
+  // ponytail: parallel query batch; upgrade to indexed query constraints when subcollection exceeds 500 items
+  const [members, { data: expenses }, { data: settlements }] = await Promise.all([
+    cachedMembers && cachedMembers.length > 0 ? Promise.resolve(cachedMembers) : getMembers(groupId),
+    getExpenses(groupId, period),
+    getSettlements(groupId),
+  ]);
 
   const result = calculateBalances(members, expenses, settlements);
   return { success: true, data: result };
