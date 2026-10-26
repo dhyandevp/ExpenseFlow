@@ -1,6 +1,6 @@
 import SEO from "../components/SEO";
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, CircleAlert } from "lucide-react";
 import { useSession } from "@clerk/clerk-react";
@@ -9,6 +9,7 @@ import { joinGroupByCode } from "../api/client";
 
 function JoinGroup() {
   const { code } = useParams();
+  const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { session } = useSession();
   const { setCurrentGroup } = useGroup();
@@ -34,7 +35,11 @@ function JoinGroup() {
         ]);
         if (!isMounted) return;
         setCurrentGroup(res.data);
-        navigate(`/group/${code.toUpperCase()}/dashboard`, { replace: true });
+        const returnUrl = searchParams.get("returnUrl");
+        const safeTarget = returnUrl && returnUrl.startsWith(`/group/${code.toUpperCase()}`)
+          ? returnUrl
+          : `/group/${code.toUpperCase()}/dashboard`;
+        navigate(safeTarget, { replace: true });
       } catch (err) {
         if (!isMounted) return;
         setLoading(false);
@@ -54,7 +59,7 @@ function JoinGroup() {
     return () => {
       isMounted = false;
     };
-  }, [code, navigate, setCurrentGroup, session]);
+  }, [code, navigate, setCurrentGroup, session, searchParams]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">

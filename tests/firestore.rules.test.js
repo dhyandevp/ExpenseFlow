@@ -49,7 +49,7 @@ describe("Firestore Security Rules", () => {
 
     it("Clerk user can create a group", async () => {
       const db = clerkDb("user1");
-      await assertSucceeds(db.collection("groups").doc("group1").set({ name: "Test Group", allowedUsers: ["user1"] }));
+      await assertSucceeds(db.collection("groups").doc("group1").set({ name: "Test Group", createdBy: "user1", memberUserIds: ["user1"] }));
     });
 
     it("Guest user cannot create a group", async () => {

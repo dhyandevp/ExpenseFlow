@@ -42,9 +42,10 @@ export default function AppLayout({ children }) {
 
   useEffect(() => {
     if (code && (!currentGroup || currentGroup.code !== code)) {
-      navigate(`/join/${code}`, { replace: true });
+      const returnUrl = location.pathname + location.search;
+      navigate(`/join/${code}?returnUrl=${encodeURIComponent(returnUrl)}`, { replace: true });
     }
-  }, [code, currentGroup, navigate]);
+  }, [code, currentGroup, location, navigate]);
 
   if (!currentGroup) {
     if (code) return null;

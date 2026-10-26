@@ -9,21 +9,8 @@ import {
   setDoc
 } from '../_lib/firebase-rest.js';
 
-// Exported for backward-compatibility with tests
-export async function initFirebase(requestId) {
-  if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-    try {
-      const appMod = 'firebase-admin/app';
-      const { initializeApp, cert, getApps } = await import(/* @vite-ignore */ appMod);
-      if (getApps().length === 0 && process.env.FIREBASE_SERVICE_ACCOUNT_B64) {
-        const sa = parseServiceAccount(process.env.FIREBASE_SERVICE_ACCOUNT_B64);
-        initializeApp({ credential: cert(sa) });
-      }
-    } catch (e) {
-      // Ignored in non-test / workers environments
-    }
-  }
-}
+// Exported for backward-compatibility with tests (no-op in unified architecture)
+export async function initFirebase() {}
 
 /**
  * Core handler logic returning { status, headers, body }
@@ -70,8 +57,8 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
     };
   }
 
-  const ip = headers['x-forwarded-for']?.split(',')[0].trim() ||
-             headers['cf-connecting-ip'] ||
+  const ip = headers['cf-connecting-ip'] ||
+             headers['x-forwarded-for']?.split(',')[0].trim() ||
              headers['x-real-ip'] ||
              '127.0.0.1';
 
@@ -152,80 +139,6 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
 
     const now = Date.now();
 
-    // In Vitest test environment with mocked firebase-admin:
-    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-      await initFirebase(requestId);
-      const fsMod = 'firebase-admin/firestore';
-      const { getFirestore } = await import(/* @vite-ignore */ fsMod);
-      const db = getFirestore();
-
-      const rateLimitRef = db.collection('rateLimits').doc(ip);
-      const rateLimitDoc = await rateLimitRef.get();
-      let attempts = [];
-      let blockUntil = 0;
-
-      if (rateLimitDoc.exists) {
-        const data = rateLimitDoc.data();
-        attempts = data.attempts || [];
-        blockUntil = data.blockUntil || 0;
-
-        if (now < blockUntil) {
-          logger.warn('rate_limit_triggered', { requestId, ip, blockUntil });
-          return {
-            status: 429,
-            headers: corsHeaders,
-            body: JSON.stringify({ error: 'Too many attempts. Please try again later.', blockUntil, requestId })
-          };
-        }
-
-        attempts = attempts.filter(time => now - time < 15 * 60 * 1000);
-      }
-
-      if (attempts.length >= 10) {
-        logger.warn('rate_limit_triggered', { requestId, ip, reason: '10_attempts_in_15_mins' });
-        return {
-          status: 429,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Rate limit exceeded (10 attempts / 15 mins)', requestId })
-        };
-      }
-
-      logger.info('guest_group_lookup', { requestId, groupCodeLength: code.length });
-      const cleanCode = code.trim().toUpperCase();
-      const groupsSnapshot = await db.collection('groups').where('code', '==', cleanCode).limit(1).get();
-
-      if (groupsSnapshot.empty) {
-        attempts.push(now);
-        await rateLimitRef.set({ attempts, blockUntil });
-        logger.warn('guest_auth_failure', { requestId, reason: 'group_not_found' });
-        logger.warn('request_completed', { requestId, status: 404, route, method, durationMs: Date.now() - startTime });
-        return {
-          status: 404,
-          headers: corsHeaders,
-          body: JSON.stringify({ error: 'Group not found', requestId })
-        };
-      }
-
-      const groupDoc = groupsSnapshot.docs[0];
-      const groupId = groupDoc.id;
-      await rateLimitRef.set({ attempts, blockUntil: 0 });
-
-      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)).replace(/-/g, '');
-      const firebaseToken = await createFirebaseCustomToken(sa, guestUid, {
-        guestGroupId: groupId,
-        mode: 'guest'
-      });
-
-      logger.info('guest_auth_success', { requestId, groupId, guestUid });
-      logger.info('request_completed', { requestId, status: 200, route, method, durationMs: Date.now() - startTime });
-      return {
-        status: 200,
-        headers: corsHeaders,
-        body: JSON.stringify({ firebaseToken, groupId, expiresIn: 3600, requestId })
-      };
-    }
-
-    // Cloudflare Workers / Production path using Firestore REST API
     if (!sa) {
       logger.error('missing_service_account', { requestId, expectedProjectId });
       return {
@@ -280,7 +193,9 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
         attempts.push(now);
         try {
           await setDoc(sa, rateLimitPath, { attempts, blockUntil });
-        } catch (e) {}
+        } catch (e) {
+          logger.warn('rate_limit_save_failed', { requestId, error: e?.message });
+        }
         logger.warn('guest_auth_failure', { requestId, reason: 'group_not_found' });
         logger.warn('request_completed', { requestId, status: 404, route, method, durationMs: Date.now() - startTime });
         return {
@@ -293,7 +208,9 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
       const groupId = group.id;
       try {
         await setDoc(sa, rateLimitPath, { attempts, blockUntil: 0 });
-      } catch (e) {}
+      } catch (e) {
+        logger.warn('rate_limit_save_failed', { requestId, error: e?.message });
+      }
 
       const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)).replace(/-/g, '');
       const firebaseToken = await createFirebaseCustomToken(sa, guestUid, {
