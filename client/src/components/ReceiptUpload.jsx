@@ -2,9 +2,10 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Upload, X, Paperclip, Image as ImageIcon } from "lucide-react";
 import { useReceiptUpload } from "../hooks/useReceiptUpload";
+import { transformReceiptThumbnail, transformReceiptLightbox } from "../utils/cloudinary";
 
-export default function ReceiptUpload({ value, onChange }) {
-  const { uploadReceipt, isUploading, progress, error: uploadError } = useReceiptUpload();
+export default function ReceiptUpload({ groupId, value, onChange }) {
+  const { uploadReceipt, isUploading, progress, error: uploadError } = useReceiptUpload(groupId);
   const [preview, setPreview] = useState(value || null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -12,9 +13,14 @@ export default function ReceiptUpload({ value, onChange }) {
     if (!file) return;
 
     try {
-      const url = await uploadReceipt(file);
+      const res = await uploadReceipt(file);
+      const url = typeof res === "string" ? res : res.url;
+      const publicId = res?.publicId || null;
+      const assetId = res?.assetId || null;
       setPreview(url);
-      onChange(url);
+      if (typeof onChange === "function") {
+        onChange({ receiptUrl: url, receiptPublicId: publicId, receiptAssetId: assetId, url });
+      }
     } catch (err) {
       // Error is handled by the hook
     }
@@ -29,7 +35,9 @@ export default function ReceiptUpload({ value, onChange }) {
 
   const handleRemove = () => {
     setPreview(null);
-    onChange(null);
+    if (typeof onChange === "function") {
+      onChange({ receiptUrl: null, receiptPublicId: null, receiptAssetId: null, url: null });
+    }
   };
 
   return (
@@ -113,11 +121,8 @@ export default function ReceiptUpload({ value, onChange }) {
 // Small thumbnail indicator for expense list items that have a receipt
 export function ReceiptIndicator({ receiptUrl, onClick }) {
   if (!receiptUrl) return null;
-  
-  // Apply Cloudinary transformation for a tiny thumbnail if it's a Cloudinary URL
-  const thumbUrl = receiptUrl.includes("/upload/") 
-    ? receiptUrl.replace("/upload/", "/upload/w_64,h_64,c_fill,f_auto,q_auto/")
-    : receiptUrl;
+
+  const thumbUrl = transformReceiptThumbnail(receiptUrl);
 
   return (
     <button
@@ -134,6 +139,8 @@ export function ReceiptIndicator({ receiptUrl, onClick }) {
 // Lightbox modal for viewing receipt images
 export function ReceiptLightbox({ receiptUrl, onClose }) {
   if (!receiptUrl) return null;
+  const displayUrl = transformReceiptLightbox(receiptUrl);
+
   return (
     <AnimatePresence>
       <motion.div
@@ -151,7 +158,7 @@ export function ReceiptLightbox({ receiptUrl, onClose }) {
           onClick={(e) => e.stopPropagation()}
         >
           <img
-            src={receiptUrl}
+            src={displayUrl}
             alt="Receipt"
             loading="lazy"
             className="rounded-2xl shadow-xl max-h-[80vh] object-contain"

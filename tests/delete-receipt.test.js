@@ -162,49 +162,27 @@ describe('DELETE /api/cloudinary/receipt', () => {
     expect(firebaseRest.setDoc).not.toHaveBeenCalled();
   });
 
-  it('supports unattached/orphaned upload cleanup when publicId is provided without expenseId', async () => {
-    clerkBackend.verifyToken.mockResolvedValue({ sub: 'user_owner' });
+  it('rejects deletion with publicId only and enforces expenseId (prevents intra-group asset deletion)', async () => {
+    clerkBackend.verifyToken.mockResolvedValue({ sub: 'user_member' });
     firebaseRest.getDoc.mockResolvedValueOnce({
       id: 'grp_1',
       createdBy: 'user_owner',
-      memberUserIds: ['user_owner']
+      memberUserIds: ['user_member', 'user_owner']
     });
-    cloudinaryUtil.destroyCloudinaryAsset.mockResolvedValue({ success: true, result: 'ok' });
 
+    // Attacker tries to supply publicId directly to delete another member's receipt
     const res = await handleDeleteReceiptRequest({
       method: 'DELETE',
       headers: { authorization: 'Bearer token' },
-      body: { groupId: 'grp_1', publicId: 'expenseflow/groups/grp_1/receipts/unattached_123' },
+      body: { groupId: 'grp_1', publicId: 'expenseflow/groups/grp_1/receipts/victim_asset' },
       env,
-      requestId: 'req_orphan'
-    });
-
-    expect(res.status).toBe(200);
-    const body = JSON.parse(res.body);
-    expect(body.success).toBe(true);
-    expect(body.unattached).toBe(true);
-    expect(cloudinaryUtil.destroyCloudinaryAsset).toHaveBeenCalledWith(expect.objectContaining({
-      publicId: 'expenseflow/groups/grp_1/receipts/unattached_123'
-    }));
-  });
-
-  it('rejects unattached upload cleanup if publicId does not belong to verified group namespace', async () => {
-    clerkBackend.verifyToken.mockResolvedValue({ sub: 'user_owner' });
-    firebaseRest.getDoc.mockResolvedValueOnce({
-      id: 'grp_1',
-      createdBy: 'user_owner',
-      memberUserIds: ['user_owner']
-    });
-
-    const res = await handleDeleteReceiptRequest({
-      method: 'DELETE',
-      headers: { authorization: 'Bearer token' },
-      body: { groupId: 'grp_1', publicId: 'expenseflow/groups/other_grp/receipts/unattached_123' },
-      env,
-      requestId: 'req_tamper'
+      requestId: 'req_exploit'
     });
 
     expect(res.status).toBe(400);
+    const body = JSON.parse(res.body);
+    expect(body.error).toBe('Valid expenseId is required');
     expect(cloudinaryUtil.destroyCloudinaryAsset).not.toHaveBeenCalled();
+    expect(firebaseRest.setDoc).not.toHaveBeenCalled();
   });
 });

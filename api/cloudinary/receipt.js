@@ -38,7 +38,7 @@ export async function handleDeleteReceiptRequest({ method, headers, body, env, r
       return { status: 401, headers: corsHeaders, body: JSON.stringify({ error: 'Invalid Clerk token', requestId }) };
     }
 
-    const { groupId, expenseId, publicId } = body || {};
+    const { groupId, expenseId } = body || {};
     if (!groupId || !ID_RE.test(groupId)) {
       return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Valid groupId is required', requestId }) };
     }
@@ -64,30 +64,7 @@ export async function handleDeleteReceiptRequest({ method, headers, body, env, r
     const apiKey = env?.CLOUDINARY_API_KEY || (typeof process !== 'undefined' ? process.env?.CLOUDINARY_API_KEY : null);
     const apiSecret = env?.CLOUDINARY_API_SECRET || (typeof process !== 'undefined' ? process.env?.CLOUDINARY_API_SECRET : null);
 
-    // Case 2: Unattached/orphaned upload cleanup (no expenseId, explicit publicId)
-    if (!expenseId && publicId) {
-      if (!validateReceiptPublicId(publicId, groupId)) {
-        logger.error('unattached_public_id_invalid_for_group', { requestId, groupId, publicId });
-        return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Receipt public ID is invalid for this group', requestId }) };
-      }
-
-      const destroyRes = await destroyCloudinaryAsset({
-        cloudName,
-        apiKey,
-        apiSecret,
-        publicId
-      });
-
-      if (!destroyRes.success) {
-        logger.error('cloudinary_unattached_destroy_failed', { requestId, groupId, publicId, error: destroyRes.error });
-        return { status: 502, headers: corsHeaders, body: JSON.stringify({ error: 'Failed to delete receipt image', requestId }) };
-      }
-
-      logger.info('unattached_receipt_cleaned_up', { requestId, groupId, publicId });
-      return { status: 200, headers: corsHeaders, body: JSON.stringify({ success: true, unattached: true, requestId }) };
-    }
-
-    // Case 1: Authoritative expense receipt deletion
+    // Authoritative expense receipt deletion: requires verified expenseId
     if (!expenseId || !ID_RE.test(expenseId)) {
       return { status: 400, headers: corsHeaders, body: JSON.stringify({ error: 'Valid expenseId is required', requestId }) };
     }
