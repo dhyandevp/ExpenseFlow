@@ -42,8 +42,5 @@ if (import.meta.env.VITE_USE_EMULATOR === 'true') {
 }
 
 const auth = getAuth(app);
-if (import.meta.env.DEV) {
-  window.__FIREBASE_AUTH__ = auth;
-}
 
 export { db, app };

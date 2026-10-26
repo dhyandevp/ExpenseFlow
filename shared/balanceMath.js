@@ -5,6 +5,14 @@
  * the need for serverless functions and dynamic database triggers. 
  */
 
+function resolveSplitMembers(expense, memberIds, allMemberIds) {
+  if (expense.split_members && expense.split_members.length > 0) {
+    const validSplit = expense.split_members.filter(id => memberIds.has(String(id)));
+    return validSplit.length > 0 ? validSplit : [expense.paidBy];
+  }
+  return allMemberIds;
+}
+
 export function calculateBalances(members, expenses, settlements = []) {
   const paidMap = {};
   const shareMap = {};
@@ -20,18 +28,17 @@ export function calculateBalances(members, expenses, settlements = []) {
   }
 
   // Aggregate expenses per expense instead of globally
-  const memberIds = new Set(members.map(m => m.id));
+  const memberIds = new Set(members.map(m => String(m.id)));
+  const allMemberIds = members.map(m => m.id);
   for (const e of expenses) {
     const payer = e.paidBy;
     // Skip ghost members (deleted members referenced by old expenses)
-    if (!memberIds.has(payer)) continue;
+    if (!memberIds.has(String(payer))) continue;
     paidMap[payer] = (paidMap[payer] || 0) + e.amount;
     totalExpenses += e.amount;
 
     // Handle split logic
-    // Default to all members if split_members is undefined or empty
-    let splitBetween = e.split_members && e.split_members.length > 0 ? e.split_members : members.map(m => m.id);
-    
+    const splitBetween = resolveSplitMembers(e, memberIds, allMemberIds);
     const splitCount = splitBetween.length;
     if (splitCount > 0) {
       const shareAmount = e.amount / splitCount;
@@ -41,8 +48,9 @@ export function calculateBalances(members, expenses, settlements = []) {
     }
   }
 
-  // Aggregate settlements
+  // Aggregate settlements (skip settlements referencing deleted members, handle string or numeric IDs)
   for (const s of settlements) {
+    if (!memberIds.has(String(s.from_member)) || !memberIds.has(String(s.to_member))) continue;
     sentMap[s.from_member] = (sentMap[s.from_member] || 0) + s.amount;
     receivedMap[s.to_member] = (receivedMap[s.to_member] || 0) + s.amount;
   }
@@ -127,10 +135,12 @@ function calculateSettlementSuggestions(balances) {
 }
 
 export function calculateCategoryBreakdown(members, expenses) {
+  const memberIds = new Set(members.map(m => String(m.id)));
   const breakdown = {};
   const totalPerCategory = {};
 
   for (const e of expenses) {
+    if (!memberIds.has(String(e.paidBy))) continue;
     totalPerCategory[e.category] = (totalPerCategory[e.category] || 0) + e.amount;
   }
 
@@ -147,6 +157,7 @@ export function calculateCategoryBreakdown(members, expenses) {
   }
 
   for (const e of expenses) {
+    if (!memberIds.has(String(e.paidBy))) continue;
     if (breakdown[e.category]) {
       const payer = e.paidBy;
       if (breakdown[e.category].members[payer]) {
@@ -189,11 +200,13 @@ export function calculateCategoryBreakdown(members, expenses) {
 }
 
 export function calculateFairnessScore(members, expenses, { currency = '₹' } = {}) {
-  const totalExpenses = expenses.reduce((s, e) => s + e.amount, 0);
+  const memberIds = new Set(members.map(m => String(m.id)));
+  const allMemberIds = members.map(m => m.id);
+  let totalExpenses = 0;
 
   const memberPaid = {};
   const memberFairShare = {};
-  
+
   for (const m of members) {
     memberPaid[m.id] = 0;
     memberFairShare[m.id] = 0;
@@ -201,9 +214,11 @@ export function calculateFairnessScore(members, expenses, { currency = '₹' } =
 
   for (const e of expenses) {
     const payer = e.paidBy;
+    if (!memberIds.has(String(payer))) continue;
     memberPaid[payer] = (memberPaid[payer] || 0) + e.amount;
+    totalExpenses += e.amount;
 
-    let splitBetween = e.split_members && e.split_members.length > 0 ? e.split_members : members.map(m => m.id);
+    const splitBetween = resolveSplitMembers(e, memberIds, allMemberIds);
     const splitCount = splitBetween.length;
     if (splitCount > 0) {
       const shareAmount = e.amount / splitCount;

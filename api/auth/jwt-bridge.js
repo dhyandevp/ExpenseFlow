@@ -212,7 +212,7 @@ export async function handleJwtBridgeRequest({ method, headers, getBody, query, 
         logger.warn('rate_limit_save_failed', { requestId, error: e?.message });
       }
 
-      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)).replace(/-/g, '');
+      const guestUid = 'guest_' + (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : crypto.randomUUID()).replace(/-/g, '');
       const firebaseToken = await createFirebaseCustomToken(sa, guestUid, {
         guestGroupId: groupId,
         mode: 'guest'

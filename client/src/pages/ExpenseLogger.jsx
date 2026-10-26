@@ -8,6 +8,7 @@ import {
   ReceiptText,
 } from "lucide-react";
 import { useGroup } from "../App";
+import { useAuth } from "../hooks/useAuth";
 import { getExpenses, createExpense, deleteExpense, getBalances } from "../api/client";
 import { formatINR as formatCurrency } from "../utils/formatCurrency";
 import ExpenseForm from "../components/ExpenseForm";
@@ -21,6 +22,7 @@ import { getCategoryColor } from "../../../shared/fairness";
 
 function ExpenseLogger() {
   const { currentGroup, setCurrentGroup } = useGroup();
+  const { isLoaded: isAuthLoaded, firebaseUser } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const { code } = useParams();
@@ -56,7 +58,7 @@ function ExpenseLogger() {
   }, [currentGroup, code, navigate]);
 
   const loadData = useCallback(async () => {
-    if (!currentGroup) return;
+    if (!currentGroup || !firebaseUser) return;
     setLoading(true);
     setError(null);
     try {
@@ -78,11 +80,13 @@ function ExpenseLogger() {
     } finally {
       setLoading(false);
     }
-  }, [currentGroup, filterCategory, filterMember]);
+  }, [currentGroup, firebaseUser, filterCategory, filterMember]);
 
   useEffect(() => {
-    loadData();
-  }, [loadData]);
+    if (isAuthLoaded && firebaseUser && currentGroup) {
+      loadData();
+    }
+  }, [loadData, isAuthLoaded, firebaseUser, currentGroup]);
 
   const handleAddExpense = async (data) => {
     try {

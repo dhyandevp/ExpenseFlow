@@ -72,5 +72,13 @@ describe('Cloudflare Worker Host Dispatch & Edge Routing', () => {
     const text = await res.text();
     expect(text).toBe('SPA index.html');
   });
+
+  it('applies security headers (nosniff, DENY, strict-origin-when-cross-origin)', async () => {
+    const req = new Request('https://expenseflow.site/robots.txt');
+    const res = await worker.fetch(req, mockEnv);
+    expect(res.headers.get('X-Content-Type-Options')).toBe('nosniff');
+    expect(res.headers.get('X-Frame-Options')).toBe('DENY');
+    expect(res.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin');
+  });
 });
 
