@@ -1,16 +1,31 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useGroup } from "../../App";
 import { joinGroupByCode } from "../../api/client";
+import { validateReturnUrl } from "../../lib/safeRedirect";
 
-export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
+export default function GuestJoinModal({ isOpen, onClose, defaultCode = "", returnUrl = null }) {
   const [code, setCode] = useState(defaultCode);
   const [errorMsg, setErrorMsg] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { setCurrentGroup } = useGroup();
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      if (defaultCode) setCode(defaultCode);
+      setErrorMsg("");
+    }
+  }, [isOpen, defaultCode]);
 
   const handleSubmit = async (e) => {
     if (e && e.preventDefault) e.preventDefault();
@@ -37,12 +52,24 @@ export default function GuestJoinModal({ isOpen, onClose, defaultCode = "" }) {
 
       setCurrentGroup(res.data);
       onClose();
-      navigate(`/group/${cleanCode}/dashboard`);
+
+      const defaultTarget = `/group/${cleanCode}/dashboard`;
+      const validated = validateReturnUrl(returnUrl, defaultTarget);
+      const upperPath = validated.toUpperCase();
+      const targetUrl = (upperPath === `/GROUP/${cleanCode}` || upperPath.startsWith(`/GROUP/${cleanCode}/`))
+        ? validated
+        : defaultTarget;
+
+      navigate(targetUrl);
     } catch (err) {
       clearTimeout(timeoutId);
-      setErrorMsg(err.message || "Failed to join group");
+      if (isMountedRef.current) {
+        setErrorMsg(err.message || "Failed to join group");
+      }
     } finally {
-      setIsLoading(false);
+      if (isMountedRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 

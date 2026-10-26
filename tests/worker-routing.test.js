@@ -65,12 +65,53 @@ describe('Cloudflare Worker Host Dispatch & Edge Routing', () => {
     expect(res.headers.get('Location')).toBe('http://app.localhost:5173/group/ABC/dashboard?tab=1');
   });
 
+  it('returns 404 for sitemap.xml on app host', async () => {
+    const req = new Request('https://app.expenseflow.site/sitemap.xml');
+    const res = await worker.fetch(req, mockEnv);
+    expect(res.status).toBe(404);
+  });
+
   it('serves SPA assets without redirect on app domain product routes', async () => {
     const req = new Request('https://app.expenseflow.site/home');
     const res = await worker.fetch(req, mockEnv);
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text).toBe('SPA index.html');
+  });
+
+  it('handles CORS OPTIONS preflight on /api/cloudinary/sign-upload and /api/cloudinary/receipt', async () => {
+    const reqSign = new Request('https://app.expenseflow.site/api/cloudinary/sign-upload', {
+      method: 'OPTIONS',
+      headers: { Origin: 'https://app.expenseflow.site' }
+    });
+    const resSign = await worker.fetch(reqSign, mockEnv);
+    expect(resSign.status).toBe(204);
+    expect(resSign.headers.get('Access-Control-Allow-Origin')).toBe('https://app.expenseflow.site');
+
+    const reqDel = new Request('https://app.expenseflow.site/api/cloudinary/receipt', {
+      method: 'OPTIONS',
+      headers: { Origin: 'https://app.expenseflow.site' }
+    });
+    const resDel = await worker.fetch(reqDel, mockEnv);
+    expect(resDel.status).toBe(204);
+  });
+
+  it('dispatches to Cloudinary endpoints returning 401 without auth', async () => {
+    const reqSign = new Request('https://app.expenseflow.site/api/cloudinary/sign-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ groupId: 'grp1' })
+    });
+    const resSign = await worker.fetch(reqSign, mockEnv);
+    expect(resSign.status).toBe(401);
+
+    const reqDel = new Request('https://app.expenseflow.site/api/cloudinary/receipt', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ groupId: 'grp1', expenseId: 'exp1' })
+    });
+    const resDel = await worker.fetch(reqDel, mockEnv);
+    expect(resDel.status).toBe(401);
   });
 
   it('applies security headers (nosniff, DENY, strict-origin-when-cross-origin)', async () => {
@@ -81,4 +122,5 @@ describe('Cloudflare Worker Host Dispatch & Edge Routing', () => {
     expect(res.headers.get('Referrer-Policy')).toBe('strict-origin-when-cross-origin');
   });
 });
+
 

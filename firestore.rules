@@ -24,7 +24,8 @@ service cloud.firestore {
 
     function isMemberOfGroup(groupId) {
       let groupData = get(/databases/$(database)/documents/groups/$(groupId)).data;
-      return !('memberUserIds' in groupData) || request.auth.uid in groupData.memberUserIds;
+      return ('memberUserIds' in groupData && request.auth.uid in groupData.memberUserIds)
+          || ('allowedUsers' in groupData && request.auth.uid in groupData.allowedUsers);
     }
 
     function canAccessGroup(groupId) {

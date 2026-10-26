@@ -3,6 +3,8 @@ import handleJwtBridge from './api/auth/jwt-bridge.js';
 import handleClerkWebhook from './api/clerk-webhook.js';
 import handleDeleteGroup from './api/delete-group.js';
 import handleJoinGroup from './api/join-group.js';
+import handleSignUpload from './api/cloudinary/sign-upload.js';
+import handleDeleteReceipt from './api/cloudinary/receipt.js';
 import { getCorsHeaders } from './api/_lib/cors.js';
 
 // Product routes that should redirect from marketing to app domain
@@ -55,7 +57,7 @@ async function handleRequest(request, env, ctx) {
   const isApp = isAppHostname(hostname);
   const isMarketing = isMarketingHostname(hostname);
 
-  // 1. Robots.txt Host Dispatch
+  // 1. Robots.txt & Sitemap Host Dispatch
   if (pathname === '/robots.txt') {
     if (isApp) {
       return new Response('User-agent: *\nDisallow: /\n', {
@@ -75,6 +77,10 @@ async function handleRequest(request, env, ctx) {
         'Cache-Control': 'public, max-age=3600',
       },
     });
+  }
+
+  if (pathname === '/sitemap.xml' && isApp) {
+    return new Response('Not found', { status: 404 });
   }
 
   // 2. Global CORS preflight for all /api endpoints
@@ -100,6 +106,12 @@ async function handleRequest(request, env, ctx) {
   }
   if (pathname === '/api/join-group') {
     return handleJoinGroup(request, env, ctx);
+  }
+  if (pathname === '/api/cloudinary/sign-upload') {
+    return handleSignUpload(request, env, ctx);
+  }
+  if (pathname === '/api/cloudinary/receipt') {
+    return handleDeleteReceipt(request, env, ctx);
   }
 
   // 4. Edge Redirect: Marketing host accessing product route -> redirect to app domain

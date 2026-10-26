@@ -73,27 +73,6 @@ export async function handleClerkWebhookRequest({ method, headers, rawBody, env,
     try {
       logger.info('webhook_processing_started', { requestId, type: eventType, userId: id });
 
-      // Vitest / test environment path
-      if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-        const appMod = 'firebase-admin/app';
-        const fsMod = 'firebase-admin/firestore';
-        const { initializeApp, cert, getApps } = await import(/* @vite-ignore */ appMod);
-        const { getFirestore } = await import(/* @vite-ignore */ fsMod);
-
-        if (getApps().length === 0) {
-          const sa = parseServiceAccount(process.env.FIREBASE_SERVICE_ACCOUNT_B64);
-          initializeApp({ credential: cert(sa) });
-        }
-        const db = getFirestore();
-        const userRef = db.collection('users').doc(id);
-        await userRef.set(userData);
-
-        logger.info('webhook_processed', { requestId, type: eventType, userId: id, action: 'user_created_in_firestore' });
-        logger.info('request_completed', { requestId, status: 200, route, method, durationMs: Date.now() - startTime });
-        return { status: 200, body: JSON.stringify({ message: 'User created in Firestore', requestId }) };
-      }
-
-      // Cloudflare Worker / Production path using Firestore REST API
       const saB64 = env?.FIREBASE_SERVICE_ACCOUNT_B64 || (typeof process !== 'undefined' ? process.env?.FIREBASE_SERVICE_ACCOUNT_B64 : null);
       const sa = parseServiceAccount(saB64);
 

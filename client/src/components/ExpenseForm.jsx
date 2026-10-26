@@ -20,6 +20,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
     split_type: "equal",
     split_members: [],
     receiptUrl: null,
+    receiptPublicId: null,
+    receiptAssetId: null,
   });
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -42,6 +44,9 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
         createdAt: initialData.createdAt,
         split_type: initialData.split_type || "equal",
         split_members: initialData.splits?.map((s) => s.member_id) || [],
+        receiptUrl: initialData.receiptUrl || null,
+        receiptPublicId: initialData.receiptPublicId || null,
+        receiptAssetId: initialData.receiptAssetId || null,
       });
     } else {
       setForm({
@@ -53,6 +58,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
         split_type: "equal",
         split_members: [],
         receiptUrl: null,
+        receiptPublicId: null,
+        receiptAssetId: null,
       });
     }
   }, [initialData, isOpen]);
@@ -86,6 +93,8 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
         createdAt: form.createdAt,
         split_type: form.split_type,
         receiptUrl: form.receiptUrl,
+        receiptPublicId: form.receiptPublicId || null,
+        receiptAssetId: form.receiptAssetId || null,
         split_members:
           form.split_members.length > 0
             ? form.split_members.map(Number)
@@ -277,8 +286,14 @@ export default function ExpenseForm({ isOpen, onClose, onSubmit, initialData }) 
 
               {/* Receipt Upload */}
               <ReceiptUpload
+                groupId={currentGroup?.id}
                 value={form.receiptUrl}
-                onChange={(url) => setForm((f) => ({ ...f, receiptUrl: url }))}
+                onChange={(res) => {
+                  const receiptUrl = typeof res === 'string' ? res : res?.receiptUrl || null;
+                  const receiptPublicId = res?.receiptPublicId || null;
+                  const receiptAssetId = res?.receiptAssetId || null;
+                  setForm((f) => ({ ...f, receiptUrl, receiptPublicId, receiptAssetId }));
+                }}
               />
 
 

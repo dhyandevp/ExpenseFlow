@@ -24,7 +24,7 @@ export function AuthProvider({ children }) {
   const { session } = useSession();
   const clerk = useClerk();
 
-  const [firebaseUser, setFirebaseUser] = useState(null);
+  const [firebaseUser, setFirebaseUser] = useState(() => auth.currentUser);
   const [authMode, setAuthMode] = useState(null); // 'clerk', 'guest', or 'none'
   const [groupAccess, setGroupAccess] = useState(null); // 'all' or specific groupId
   const [userProfile, setUserProfile] = useState(null);
@@ -167,17 +167,19 @@ export function AuthProvider({ children }) {
       await clerk.signOut();
     }
     await firebaseSignOut(auth);
+    setFirebaseUser(null);
     frontLogger.log('sign_out_success');
   };
 
-  // We are fully loaded ONLY if Clerk is loaded, Firebase is loaded, 
+  // We are fully loaded ONLY if Clerk is loaded, Firebase is loaded,
   // there is no pending bridge operation, and the profile state is resolved.
   const isLoaded = isClerkLoaded && isFirebaseLoaded && !isBridgePending && profileStatus !== "loading";
+  const effectiveFirebaseUser = firebaseUser || auth.currentUser;
 
   const refreshProfile = async () => {
-    if (firebaseUser && authMode === 'clerk') {
+    if (effectiveFirebaseUser && authMode === 'clerk') {
       try {
-        const profileRes = await getUserProfile(firebaseUser.uid);
+        const profileRes = await getUserProfile(effectiveFirebaseUser.uid);
         if (profileRes && profileRes.data) {
           setUserProfile(profileRes.data);
           setProfileStatus("complete");
@@ -194,8 +196,8 @@ export function AuthProvider({ children }) {
   return (
     <AuthContext.Provider
       value={{
-        user: clerkUser || firebaseUser,
-        firebaseUser,
+        user: clerkUser || effectiveFirebaseUser,
+        firebaseUser: effectiveFirebaseUser,
         authMode,
         groupAccess,
         signOut,

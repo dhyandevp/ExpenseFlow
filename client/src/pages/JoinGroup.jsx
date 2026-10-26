@@ -1,16 +1,18 @@
 import SEO from "../components/SEO";
 import { useEffect, useState, useRef } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Loader2, CircleAlert } from "lucide-react";
 import { useSession } from "@clerk/clerk-react";
 import { useAuth } from "../hooks/useAuth";
 import { useGroup } from "../App";
 import { joinGroupByCode } from "../api/client";
+import { validateReturnUrl } from "../lib/safeRedirect";
 
 function JoinGroup() {
   const { code } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const { session, isLoaded: isSessionLoaded } = useSession();
   const { isLoaded: isAuthLoaded, firebaseUser } = useAuth();
   const { currentGroup, setCurrentGroup } = useGroup();
@@ -25,6 +27,8 @@ function JoinGroup() {
   }, []);
 
   const cleanCode = (code || "").trim().toUpperCase();
+  const searchParams = new URLSearchParams(location.search);
+  const rawReturnUrl = searchParams.get("returnUrl");
 
   useEffect(() => {
     if (!isSessionLoaded || !isAuthLoaded) return;
@@ -33,9 +37,16 @@ function JoinGroup() {
       return;
     }
 
+    const defaultTarget = `/group/${cleanCode}/dashboard`;
+    const validated = validateReturnUrl(rawReturnUrl, defaultTarget);
+    const upperPath = validated.toUpperCase();
+    const targetUrl = (upperPath === `/GROUP/${cleanCode}` || upperPath.startsWith(`/GROUP/${cleanCode}/`))
+      ? validated
+      : defaultTarget;
+
     // Only skip join if the user already has this group loaded AND has an active Firebase session
     if (currentGroup && currentGroup.code === cleanCode && firebaseUser) {
-      navigate(`/group/${cleanCode}/dashboard`, { replace: true });
+      navigate(targetUrl, { replace: true });
       return;
     }
 
@@ -61,7 +72,7 @@ function JoinGroup() {
         joiningRef.current = null;
         if (!isMountedRef.current) return;
         setCurrentGroup(res.data);
-        navigate(`/group/${cleanCode}/dashboard`, { replace: true });
+        navigate(targetUrl, { replace: true });
       } catch (err) {
         clearTimeout(timeoutId);
         joiningRef.current = null;
@@ -83,7 +94,7 @@ function JoinGroup() {
       clearTimeout(timeoutId);
       clearTimeout(redirectTimer);
     };
-  }, [cleanCode, isSessionLoaded, isAuthLoaded]);
+  }, [cleanCode, isSessionLoaded, isAuthLoaded, rawReturnUrl]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-4">
